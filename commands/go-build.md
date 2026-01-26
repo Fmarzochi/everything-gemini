@@ -43,7 +43,7 @@ go mod tidy -v
 
 ## Example Session
 
-```
+```text
 User: /go-build
 
 Agent:

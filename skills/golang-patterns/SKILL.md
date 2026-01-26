@@ -364,7 +364,7 @@ func WriteAndFlush(w io.Writer, data []byte) error {
 
 ### Standard Project Layout
 
-```
+```text
 myproject/
 ├── cmd/
 │   └── myapp/

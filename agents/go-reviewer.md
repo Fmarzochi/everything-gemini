@@ -224,7 +224,7 @@ When invoked:
 ## Review Output Format
 
 For each issue:
-```
+```text
 [CRITICAL] SQL Injection vulnerability
 File: internal/repository/user.go:42
 Issue: User input directly concatenated into SQL query

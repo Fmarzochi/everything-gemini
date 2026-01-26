@@ -125,7 +125,7 @@ go list -f '{{.ImportPath}} -> {{.Imports}}' ./...
 - Use interfaces to break the cycle
 - Restructure package dependencies
 
-```
+```text
 # Before (cycle)
 package/a -> package/b -> package/a
 
@@ -305,7 +305,7 @@ x = x  // Remove pointless assignment
 
 ## Resolution Workflow
 
-```
+```text
 1. go build ./...
    ↓ Error?
 2. Parse error message
@@ -340,7 +340,7 @@ Stop and report if:
 
 After each fix attempt:
 
-```
+```text
 [FIXED] internal/handler/user.go:42
 Error: undefined: UserService
 Fix: Added import "project/internal/service"
@@ -349,7 +349,7 @@ Remaining errors: 3
 ```
 
 Final summary:
-```
+```text
 Build Status: SUCCESS/FAILED
 Errors Fixed: N
 Vet Warnings Fixed: N

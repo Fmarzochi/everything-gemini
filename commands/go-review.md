@@ -68,7 +68,7 @@ govulncheck ./...
 
 ## Example Usage
 
-```
+```text
 User: /go-review
 
 Agent:
