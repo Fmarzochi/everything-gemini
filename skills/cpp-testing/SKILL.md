@@ -1,72 +1,95 @@
 ---
 name: cpp-testing
-description: C++ testing strategies using GoogleTest/GoogleMock, TDD workflow, CMake/CTest, coverage, sanitizers, and practical testing patterns.
+description: Use only when writing/updating/fixing C++ tests, configuring GoogleTest/CTest, diagnosing failing or flaky tests, or adding coverage/sanitizers.
 ---
 
-# C++ Testing Patterns
+# C++ Testing (Agent Skill)
 
-Actionable, example-driven testing guidance for modern C++ (C++17/20) using GoogleTest/GoogleMock, CMake, and CTest.
+Agent-focused testing workflow for modern C++ (C++17/20) using GoogleTest/GoogleMock with CMake/CTest.
 
-## When to Activate
+## When to Use
 
-- Writing new C++ features or refactoring existing code
-- Designing unit and integration tests for libraries or services
+- Writing new C++ tests or fixing existing tests
+- Designing unit/integration test coverage for C++ components
 - Adding test coverage, CI gating, or regression protection
-- Setting up CMake/CTest workflows for consistent test execution
+- Configuring CMake/CTest workflows for consistent execution
+- Investigating test failures or flaky behavior
+- Enabling sanitizers for memory/race diagnostics
 
-## TDD Workflow for C++
+### When NOT to Use
 
-### The Red-Green-Refactor Loop
+- Implementing new product features without test changes
+- Large-scale refactors unrelated to test coverage or failures
+- Performance tuning without test regressions to validate
+- Non-C++ projects or non-test tasks
 
-1. **RED**: Write a failing test for the new behavior
-2. **GREEN**: Implement the minimal code to pass
-3. **REFACTOR**: Improve the design while keeping tests green
+## Core Concepts
+
+- **TDD loop**: red → green → refactor (tests first, minimal fix, then cleanups).
+- **Isolation**: prefer dependency injection and fakes over global state.
+- **Test layout**: `tests/unit`, `tests/integration`, `tests/testdata`.
+- **Mocks vs fakes**: mock for interactions, fake for stateful behavior.
+- **CTest discovery**: use `gtest_discover_tests()` for stable test discovery.
+- **CI signal**: run subset first, then full suite with `--output-on-failure`.
+
+## TDD Workflow
+
+Follow the RED → GREEN → REFACTOR loop:
+
+1. **RED**: write a failing test that captures the new behavior
+2. **GREEN**: implement the smallest change to pass
+3. **REFACTOR**: clean up while tests stay green
 
 ```cpp
-// calculator_test.cpp
+// tests/add_test.cpp
 #include <gtest/gtest.h>
 
-int Add(int a, int b); // Step 1: declare the behavior
+int Add(int a, int b); // Provided by production code.
 
-TEST(CalculatorTest, AddsTwoNumbers) { // Step 1: RED
+TEST(AddTest, AddsTwoNumbers) { // RED
+  EXPECT_EQ(Add(2, 3), 5);
+}
+
+// src/add.cpp
+int Add(int a, int b) { // GREEN
+  return a + b;
+}
+
+// REFACTOR: simplify/rename once tests pass
+```
+
+## Code Examples
+
+### Basic Unit Test (gtest)
+
+```cpp
+// tests/calculator_test.cpp
+#include <gtest/gtest.h>
+
+int Add(int a, int b); // Provided by production code.
+
+TEST(CalculatorTest, AddsTwoNumbers) {
     EXPECT_EQ(Add(2, 3), 5);
 }
-
-// calculator.cpp
-int Add(int a, int b) { // Step 2: GREEN
-    return a + b;
-}
-
-// Step 3: REFACTOR when needed, keeping tests green
 ```
 
-## Core Patterns
-
-### Basic Test Structure
+### Fixture (gtest)
 
 ```cpp
+// tests/user_store_test.cpp
+// Pseudocode stub: replace UserStore/User with project types.
 #include <gtest/gtest.h>
+#include <memory>
+#include <optional>
+#include <string>
 
-int Clamp(int value, int lo, int hi);
-
-TEST(ClampTest, ReturnsLowerBound) {
-    EXPECT_EQ(Clamp(-1, 0, 10), 0);
-}
-
-TEST(ClampTest, ReturnsUpperBound) {
-    EXPECT_EQ(Clamp(42, 0, 10), 10);
-}
-
-TEST(ClampTest, ReturnsValueInRange) {
-    EXPECT_EQ(Clamp(5, 0, 10), 5);
-}
-```
-
-### Fixtures for Shared Setup
-
-```cpp
-#include <gtest/gtest.h>
-#include "user_store.h"
+struct User { std::string name; };
+class UserStore {
+public:
+    explicit UserStore(std::string /*path*/) {}
+    void Seed(std::initializer_list<User> /*users*/) {}
+    std::optional<User> Find(const std::string &/*name*/) { return User{"alice"}; }
+};
 
 class UserStoreTest : public ::testing::Test {
 protected:
@@ -85,55 +108,13 @@ TEST_F(UserStoreTest, FindsExistingUser) {
 }
 ```
 
-### Parameterized Tests
+### Mock (gmock)
 
 ```cpp
-#include <gtest/gtest.h>
-
-struct Case {
-    int input;
-    int expected;
-};
-
-class AbsTest : public ::testing::TestWithParam<Case> {};
-
-TEST_P(AbsTest, HandlesValues) {
-    auto [input, expected] = GetParam();
-    EXPECT_EQ(std::abs(input), expected);
-}
-
-INSTANTIATE_TEST_SUITE_P(
-    BasicCases,
-    AbsTest,
-    ::testing::Values(
-        Case{-3, 3},
-        Case{0, 0},
-        Case{7, 7}
-    )
-);
-```
-
-### Death Tests (Failure Conditions)
-
-```cpp
-#include <gtest/gtest.h>
-
-void RequirePositive(int value) {
-    if (value <= 0) {
-        std::abort();
-    }
-}
-
-TEST(DeathTest, AbortsOnNonPositive) {
-    ASSERT_DEATH(RequirePositive(0), "");
-}
-```
-
-### GoogleMock for Behavior Verification
-
-```cpp
+// tests/notifier_test.cpp
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <string>
 
 class Notifier {
 public:
@@ -149,9 +130,7 @@ public:
 class Service {
 public:
     explicit Service(Notifier &notifier) : notifier_(notifier) {}
-    void Publish(const std::string &message) {
-        notifier_.Send(message);
-    }
+    void Publish(const std::string &message) { notifier_.Send(message); }
 
 private:
     Notifier &notifier_;
@@ -161,42 +140,15 @@ TEST(ServiceTest, SendsNotifications) {
     MockNotifier notifier;
     Service service(notifier);
 
-    EXPECT_CALL(notifier, Send("hello"))
-        .Times(1);
-
+    EXPECT_CALL(notifier, Send("hello")).Times(1);
     service.Publish("hello");
 }
 ```
 
-### Fakes vs Mocks
-
-- **Fake**: a lightweight in-memory implementation to exercise logic (great for stateful systems)
-- **Mock**: used to assert interactions or order of operations
-
-Prefer fakes for higher signal tests, use mocks only when behavior is the real contract.
-
-## Test Organization
-
-Recommended structure:
-
-```
-project/
-|-- CMakeLists.txt
-|-- include/
-|-- src/
-|-- tests/
-|   |-- unit/
-|   |-- integration/
-|   |-- testdata/
-```
-
-Keep unit tests close to the source, keep integration tests in their own folders, and isolate large fixtures in `testdata/`.
-
-## CMake + CTest Workflow
-
-### FetchContent for GoogleTest/GoogleMock
+### CMake/CTest Quickstart
 
 ```cmake
+# CMakeLists.txt (excerpt)
 cmake_minimum_required(VERSION 3.20)
 project(example LANGUAGES CXX)
 
@@ -204,9 +156,11 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include(FetchContent)
+# Prefer project-locked versions. If using a tag, use a pinned version per project policy.
+set(GTEST_VERSION v1.17.0) # Adjust to project policy.
 FetchContent_Declare(
   googletest
-  URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
+  URL https://github.com/google/googletest/archive/refs/tags/${GTEST_VERSION}.zip
 )
 FetchContent_MakeAvailable(googletest)
 
@@ -214,19 +168,12 @@ add_executable(example_tests
   tests/calculator_test.cpp
   src/calculator.cpp
 )
-
-target_link_libraries(example_tests
-  GTest::gtest
-  GTest::gmock
-  GTest::gtest_main
-)
+target_link_libraries(example_tests GTest::gtest GTest::gmock GTest::gtest_main)
 
 enable_testing()
 include(GoogleTest)
 gtest_discover_tests(example_tests)
 ```
-
-### Configure, Build, Run
 
 ```bash
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
@@ -234,54 +181,66 @@ cmake --build build -j
 ctest --test-dir build --output-on-failure
 ```
 
-### Run a Subset of Tests
+## Running Tests
 
 ```bash
+ctest --test-dir build --output-on-failure
 ctest --test-dir build -R ClampTest
 ctest --test-dir build -R "UserStoreTest.*" --output-on-failure
 ```
 
-## Coverage Workflows
+```bash
+./build/example_tests --gtest_filter=ClampTest.*
+./build/example_tests --gtest_filter=UserStoreTest.FindsExistingUser
+```
 
-### GCC + gcov + lcov
+## Debugging Failures
+
+1. Re-run the single failing test with gtest filter.
+2. Add scoped logging around the failing assertion.
+3. Re-run with sanitizers enabled.
+4. Expand to full suite once the root cause is fixed.
+
+## Coverage
+
+Prefer target-level settings instead of global flags.
+
+```cmake
+option(ENABLE_COVERAGE "Enable coverage flags" OFF)
+
+if(ENABLE_COVERAGE)
+  if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+    target_compile_options(example_tests PRIVATE --coverage)
+    target_link_options(example_tests PRIVATE --coverage)
+  elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    target_compile_options(example_tests PRIVATE -fprofile-instr-generate -fcoverage-mapping)
+    target_link_options(example_tests PRIVATE -fprofile-instr-generate)
+  endif()
+endif()
+```
+
+GCC + gcov + lcov:
 
 ```bash
-cmake -S . -B build-cov -DCMAKE_BUILD_TYPE=Debug \
-  -DCMAKE_CXX_FLAGS="--coverage"
+cmake -S . -B build-cov -DENABLE_COVERAGE=ON
 cmake --build build-cov -j
 ctest --test-dir build-cov
-
 lcov --capture --directory build-cov --output-file coverage.info
 lcov --remove coverage.info '/usr/*' --output-file coverage.info
-
 genhtml coverage.info --output-directory coverage
 ```
 
-### LLVM/Clang + llvm-cov
+Clang + llvm-cov:
 
 ```bash
-cmake -S . -B build-llvm -DCMAKE_BUILD_TYPE=Debug \
-  -DCMAKE_CXX_COMPILER=clang++ \
-  -DCMAKE_CXX_FLAGS="-fprofile-instr-generate -fcoverage-mapping"
+cmake -S . -B build-llvm -DENABLE_COVERAGE=ON -DCMAKE_CXX_COMPILER=clang++
 cmake --build build-llvm -j
-
-LLVM_PROFILE_FILE="build-llvm/default.profraw" \
-ctest --test-dir build-llvm
-
+LLVM_PROFILE_FILE="build-llvm/default.profraw" ctest --test-dir build-llvm
 llvm-profdata merge -sparse build-llvm/default.profraw -o build-llvm/default.profdata
-llvm-cov report build-llvm/example_tests \
-  -instr-profile=build-llvm/default.profdata
+llvm-cov report build-llvm/example_tests -instr-profile=build-llvm/default.profdata
 ```
 
 ## Sanitizers
-
-### Common Flags
-
-- AddressSanitizer (ASan): `-fsanitize=address`
-- UndefinedBehaviorSanitizer (UBSan): `-fsanitize=undefined`
-- ThreadSanitizer (TSan): `-fsanitize=thread`
-
-### CMake Toggle Example
 
 ```cmake
 option(ENABLE_ASAN "Enable AddressSanitizer" OFF)
@@ -292,123 +251,22 @@ if(ENABLE_ASAN)
   add_compile_options(-fsanitize=address -fno-omit-frame-pointer)
   add_link_options(-fsanitize=address)
 endif()
-
 if(ENABLE_UBSAN)
   add_compile_options(-fsanitize=undefined -fno-omit-frame-pointer)
   add_link_options(-fsanitize=undefined)
 endif()
-
 if(ENABLE_TSAN)
   add_compile_options(-fsanitize=thread)
   add_link_options(-fsanitize=thread)
 endif()
 ```
 
-Usage:
+## Flaky Tests Guardrails
 
-```bash
-cmake -S . -B build-asan -DENABLE_ASAN=ON
-cmake --build build-asan
-ctest --test-dir build-asan --output-on-failure
-```
-
-## Common Scenarios
-
-### API-Like Boundaries (Interfaces)
-
-```cpp
-class Clock {
-public:
-    virtual ~Clock() = default;
-    virtual std::chrono::system_clock::time_point Now() const = 0;
-};
-
-class SystemClock : public Clock {
-public:
-    std::chrono::system_clock::time_point Now() const override {
-        return std::chrono::system_clock::now();
-    }
-};
-
-class Session {
-public:
-    Session(Clock &clock, std::chrono::seconds ttl)
-        : clock_(clock), ttl_(ttl) {}
-
-    bool IsExpired(std::chrono::system_clock::time_point created) const {
-        return (clock_.Now() - created) > ttl_;
-    }
-
-private:
-    Clock &clock_;
-    std::chrono::seconds ttl_;
-};
-```
-
-### Filesystem Isolation
-
-```cpp
-#include <filesystem>
-#include <gtest/gtest.h>
-
-TEST(FileTest, WritesOutput) {
-    auto temp = std::filesystem::temp_directory_path() / "cpp-testing";
-    std::filesystem::create_directories(temp);
-
-    auto file = temp / "output.txt";
-    std::ofstream out(file);
-    out << "hello";
-    out.close();
-
-    std::ifstream in(file);
-    std::string content;
-    in >> content;
-
-    EXPECT_EQ(content, "hello");
-
-    std::filesystem::remove_all(temp);
-}
-```
-
-### Time-Dependent Logic
-
-```cpp
-class FakeClock : public Clock {
-public:
-    explicit FakeClock(std::chrono::system_clock::time_point now) : now_(now) {}
-    std::chrono::system_clock::time_point Now() const override { return now_; }
-    void Advance(std::chrono::seconds delta) { now_ += delta; }
-
-private:
-    std::chrono::system_clock::time_point now_;
-};
-```
-
-### Concurrency (Deterministic Tests)
-
-```cpp
-#include <condition_variable>
-#include <mutex>
-#include <thread>
-
-TEST(WorkerTest, SignalsCompletion) {
-    std::mutex mu;
-    std::condition_variable cv;
-    bool done = false;
-
-    std::thread worker([&] {
-        std::lock_guard<std::mutex> lock(mu);
-        done = true;
-        cv.notify_one();
-    });
-
-    std::unique_lock<std::mutex> lock(mu);
-    bool ok = cv.wait_for(lock, std::chrono::milliseconds(500), [&] { return done; });
-
-    worker.join();
-    ASSERT_TRUE(ok);
-}
-```
+- Never use `sleep` for synchronization; use condition variables or latches.
+- Make temp directories unique per test and always clean them.
+- Avoid real time, network, or filesystem dependencies in unit tests.
+- Use deterministic seeds for randomized inputs.
 
 ## Best Practices
 
@@ -427,22 +285,38 @@ TEST(WorkerTest, SignalsCompletion) {
 - Don't over-mock simple value objects
 - Don't use brittle string matching for non-critical logs
 
-## Alternatives to GoogleTest
+### Common Pitfalls
 
-- **Catch2**: header-only, expressive matchers, fast setup
-- **doctest**: lightweight, minimal compile overhead
+- **Using fixed temp paths** → Generate unique temp directories per test and clean them.
+- **Relying on wall clock time** → Inject a clock or use fake time sources.
+- **Flaky concurrency tests** → Use condition variables/latches and bounded waits.
+- **Hidden global state** → Reset global state in fixtures or remove globals.
+- **Over-mocking** → Prefer fakes for stateful behavior and only mock interactions.
+- **Missing sanitizer runs** → Add ASan/UBSan/TSan builds in CI.
+- **Coverage on debug-only builds** → Ensure coverage targets use consistent flags.
 
-## Fuzzing and Property Testing
+## Optional Appendix: Fuzzing / Property Testing
 
-- **libFuzzer**: integrate with LLVM; focus on pure functions with minimal I/O
-- **RapidCheck**: property-based testing to validate invariants over many inputs
+Only use if the project already supports LLVM/libFuzzer or a property-testing library.
 
-Minimal libFuzzer harness:
+- **libFuzzer**: best for pure functions with minimal I/O.
+- **RapidCheck**: property-based tests to validate invariants.
+
+Minimal libFuzzer harness (pseudocode: replace ParseConfig):
 
 ```cpp
+#include <cstddef>
+#include <cstdint>
+#include <string>
+
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     std::string input(reinterpret_cast<const char *>(data), size);
-    ParseConfig(input);
+    // ParseConfig(input); // project function
     return 0;
 }
 ```
+
+## Alternatives to GoogleTest
+
+- **Catch2**: header-only, expressive matchers
+- **doctest**: lightweight, minimal compile overhead
