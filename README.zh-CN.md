@@ -171,6 +171,7 @@ everything-claude-code/
 |   |-- verification-loop/          # 持续验证（详细指南）
 |   |-- golang-patterns/            # Go 惯用语和最佳实践（新增）
 |   |-- golang-testing/             # Go 测试模式、TDD、基准测试（新增）
+|   |-- cpp-testing/                # C++ 测试模式、GoogleTest、CMake/CTest（新增）
 |
 |-- commands/         # 用于快速执行的斜杠命令
 |   |-- tdd.md              # /tdd - 测试驱动开发

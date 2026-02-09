@@ -218,6 +218,7 @@ everything-claude-code/
 |   |-- verification-loop/          # Continuous verification (Longform Guide)
 |   |-- golang-patterns/            # Go idioms and best practices
 |   |-- golang-testing/             # Go testing patterns, TDD, benchmarks
+|   |-- cpp-testing/                # C++ testing with GoogleTest, CMake/CTest (NEW)
 |   |-- django-patterns/            # Django patterns, models, views (NEW)
 |   |-- django-security/            # Django security best practices (NEW)
 |   |-- django-tdd/                 # Django TDD workflow (NEW)
