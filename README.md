@@ -368,7 +368,7 @@ Both options create:
 
 ### AgentShield — Security Auditor
 
-> Built at the Claude Code Hackathon (Cerebral Valley x Anthropic, Feb 2026). 387 tests, 98% coverage, 16 static analysis rules.
+> Built at the Claude Code Hackathon (Cerebral Valley x Anthropic, Feb 2026). 487 tests, 98% coverage, 35 static analysis rules.
 
 Scan your Claude Code configuration for vulnerabilities, misconfigurations, and injection risks.
 
@@ -386,7 +386,7 @@ npx ecc-agentshield scan --opus --stream
 npx ecc-agentshield init
 ```
 
-**What it scans:** CLAUDE.md, settings.json, MCP configs, hooks, agent definitions, and skills across 5 categories — secrets detection (11 patterns), permission auditing, hook injection analysis, MCP server risk profiling, and agent config review.
+**What it scans:** CLAUDE.md, settings.json, MCP configs, hooks, agent definitions, and skills across 5 categories — secrets detection (14 patterns), permission auditing, hook injection analysis, MCP server risk profiling, and agent config review.
 
 **The `--opus` flag** runs three Claude Opus 4.6 agents in a red-team/blue-team/auditor pipeline. The attacker finds exploit chains, the defender evaluates protections, and the auditor synthesizes both into a prioritized risk assessment. Adversarial reasoning, not just pattern matching.
 
