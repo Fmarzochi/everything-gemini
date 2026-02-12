@@ -123,6 +123,11 @@ export interface ReadStdinJsonOptions {
    * if stdin never closes. Default: 5000
    */
   timeoutMs?: number;
+  /**
+   * Maximum stdin data size in bytes. Prevents unbounded memory growth.
+   * Default: 1048576 (1MB)
+   */
+  maxSize?: number;
 }
 
 /**

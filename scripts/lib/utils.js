@@ -62,7 +62,7 @@ function ensureDir(dirPath) {
   } catch (err) {
     // EEXIST is fine (race condition with another process creating it)
     if (err.code !== 'EEXIST') {
-      throw err;
+      throw new Error(`Failed to create directory '${dirPath}': ${err.message}`);
     }
   }
   return dirPath;
@@ -140,6 +140,9 @@ function getDateTimeString() {
  * @param {object} options - Options { maxAge: days, recursive: boolean }
  */
 function findFiles(dir, pattern, options = {}) {
+  if (!dir || typeof dir !== 'string') return [];
+  if (!pattern || typeof pattern !== 'string') return [];
+
   const { maxAge = null, recursive = false } = options;
   const results = [];
 
@@ -201,7 +204,7 @@ function findFiles(dir, pattern, options = {}) {
  * @returns {Promise<object>} Parsed JSON object, or empty object if stdin is empty
  */
 async function readStdinJson(options = {}) {
-  const { timeoutMs = 5000 } = options;
+  const { timeoutMs = 5000, maxSize = 1024 * 1024 } = options;
 
   return new Promise((resolve, reject) => {
     let data = '';
@@ -221,7 +224,9 @@ async function readStdinJson(options = {}) {
 
     process.stdin.setEncoding('utf8');
     process.stdin.on('data', chunk => {
-      data += chunk;
+      if (data.length < maxSize) {
+        data += chunk;
+      }
     });
 
     process.stdin.on('end', () => {
@@ -382,9 +387,14 @@ function replaceInFile(filePath, search, replace) {
   const content = readFile(filePath);
   if (content === null) return false;
 
-  const newContent = content.replace(search, replace);
-  writeFile(filePath, newContent);
-  return true;
+  try {
+    const newContent = content.replace(search, replace);
+    writeFile(filePath, newContent);
+    return true;
+  } catch (err) {
+    log(`[Utils] replaceInFile failed for ${filePath}: ${err.message}`);
+    return false;
+  }
 }
 
 /**
@@ -400,11 +410,17 @@ function countInFile(filePath, pattern) {
   if (content === null) return 0;
 
   let regex;
-  if (pattern instanceof RegExp) {
-    // Ensure global flag is set for correct counting
-    regex = pattern.global ? pattern : new RegExp(pattern.source, pattern.flags + 'g');
-  } else {
-    regex = new RegExp(pattern, 'g');
+  try {
+    if (pattern instanceof RegExp) {
+      // Ensure global flag is set for correct counting
+      regex = pattern.global ? pattern : new RegExp(pattern.source, pattern.flags + 'g');
+    } else if (typeof pattern === 'string') {
+      regex = new RegExp(pattern, 'g');
+    } else {
+      return 0;
+    }
+  } catch {
+    return 0; // Invalid regex pattern
   }
   const matches = content.match(regex);
   return matches ? matches.length : 0;
@@ -417,7 +433,12 @@ function grepFile(filePath, pattern) {
   const content = readFile(filePath);
   if (content === null) return [];
 
-  const regex = pattern instanceof RegExp ? pattern : new RegExp(pattern);
+  let regex;
+  try {
+    regex = pattern instanceof RegExp ? pattern : new RegExp(pattern);
+  } catch {
+    return []; // Invalid regex pattern
+  }
   const lines = content.split('\n');
   const results = [];
 

@@ -194,6 +194,10 @@ function setAlias(alias, sessionPath, title = null) {
     return { success: false, error: 'Session path cannot be empty' };
   }
 
+  if (alias.length > 128) {
+    return { success: false, error: 'Alias name cannot exceed 128 characters' };
+  }
+
   if (!/^[a-zA-Z0-9_-]+$/.test(alias)) {
     return { success: false, error: 'Alias name must contain only letters, numbers, dashes, and underscores' };
   }
