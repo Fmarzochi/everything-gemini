@@ -335,8 +335,9 @@ function runTests() {
 
   if (test('returns informative prompt', () => {
     const prompt = pm.getSelectionPrompt();
-    assert.ok(prompt.includes('Available package managers'), 'Should list available managers');
+    assert.ok(prompt.includes('Supported package managers'), 'Should list supported managers');
     assert.ok(prompt.includes('CLAUDE_PACKAGE_MANAGER'), 'Should mention env var');
+    assert.ok(prompt.includes('lock file'), 'Should mention lock file option');
   })) passed++; else failed++;
 
   // Summary
