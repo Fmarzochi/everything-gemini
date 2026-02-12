@@ -464,6 +464,7 @@ node tests/hooks/hooks.test.js
 - **完整指南（進階）：** [Everything Claude Code 完整指南](https://x.com/affaanmustafa/status/2014040193557471352)
 - **追蹤：** [@affaanmustafa](https://x.com/affaanmustafa)
 - **zenith.chat：** [zenith.chat](https://zenith.chat)
+- **技能目錄：** [awesome-agent-skills](https://github.com/JackyST0/awesome-agent-skills)
 
 ---
 
