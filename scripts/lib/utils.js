@@ -35,13 +35,6 @@ function getSessionsDir() {
 }
 
 /**
- * Get the session aliases file path
- */
-function getAliasesPath() {
-  return path.join(getClaudeDir(), 'session-aliases.json');
-}
-
-/**
  * Get the learned skills directory
  */
 function getLearnedSkillsDir() {
@@ -447,7 +440,6 @@ module.exports = {
   getHomeDir,
   getClaudeDir,
   getSessionsDir,
-  getAliasesPath,
   getLearnedSkillsDir,
   getTempDir,
   ensureDir,

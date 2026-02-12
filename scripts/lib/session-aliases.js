@@ -154,6 +154,8 @@ function saveAliases(aliases) {
  * @returns {object|null} Alias data or null if not found
  */
 function resolveAlias(alias) {
+  if (!alias) return null;
+
   // Validate alias name (alphanumeric, dash, underscore)
   if (!/^[a-zA-Z0-9_-]+$/.test(alias)) {
     return null;
@@ -399,6 +401,10 @@ function getAliasesForSession(sessionPath) {
  * @returns {object} Cleanup result
  */
 function cleanupAliases(sessionExists) {
+  if (typeof sessionExists !== 'function') {
+    return { totalChecked: 0, removed: 0, removedAliases: [], error: 'sessionExists must be a function' };
+  }
+
   const data = loadAliases();
   const removed = [];
 
@@ -409,8 +415,8 @@ function cleanupAliases(sessionExists) {
     }
   }
 
-  if (removed.length > 0) {
-    saveAliases(data);
+  if (removed.length > 0 && !saveAliases(data)) {
+    log('[Aliases] Failed to save after cleanup');
   }
 
   return {
