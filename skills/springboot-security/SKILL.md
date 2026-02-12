@@ -42,16 +42,87 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 - Use `@PreAuthorize("hasRole('ADMIN')")` or `@PreAuthorize("@authz.canEdit(#id)")`
 - Deny by default; expose only required scopes
 
+```java
+@RestController
+@RequestMapping("/api/admin")
+public class AdminController {
+
+  @PreAuthorize("hasRole('ADMIN')")
+  @GetMapping("/users")
+  public List<UserDto> listUsers() {
+    return userService.findAll();
+  }
+
+  @PreAuthorize("@authz.isOwner(#id, authentication)")
+  @DeleteMapping("/users/{id}")
+  public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+    userService.delete(id);
+    return ResponseEntity.noContent().build();
+  }
+}
+```
+
 ## Input Validation
 
 - Use Bean Validation with `@Valid` on controllers
 - Apply constraints on DTOs: `@NotBlank`, `@Email`, `@Size`, custom validators
 - Sanitize any HTML with a whitelist before rendering
 
+```java
+// BAD: No validation
+@PostMapping("/users")
+public User createUser(@RequestBody UserDto dto) {
+  return userService.create(dto);
+}
+
+// GOOD: Validated DTO
+public record CreateUserDto(
+    @NotBlank @Size(max = 100) String name,
+    @NotBlank @Email String email,
+    @NotNull @Min(0) @Max(150) Integer age
+) {}
+
+@PostMapping("/users")
+public ResponseEntity<UserDto> createUser(@Valid @RequestBody CreateUserDto dto) {
+  return ResponseEntity.status(HttpStatus.CREATED)
+      .body(userService.create(dto));
+}
+```
+
 ## SQL Injection Prevention
 
 - Use Spring Data repositories or parameterized queries
 - For native queries, use `:param` bindings; never concatenate strings
+
+```java
+// BAD: String concatenation in native query
+@Query(value = "SELECT * FROM users WHERE name = '" + name + "'", nativeQuery = true)
+
+// GOOD: Parameterized native query
+@Query(value = "SELECT * FROM users WHERE name = :name", nativeQuery = true)
+List<User> findByName(@Param("name") String name);
+
+// GOOD: Spring Data derived query (auto-parameterized)
+List<User> findByEmailAndActiveTrue(String email);
+```
+
+## Password Encoding
+
+- Always hash passwords with BCrypt or Argon2 — never store plaintext
+- Use `PasswordEncoder` bean, not manual hashing
+
+```java
+@Bean
+public PasswordEncoder passwordEncoder() {
+  return new BCryptPasswordEncoder(12); // cost factor 12
+}
+
+// In service
+public User register(CreateUserDto dto) {
+  String hashedPassword = passwordEncoder.encode(dto.password());
+  return userRepository.save(new User(dto.email(), hashedPassword));
+}
+```
 
 ## CSRF Protection
 
@@ -70,6 +141,25 @@ http
 - Keep `application.yml` free of credentials; use placeholders
 - Rotate tokens and DB credentials regularly
 
+```yaml
+# BAD: Hardcoded in application.yml
+spring:
+  datasource:
+    password: mySecretPassword123
+
+# GOOD: Environment variable placeholder
+spring:
+  datasource:
+    password: ${DB_PASSWORD}
+
+# GOOD: Spring Cloud Vault integration
+spring:
+  cloud:
+    vault:
+      uri: https://vault.example.com
+      token: ${VAULT_TOKEN}
+```
+
 ## Security Headers
 
 ```java
@@ -82,10 +172,62 @@ http
     .referrerPolicy(rp -> rp.policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.NO_REFERRER)));
 ```
 
+## CORS Configuration
+
+- Configure CORS at the security filter level, not per-controller
+- Restrict allowed origins — never use `*` in production
+
+```java
+@Bean
+public CorsConfigurationSource corsConfigurationSource() {
+  CorsConfiguration config = new CorsConfiguration();
+  config.setAllowedOrigins(List.of("https://app.example.com"));
+  config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
+  config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+  config.setAllowCredentials(true);
+  config.setMaxAge(3600L);
+
+  UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+  source.registerCorsConfiguration("/api/**", config);
+  return source;
+}
+
+// In SecurityFilterChain:
+http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
+```
+
 ## Rate Limiting
 
 - Apply Bucket4j or gateway-level limits on expensive endpoints
 - Log and alert on bursts; return 429 with retry hints
+
+```java
+// Using Bucket4j for per-endpoint rate limiting
+@Component
+public class RateLimitFilter extends OncePerRequestFilter {
+  private final Map<String, Bucket> buckets = new ConcurrentHashMap<>();
+
+  private Bucket createBucket() {
+    return Bucket.builder()
+        .addLimit(Bandwidth.classic(100, Refill.intervally(100, Duration.ofMinutes(1))))
+        .build();
+  }
+
+  @Override
+  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
+      FilterChain chain) throws ServletException, IOException {
+    String clientIp = request.getRemoteAddr();
+    Bucket bucket = buckets.computeIfAbsent(clientIp, k -> createBucket());
+
+    if (bucket.tryConsume(1)) {
+      chain.doFilter(request, response);
+    } else {
+      response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
+      response.getWriter().write("{\"error\": \"Rate limit exceeded\"}");
+    }
+  }
+}
+```
 
 ## Dependency Security
 

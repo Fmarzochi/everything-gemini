@@ -318,7 +318,8 @@ everything-claude-code/
 |-- examples/         # Example configurations and sessions
 |   |-- CLAUDE.md             # Example project-level config
 |   |-- user-CLAUDE.md        # Example user-level config
-|   |-- saas-nextjs-CLAUDE.md # Real-world SaaS (Next.js + Supabase + Stripe)
+|   |-- saas-nextjs-CLAUDE.md   # Real-world SaaS (Next.js + Supabase + Stripe)
+|   |-- go-microservice-CLAUDE.md # Real-world Go microservice (gRPC + PostgreSQL)
 |
 |-- mcp-configs/      # MCP server configurations
 |   |-- mcp-servers.json    # GitHub, Supabase, Vercel, Railway, etc.
