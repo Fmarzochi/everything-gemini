@@ -11,10 +11,13 @@
 
 const fs = require('fs');
 
+const MAX_STDIN = 1024 * 1024; // 1MB limit
 let data = '';
 
 process.stdin.on('data', chunk => {
-  data += chunk;
+  if (data.length < MAX_STDIN) {
+    data += chunk;
+  }
 });
 
 process.stdin.on('end', () => {

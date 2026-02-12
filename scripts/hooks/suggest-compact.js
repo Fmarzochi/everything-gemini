@@ -13,10 +13,10 @@
  * - Compact after completing a milestone, before starting next
  */
 
+const fs = require('fs');
 const path = require('path');
 const {
   getTempDir,
-  readFile,
   writeFile,
   log
 } = require('../lib/utils');
@@ -32,15 +32,27 @@ async function main() {
   let count = 1;
 
   // Read existing count or start at 1
-  const existing = readFile(counterFile);
-  if (existing) {
-    const parsed = parseInt(existing.trim(), 10);
-    // Guard against NaN from corrupted counter file
-    count = Number.isFinite(parsed) ? parsed + 1 : 1;
+  // Use fd-based read+write to reduce (but not eliminate) race window
+  // between concurrent hook invocations
+  try {
+    const fd = fs.openSync(counterFile, 'a+');
+    try {
+      const buf = Buffer.alloc(64);
+      const bytesRead = fs.readSync(fd, buf, 0, 64, 0);
+      if (bytesRead > 0) {
+        const parsed = parseInt(buf.toString('utf8', 0, bytesRead).trim(), 10);
+        count = Number.isFinite(parsed) ? parsed + 1 : 1;
+      }
+      // Truncate and write new value
+      fs.ftruncateSync(fd, 0);
+      fs.writeSync(fd, String(count), 0);
+    } finally {
+      fs.closeSync(fd);
+    }
+  } catch {
+    // Fallback: just use writeFile if fd operations fail
+    writeFile(counterFile, String(count));
   }
-
-  // Save updated count
-  writeFile(counterFile, String(count));
 
   // Suggest compact after threshold tool calls
   if (count === threshold) {

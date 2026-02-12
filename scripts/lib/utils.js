@@ -168,14 +168,19 @@ function findFiles(dir, pattern, options = {}) {
         const fullPath = path.join(currentDir, entry.name);
 
         if (entry.isFile() && regex.test(entry.name)) {
+          let stats;
+          try {
+            stats = fs.statSync(fullPath);
+          } catch {
+            continue; // File deleted between readdir and stat
+          }
+
           if (maxAge !== null) {
-            const stats = fs.statSync(fullPath);
             const ageInDays = (Date.now() - stats.mtimeMs) / (1000 * 60 * 60 * 24);
             if (ageInDays <= maxAge) {
               results.push({ path: fullPath, mtime: stats.mtimeMs });
             }
           } else {
-            const stats = fs.statSync(fullPath);
             results.push({ path: fullPath, mtime: stats.mtimeMs });
           }
         } else if (entry.isDirectory() && recursive) {

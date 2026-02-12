@@ -236,7 +236,7 @@ async function runTests() {
   })) passed++; else failed++;
 
   if (await asyncTest('blocking hooks output BLOCKED message', async () => {
-    // Test the dev server blocking hook
+    // Test the dev server blocking hook — must send a matching command
     const blockingCommand = hooks.hooks.PreToolUse[0].hooks[0].command;
     const match = blockingCommand.match(/^node -e "(.+)"$/s);
 
@@ -248,6 +248,10 @@ async function runTests() {
     let code = null;
     proc.stderr.on('data', data => stderr += data);
 
+    // Send a dev server command so the hook triggers the block
+    proc.stdin.write(JSON.stringify({
+      tool_input: { command: 'npm run dev' }
+    }));
     proc.stdin.end();
 
     await new Promise(resolve => {
@@ -258,7 +262,7 @@ async function runTests() {
     });
 
     assert.ok(stderr.includes('BLOCKED'), 'Blocking hook should output BLOCKED');
-    assert.strictEqual(code, 1, 'Blocking hook should exit with code 1');
+    assert.strictEqual(code, 2, 'Blocking hook should exit with code 2');
   })) passed++; else failed++;
 
   // ==========================================
@@ -271,8 +275,8 @@ async function runTests() {
     assert.strictEqual(result.code, 0, 'Non-blocking hook should exit 0');
   })) passed++; else failed++;
 
-  if (await asyncTest('blocking hooks exit with code 1', async () => {
-    // The dev server blocker always blocks
+  if (await asyncTest('blocking hooks exit with code 2', async () => {
+    // The dev server blocker blocks when a dev server command is detected
     const blockingCommand = hooks.hooks.PreToolUse[0].hooks[0].command;
     const match = blockingCommand.match(/^node -e "(.+)"$/s);
 
@@ -281,6 +285,9 @@ async function runTests() {
     });
 
     let code = null;
+    proc.stdin.write(JSON.stringify({
+      tool_input: { command: 'yarn dev' }
+    }));
     proc.stdin.end();
 
     await new Promise(resolve => {
@@ -290,7 +297,7 @@ async function runTests() {
       });
     });
 
-    assert.strictEqual(code, 1, 'Blocking hook should exit 1');
+    assert.strictEqual(code, 2, 'Blocking hook should exit 2');
   })) passed++; else failed++;
 
   if (await asyncTest('hooks handle missing files gracefully', async () => {

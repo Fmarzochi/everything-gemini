@@ -58,10 +58,6 @@ function getSessionPath(filename) {
  * @returns {string|null} Session content or null if not found
  */
 function getSessionContent(sessionPath) {
-  if (!fs.existsSync(sessionPath)) {
-    return null;
-  }
-
   return readFile(sessionPath);
 }
 
@@ -217,8 +213,14 @@ function getAllSessions(options = {}) {
 
     const sessionPath = path.join(sessionsDir, filename);
 
-    // Get file stats
-    const stats = fs.statSync(sessionPath);
+    // Get file stats (wrapped in try-catch to handle TOCTOU race where
+    // file is deleted between readdirSync and statSync)
+    let stats;
+    try {
+      stats = fs.statSync(sessionPath);
+    } catch {
+      continue; // File was deleted between readdir and stat
+    }
 
     sessions.push({
       ...metadata,
@@ -226,7 +228,7 @@ function getAllSessions(options = {}) {
       hasContent: stats.size > 0,
       size: stats.size,
       modifiedTime: stats.mtime,
-      createdTime: stats.birthtime
+      createdTime: stats.birthtime || stats.ctime
     });
   }
 
@@ -278,14 +280,19 @@ function getSessionById(sessionId, includeContent = false) {
     }
 
     const sessionPath = path.join(sessionsDir, filename);
-    const stats = fs.statSync(sessionPath);
+    let stats;
+    try {
+      stats = fs.statSync(sessionPath);
+    } catch {
+      return null; // File was deleted between readdir and stat
+    }
 
     const session = {
       ...metadata,
       sessionPath,
       size: stats.size,
       modifiedTime: stats.mtime,
-      createdTime: stats.birthtime
+      createdTime: stats.birthtime || stats.ctime
     };
 
     if (includeContent) {
@@ -319,11 +326,12 @@ function getSessionTitle(sessionPath) {
  * @returns {string} Formatted size (e.g., "1.2 KB")
  */
 function getSessionSize(sessionPath) {
-  if (!fs.existsSync(sessionPath)) {
+  let stats;
+  try {
+    stats = fs.statSync(sessionPath);
+  } catch {
     return '0 B';
   }
-
-  const stats = fs.statSync(sessionPath);
   const size = stats.size;
 
   if (size < 1024) return `${size} B`;
@@ -387,7 +395,11 @@ function deleteSession(sessionPath) {
  * @returns {boolean} True if session exists
  */
 function sessionExists(sessionPath) {
-  return fs.existsSync(sessionPath) && fs.statSync(sessionPath).isFile();
+  try {
+    return fs.statSync(sessionPath).isFile();
+  } catch {
+    return false;
+  }
 }
 
 module.exports = {

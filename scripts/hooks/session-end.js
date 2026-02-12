@@ -99,17 +99,24 @@ async function main() {
   const transcriptPath = process.env.CLAUDE_TRANSCRIPT_PATH;
   let summary = null;
 
-  if (transcriptPath && fs.existsSync(transcriptPath)) {
-    summary = extractSessionSummary(transcriptPath);
+  if (transcriptPath) {
+    if (fs.existsSync(transcriptPath)) {
+      summary = extractSessionSummary(transcriptPath);
+    } else {
+      log(`[SessionEnd] Transcript not found: ${transcriptPath}`);
+    }
   }
 
   if (fs.existsSync(sessionFile)) {
     // Update existing session file
-    replaceInFile(
+    const updated = replaceInFile(
       sessionFile,
       /\*\*Last Updated:\*\*.*/,
       `**Last Updated:** ${currentTime}`
     );
+    if (!updated) {
+      log(`[SessionEnd] Failed to update timestamp in ${sessionFile}`);
+    }
 
     // If we have a new summary and the file still has the blank template, replace it
     if (summary) {
