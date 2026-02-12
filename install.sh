@@ -69,6 +69,11 @@ if [[ "$TARGET" == "claude" ]]; then
 
     # Install each requested language
     for lang in "$@"; do
+        # Validate language name to prevent path traversal
+        if [[ ! "$lang" =~ ^[a-zA-Z0-9_-]+$ ]]; then
+            echo "Error: invalid language name '$lang'. Only alphanumeric, dash, and underscore allowed." >&2
+            continue
+        fi
         lang_dir="$RULES_DIR/$lang"
         if [[ ! -d "$lang_dir" ]]; then
             echo "Warning: rules/$lang/ does not exist, skipping." >&2
@@ -101,6 +106,11 @@ if [[ "$TARGET" == "cursor" ]]; then
 
     # Install language-specific rules
     for lang in "$@"; do
+        # Validate language name to prevent path traversal
+        if [[ ! "$lang" =~ ^[a-zA-Z0-9_-]+$ ]]; then
+            echo "Error: invalid language name '$lang'. Only alphanumeric, dash, and underscore allowed." >&2
+            continue
+        fi
         if [[ -d "$CURSOR_SRC/rules" ]]; then
             found=false
             for f in "$CURSOR_SRC/rules"/${lang}-*.md; do

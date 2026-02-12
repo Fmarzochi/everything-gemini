@@ -157,10 +157,10 @@ ${summarySection}
 function buildSummarySection(summary) {
   let section = '## Session Summary\n\n';
 
-  // Tasks (from user messages)
+  // Tasks (from user messages — escape backticks to prevent markdown breaks)
   section += '### Tasks\n';
   for (const msg of summary.userMessages) {
-    section += `- ${msg}\n`;
+    section += `- ${msg.replace(/`/g, '\\`')}\n`;
   }
   section += '\n';
 

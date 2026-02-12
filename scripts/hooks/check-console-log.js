@@ -59,8 +59,8 @@ process.stdin.on('end', () => {
     if (hasConsole) {
       log('[Hook] Remove console.log statements before committing');
     }
-  } catch {
-    // Silently ignore errors (git might not be available, etc.)
+  } catch (err) {
+    log(`[Hook] check-console-log error: ${err.message}`);
   }
 
   // Always output the original data
