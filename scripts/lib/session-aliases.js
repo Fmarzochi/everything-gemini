@@ -189,6 +189,11 @@ function setAlias(alias, sessionPath, title = null) {
     return { success: false, error: 'Alias name cannot be empty' };
   }
 
+  // Validate session path
+  if (!sessionPath || typeof sessionPath !== 'string' || sessionPath.trim().length === 0) {
+    return { success: false, error: 'Session path cannot be empty' };
+  }
+
   if (!/^[a-zA-Z0-9_-]+$/.test(alias)) {
     return { success: false, error: 'Alias name must contain only letters, numbers, dashes, and underscores' };
   }
@@ -325,8 +330,9 @@ function renameAlias(oldAlias, newAlias) {
     };
   }
 
-  // Restore old alias on failure
+  // Restore old alias and remove new alias on failure
   data.aliases[oldAlias] = aliasData;
+  delete data.aliases[newAlias];
   return { success: false, error: 'Failed to rename alias' };
 }
 

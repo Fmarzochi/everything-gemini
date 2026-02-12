@@ -271,7 +271,7 @@ function getSessionById(sessionId, includeContent = false) {
     if (!metadata) continue;
 
     // Check if session ID matches (short ID or full filename without .tmp)
-    const shortIdMatch = metadata.shortId !== 'no-id' && metadata.shortId.startsWith(sessionId);
+    const shortIdMatch = sessionId.length > 0 && metadata.shortId !== 'no-id' && metadata.shortId.startsWith(sessionId);
     const filenameMatch = filename === sessionId || filename === `${sessionId}.tmp`;
     const noIdMatch = metadata.shortId === 'no-id' && filename === `${sessionId}-session.tmp`;
 
