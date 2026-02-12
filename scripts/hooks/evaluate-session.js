@@ -41,8 +41,8 @@ async function main() {
         // Handle ~ in path
         learnedSkillsPath = config.learned_skills_path.replace(/^~/, require('os').homedir());
       }
-    } catch {
-      // Invalid config, use defaults
+    } catch (err) {
+      log(`[ContinuousLearning] Failed to parse config: ${err.message}, using defaults`);
     }
   }
 
