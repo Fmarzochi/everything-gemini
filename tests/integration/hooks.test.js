@@ -307,8 +307,7 @@ async function runTests() {
     try {
       const result = await runHookWithInput(
         path.join(scriptsDir, 'evaluate-session.js'),
-        {},
-        { CLAUDE_TRANSCRIPT_PATH: transcriptPath }
+        { transcript_path: transcriptPath }
       );
 
       // Should not crash, just skip processing
@@ -364,8 +363,7 @@ async function runTests() {
     try {
       const result = await runHookWithInput(
         path.join(scriptsDir, 'evaluate-session.js'),
-        {},
-        { CLAUDE_TRANSCRIPT_PATH: transcriptPath }
+        { transcript_path: transcriptPath }
       );
 
       assert.ok(result.stderr.includes('15 messages'), 'Should process session');
