@@ -75,6 +75,35 @@ function runValidatorWithDir(validatorName, dirConstant, overridePath) {
 }
 
 /**
+ * Run a validator script with multiple directory overrides.
+ * @param {string} validatorName
+ * @param {Record<string, string>} overrides - map of constant name to path
+ */
+function runValidatorWithDirs(validatorName, overrides) {
+  const validatorPath = path.join(validatorsDir, `${validatorName}.js`);
+  let source = fs.readFileSync(validatorPath, 'utf8');
+  source = source.replace(/^#!.*\n/, '');
+  for (const [constant, overridePath] of Object.entries(overrides)) {
+    const dirRegex = new RegExp(`const ${constant} = .*?;`);
+    source = source.replace(dirRegex, `const ${constant} = ${JSON.stringify(overridePath)};`);
+  }
+  try {
+    const stdout = execFileSync('node', ['-e', source], {
+      encoding: 'utf8',
+      stdio: ['pipe', 'pipe', 'pipe'],
+      timeout: 10000,
+    });
+    return { code: 0, stdout, stderr: '' };
+  } catch (err) {
+    return {
+      code: err.status || 1,
+      stdout: err.stdout || '',
+      stderr: err.stderr || '',
+    };
+  }
+}
+
+/**
  * Run a validator script directly (tests real project)
  */
 function runValidator(validatorName) {
@@ -469,6 +498,63 @@ function runTests() {
     assert.strictEqual(result.code, 0, 'Should ignore non-md files');
     assert.ok(result.stdout.includes('Validated 1'), 'Should count only .md files');
     cleanupTestDir(testDir);
+  })) passed++; else failed++;
+
+  if (test('detects broken command cross-reference', () => {
+    const testDir = createTestDir();
+    const agentsDir = createTestDir();
+    const skillsDir = createTestDir();
+    fs.writeFileSync(path.join(testDir, 'my-cmd.md'), '# Command\nUse `/nonexistent-cmd` to do things.');
+
+    const result = runValidatorWithDirs('validate-commands', {
+      COMMANDS_DIR: testDir, AGENTS_DIR: agentsDir, SKILLS_DIR: skillsDir
+    });
+    assert.strictEqual(result.code, 1, 'Should fail on broken command ref');
+    assert.ok(result.stderr.includes('nonexistent-cmd'), 'Should report broken command');
+    cleanupTestDir(testDir); cleanupTestDir(agentsDir); cleanupTestDir(skillsDir);
+  })) passed++; else failed++;
+
+  if (test('detects broken agent path reference', () => {
+    const testDir = createTestDir();
+    const agentsDir = createTestDir();
+    const skillsDir = createTestDir();
+    fs.writeFileSync(path.join(testDir, 'cmd.md'), '# Command\nAgent: `agents/fake-agent.md`');
+
+    const result = runValidatorWithDirs('validate-commands', {
+      COMMANDS_DIR: testDir, AGENTS_DIR: agentsDir, SKILLS_DIR: skillsDir
+    });
+    assert.strictEqual(result.code, 1, 'Should fail on broken agent ref');
+    assert.ok(result.stderr.includes('fake-agent'), 'Should report broken agent');
+    cleanupTestDir(testDir); cleanupTestDir(agentsDir); cleanupTestDir(skillsDir);
+  })) passed++; else failed++;
+
+  if (test('skips references inside fenced code blocks', () => {
+    const testDir = createTestDir();
+    const agentsDir = createTestDir();
+    const skillsDir = createTestDir();
+    fs.writeFileSync(path.join(testDir, 'cmd.md'),
+      '# Command\n\n```\nagents/example-agent.md\n`/example-cmd`\n```\n');
+
+    const result = runValidatorWithDirs('validate-commands', {
+      COMMANDS_DIR: testDir, AGENTS_DIR: agentsDir, SKILLS_DIR: skillsDir
+    });
+    assert.strictEqual(result.code, 0, 'Should skip refs inside code blocks');
+    cleanupTestDir(testDir); cleanupTestDir(agentsDir); cleanupTestDir(skillsDir);
+  })) passed++; else failed++;
+
+  if (test('detects broken workflow agent reference', () => {
+    const testDir = createTestDir();
+    const agentsDir = createTestDir();
+    const skillsDir = createTestDir();
+    fs.writeFileSync(path.join(agentsDir, 'planner.md'), '---\nmodel: sonnet\ntools: Read\n---\n# A');
+    fs.writeFileSync(path.join(testDir, 'cmd.md'), '# Command\nWorkflow:\nplanner -> ghost-agent');
+
+    const result = runValidatorWithDirs('validate-commands', {
+      COMMANDS_DIR: testDir, AGENTS_DIR: agentsDir, SKILLS_DIR: skillsDir
+    });
+    assert.strictEqual(result.code, 1, 'Should fail on broken workflow agent');
+    assert.ok(result.stderr.includes('ghost-agent'), 'Should report broken workflow agent');
+    cleanupTestDir(testDir); cleanupTestDir(agentsDir); cleanupTestDir(skillsDir);
   })) passed++; else failed++;
 
   // ==========================================
