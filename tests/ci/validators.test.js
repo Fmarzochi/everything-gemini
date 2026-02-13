@@ -2007,6 +2007,30 @@ function runTests() {
     cleanupTestDir(testDir);
   })) passed++; else failed++;
 
+  // ── Round 78: validate-hooks.js wrapped { hooks: { ... } } format ──
+  console.log('\nRound 78: validate-hooks.js (wrapped hooks format):');
+
+  if (test('validates wrapped format { hooks: { PreToolUse: [...] } }', () => {
+    const testDir = createTestDir();
+    const hooksFile = path.join(testDir, 'hooks.json');
+    // The production hooks.json uses this wrapped format — { hooks: { ... } }
+    // data.hooks is the object with event types, not data itself
+    fs.writeFileSync(hooksFile, JSON.stringify({
+      "$schema": "https://json.schemastore.org/claude-code-settings.json",
+      hooks: {
+        PreToolUse: [{ matcher: 'Write', hooks: [{ type: 'command', command: 'echo ok' }] }],
+        PostToolUse: [{ matcher: 'Read', hooks: [{ type: 'command', command: 'echo done' }] }]
+      }
+    }));
+
+    const result = runValidatorWithDir('validate-hooks', 'HOOKS_FILE', hooksFile);
+    assert.strictEqual(result.code, 0,
+      `Should pass wrapped hooks format, got exit ${result.code}. stderr: ${result.stderr}`);
+    assert.ok(result.stdout.includes('Validated 2'),
+      `Should validate 2 matchers, got: ${result.stdout}`);
+    cleanupTestDir(testDir);
+  })) passed++; else failed++;
+
   // Summary
   console.log(`\nResults: Passed: ${passed}, Failed: ${failed}`);
   process.exit(failed > 0 ? 1 : 0);

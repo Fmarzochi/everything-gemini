@@ -1207,6 +1207,67 @@ src/main.ts
     }
   })) passed++; else failed++;
 
+  // ── Round 78: getSessionStats reads real file when given existing .tmp path ──
+  console.log('\nRound 78: getSessionStats (actual file path → reads from disk):');
+
+  if (test('getSessionStats reads from disk when given path to existing .tmp file', () => {
+    const dir = createTempSessionDir();
+    try {
+      const sessionPath = path.join(dir, '2026-03-01-test1234-session.tmp');
+      const content = '# Real File Stats Test\n\n**Date:** 2026-03-01\n**Started:** 09:00\n\n### Completed\n- [x] First task\n- [x] Second task\n\n### In Progress\n- [ ] Third task\n\n### Notes for Next Session\nDon\'t forget the edge cases\n';
+      fs.writeFileSync(sessionPath, content);
+
+      // Pass the FILE PATH (not content) — this exercises looksLikePath branch
+      const stats = sessionManager.getSessionStats(sessionPath);
+      assert.strictEqual(stats.completedItems, 2, 'Should find 2 completed items from file');
+      assert.strictEqual(stats.inProgressItems, 1, 'Should find 1 in-progress item from file');
+      assert.strictEqual(stats.totalItems, 3, 'Should find 3 total items from file');
+      assert.strictEqual(stats.hasNotes, true, 'Should detect notes section from file');
+      assert.ok(stats.lineCount > 5, `Should have multiple lines from file, got ${stats.lineCount}`);
+    } finally {
+      cleanup(dir);
+    }
+  })) passed++; else failed++;
+
+  // ── Round 78: getAllSessions hasContent field ──
+  console.log('\nRound 78: getAllSessions (hasContent field):');
+
+  if (test('getAllSessions hasContent is true for non-empty and false for empty files', () => {
+    const isoHome = path.join(os.tmpdir(), `ecc-hascontent-${Date.now()}`);
+    const isoSessions = path.join(isoHome, '.claude', 'sessions');
+    fs.mkdirSync(isoSessions, { recursive: true });
+    const savedHome = process.env.HOME;
+    const savedProfile = process.env.USERPROFILE;
+    try {
+      // Create one non-empty session and one empty session
+      fs.writeFileSync(path.join(isoSessions, '2026-04-01-nonempty-session.tmp'), '# Has content');
+      fs.writeFileSync(path.join(isoSessions, '2026-04-02-emptyfile-session.tmp'), '');
+
+      process.env.HOME = isoHome;
+      process.env.USERPROFILE = isoHome;
+      delete require.cache[require.resolve('../../scripts/lib/session-manager')];
+      delete require.cache[require.resolve('../../scripts/lib/utils')];
+      const freshSM = require('../../scripts/lib/session-manager');
+
+      const result = freshSM.getAllSessions({ limit: 100 });
+      assert.strictEqual(result.total, 2, 'Should find both sessions');
+
+      const nonEmpty = result.sessions.find(s => s.shortId === 'nonempty');
+      const empty = result.sessions.find(s => s.shortId === 'emptyfile');
+
+      assert.ok(nonEmpty, 'Should find the non-empty session');
+      assert.ok(empty, 'Should find the empty session');
+      assert.strictEqual(nonEmpty.hasContent, true, 'Non-empty file should have hasContent: true');
+      assert.strictEqual(empty.hasContent, false, 'Empty file should have hasContent: false');
+    } finally {
+      process.env.HOME = savedHome;
+      process.env.USERPROFILE = savedProfile;
+      delete require.cache[require.resolve('../../scripts/lib/session-manager')];
+      delete require.cache[require.resolve('../../scripts/lib/utils')];
+      fs.rmSync(isoHome, { recursive: true, force: true });
+    }
+  })) passed++; else failed++;
+
   // ── Round 75: deleteSession catch — unlinkSync throws on read-only dir ──
   console.log('\nRound 75: deleteSession (unlink failure in read-only dir):');
 
