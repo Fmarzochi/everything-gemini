@@ -1194,6 +1194,43 @@ function runTests() {
       `At CWD=/ with no session ID, should use the fallback parameter. Got: "${result.stdout}"`);
   })) passed++; else failed++;
 
+  // ── Round 88: replaceInFile with empty replacement (deletion) ──
+  console.log('\nRound 88: replaceInFile with empty replacement string (deletion):');
+  if (test('replaceInFile with empty string replacement deletes matched text', () => {
+    const tmpDir = path.join(utils.getTempDir(), `ecc-r88-replace-empty-${Date.now()}`);
+    fs.mkdirSync(tmpDir, { recursive: true });
+    const tmpFile = path.join(tmpDir, 'delete-test.txt');
+    try {
+      fs.writeFileSync(tmpFile, 'hello REMOVE_ME world');
+      const result = utils.replaceInFile(tmpFile, 'REMOVE_ME ', '');
+      assert.strictEqual(result, true, 'Should return true on successful replacement');
+      const content = fs.readFileSync(tmpFile, 'utf8');
+      assert.strictEqual(content, 'hello world',
+        'Empty replacement should delete the matched text');
+    } finally {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  })) passed++; else failed++;
+
+  // ── Round 88: countInFile with valid file but zero matches ──
+  console.log('\nRound 88: countInFile with existing file but non-matching pattern:');
+  if (test('countInFile returns 0 for valid file with no pattern matches', () => {
+    const tmpDir = path.join(utils.getTempDir(), `ecc-r88-count-zero-${Date.now()}`);
+    fs.mkdirSync(tmpDir, { recursive: true });
+    const tmpFile = path.join(tmpDir, 'no-match.txt');
+    try {
+      fs.writeFileSync(tmpFile, 'apple banana cherry');
+      const count = utils.countInFile(tmpFile, 'ZZZZNOTHERE');
+      assert.strictEqual(count, 0,
+        'Should return 0 when regex matches nothing in existing file');
+      const countRegex = utils.countInFile(tmpFile, /ZZZZNOTHERE/g);
+      assert.strictEqual(countRegex, 0,
+        'Should return 0 for RegExp with no matches in existing file');
+    } finally {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  })) passed++; else failed++;
+
   // Summary
   console.log('\n=== Test Results ===');
   console.log(`Passed: ${passed}`);

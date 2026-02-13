@@ -1385,6 +1385,22 @@ src/main.ts
     }
   })) passed++; else failed++;
 
+  // ── Round 88: parseSessionMetadata null date/started/lastUpdated fields ──
+  console.log('\nRound 88: parseSessionMetadata content lacking Date/Started/Updated fields:');
+  if (test('parseSessionMetadata returns null for date, started, lastUpdated when fields absent', () => {
+    const content = '# Title Only\n\n### Notes for Next Session\nSome notes\n';
+    const meta = sessionManager.parseSessionMetadata(content);
+    assert.strictEqual(meta.date, null,
+      'date should be null when **Date:** field is absent');
+    assert.strictEqual(meta.started, null,
+      'started should be null when **Started:** field is absent');
+    assert.strictEqual(meta.lastUpdated, null,
+      'lastUpdated should be null when **Last Updated:** field is absent');
+    // Confirm other fields still parse correctly
+    assert.strictEqual(meta.title, 'Title Only');
+    assert.strictEqual(meta.notes, 'Some notes');
+  })) passed++; else failed++;
+
   // Summary
   console.log(`\nResults: Passed: ${passed}, Failed: ${failed}`);
   process.exit(failed > 0 ? 1 : 0);
