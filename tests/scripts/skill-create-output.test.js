@@ -470,6 +470,17 @@ function runTests() {
     assert.ok(boxLines.length >= 3, 'Should render a complete box');
   })) passed++; else failed++;
 
+  // ── Round 68: demo function export ──
+  console.log('\ndemo export (Round 68):');
+
+  if (test('module exports demo function alongside SkillCreateOutput', () => {
+    const mod = require('../../scripts/skill-create-output');
+    assert.ok(mod.demo, 'Should export demo function');
+    assert.strictEqual(typeof mod.demo, 'function', 'demo should be a function');
+    assert.ok(mod.SkillCreateOutput, 'Should also export SkillCreateOutput');
+    assert.strictEqual(typeof mod.SkillCreateOutput, 'function', 'SkillCreateOutput should be a constructor');
+  })) passed++; else failed++;
+
   // Summary
   console.log(`\nResults: Passed: ${passed}, Failed: ${failed}`);
   process.exit(failed > 0 ? 1 : 0);

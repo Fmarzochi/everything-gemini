@@ -306,6 +306,44 @@ function runTests() {
     assert.ok(result.stdout.includes('Source: environment'), 'Should show environment as source');
   })) passed++; else failed++;
 
+  // ── Round 68: --project success path and --list (current) marker ──
+  console.log('\n--project success path (Round 68):');
+
+  if (test('--project npm writes project config and succeeds', () => {
+    const tmpDir = path.join(os.tmpdir(), `spm-test-project-${Date.now()}`);
+    fs.mkdirSync(tmpDir, { recursive: true });
+    try {
+      const result = require('child_process').spawnSync('node', [SCRIPT, '--project', 'npm'], {
+        encoding: 'utf8',
+        stdio: ['pipe', 'pipe', 'pipe'],
+        env: { ...process.env },
+        timeout: 10000,
+        cwd: tmpDir
+      });
+      assert.strictEqual(result.status, 0, `Expected exit 0, got ${result.status}. stderr: ${result.stderr}`);
+      assert.ok(result.stdout.includes('Project preference set to'), 'Should show project success message');
+      assert.ok(result.stdout.includes('npm'), 'Should mention npm');
+      // Verify config file was created in the project CWD
+      const configPath = path.join(tmpDir, '.claude', 'package-manager.json');
+      assert.ok(fs.existsSync(configPath), 'Project config file should be created in CWD');
+      const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+      assert.strictEqual(config.packageManager, 'npm', 'Config should contain npm');
+    } finally {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  })) passed++; else failed++;
+
+  console.log('\n--list (current) marker (Round 68):');
+
+  if (test('--list output includes (current) marker for active PM', () => {
+    const result = run(['--list']);
+    assert.strictEqual(result.code, 0);
+    assert.ok(result.stdout.includes('(current)'), '--list should mark the active PM with (current)');
+    // The (current) marker should appear exactly once
+    const currentCount = (result.stdout.match(/\(current\)/g) || []).length;
+    assert.strictEqual(currentCount, 1, `Expected exactly 1 "(current)" in --list, found ${currentCount}`);
+  })) passed++; else failed++;
+
   // Summary
   console.log(`\nResults: Passed: ${passed}, Failed: ${failed}`);
   process.exit(failed > 0 ? 1 : 0);
