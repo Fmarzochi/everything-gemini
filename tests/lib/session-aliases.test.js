@@ -896,6 +896,37 @@ function runTests() {
     }
   })) passed++; else failed++;
 
+  // ── Round 64: loadAliases backfills missing version and metadata ──
+  console.log('\nRound 64: loadAliases version/metadata backfill:');
+
+  if (test('loadAliases backfills missing version and metadata fields', () => {
+    resetAliases();
+    const aliasesPath = aliases.getAliasesPath();
+    // Write a file with valid aliases but NO version and NO metadata
+    fs.writeFileSync(aliasesPath, JSON.stringify({
+      aliases: {
+        'backfill-test': {
+          sessionPath: '/sessions/backfill',
+          createdAt: '2026-01-15T00:00:00.000Z',
+          updatedAt: '2026-01-15T00:00:00.000Z',
+          title: 'Backfill Test'
+        }
+      }
+    }));
+
+    const data = aliases.loadAliases();
+    // Version should be backfilled to ALIAS_VERSION ('1.0')
+    assert.strictEqual(data.version, '1.0', 'Should backfill missing version to 1.0');
+    // Metadata should be backfilled with totalCount from aliases
+    assert.ok(data.metadata, 'Should backfill missing metadata object');
+    assert.strictEqual(data.metadata.totalCount, 1, 'Metadata totalCount should match alias count');
+    assert.ok(data.metadata.lastUpdated, 'Metadata should have lastUpdated');
+    // Alias data should be preserved
+    assert.ok(data.aliases['backfill-test'], 'Alias data should be preserved');
+    assert.strictEqual(data.aliases['backfill-test'].sessionPath, '/sessions/backfill');
+    resetAliases();
+  })) passed++; else failed++;
+
   // Summary
   console.log(`\nResults: Passed: ${passed}, Failed: ${failed}`);
   process.exit(failed > 0 ? 1 : 0);

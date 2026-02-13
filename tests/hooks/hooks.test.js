@@ -2999,6 +2999,19 @@ async function runTests() {
       'Should pass through data unchanged when tool_input is absent');
   })) passed++; else failed++;
 
+  // ── Round 64: post-edit-typecheck.js valid JSON without tool_input ──
+  console.log('\nRound 64: post-edit-typecheck.js (valid JSON without tool_input):');
+
+  if (await asyncTest('skips typecheck when JSON has no tool_input field', async () => {
+    const stdinJson = JSON.stringify({ result: 'ok', metadata: { action: 'test' } });
+    const result = await runScript(path.join(scriptsDir, 'post-edit-typecheck.js'), stdinJson);
+
+    assert.strictEqual(result.code, 0, 'Should exit 0 for JSON without tool_input');
+    // input.tool_input?.file_path is undefined → skips TS check → passes through
+    assert.strictEqual(result.stdout, stdinJson,
+      'Should pass through data unchanged when tool_input is absent');
+  })) passed++; else failed++;
+
   // Summary
   console.log('\n=== Test Results ===');
   console.log(`Passed: ${passed}`);
