@@ -2546,6 +2546,63 @@ async function runTests() {
     }
   })) passed++; else failed++;
 
+  // ── Round 49: typecheck extension matching and session-end conditional sections ──
+  console.log('\nRound 49: post-edit-typecheck.js (extension edge cases):');
+
+  if (await asyncTest('.d.ts files match the TS regex and trigger typecheck path', async () => {
+    const testDir = createTestDir();
+    const testFile = path.join(testDir, 'types.d.ts');
+    fs.writeFileSync(testFile, 'declare const x: number;');
+
+    const stdinJson = JSON.stringify({ tool_input: { file_path: testFile } });
+    const result = await runScript(path.join(scriptsDir, 'post-edit-typecheck.js'), stdinJson);
+    assert.strictEqual(result.code, 0, 'Should exit 0 for .d.ts file');
+    assert.ok(result.stdout.includes('tool_input'), 'Should pass through stdin data');
+    cleanupTestDir(testDir);
+  })) passed++; else failed++;
+
+  if (await asyncTest('.mts extension does not trigger typecheck', async () => {
+    const stdinJson = JSON.stringify({ tool_input: { file_path: '/project/utils.mts' } });
+    const result = await runScript(path.join(scriptsDir, 'post-edit-typecheck.js'), stdinJson);
+    assert.strictEqual(result.code, 0, 'Should exit 0 for .mts file');
+    assert.strictEqual(result.stdout, stdinJson, 'Should pass through .mts unchanged');
+  })) passed++; else failed++;
+
+  console.log('\nRound 49: session-end.js (conditional summary sections):');
+
+  if (await asyncTest('summary omits Files Modified and Tools Used when none found', async () => {
+    const isoHome = path.join(os.tmpdir(), `ecc-notools-${Date.now()}`);
+    const sessionsDir = path.join(isoHome, '.claude', 'sessions');
+    fs.mkdirSync(sessionsDir, { recursive: true });
+
+    const testDir = createTestDir();
+    const transcriptPath = path.join(testDir, 'transcript.jsonl');
+    // Only user messages — no tool_use entries at all
+    const lines = [
+      '{"type":"user","content":"How does authentication work?"}',
+      '{"type":"assistant","message":{"content":[{"type":"text","text":"It uses JWT"}]}}'
+    ];
+    fs.writeFileSync(transcriptPath, lines.join('\n'));
+    const stdinJson = JSON.stringify({ transcript_path: transcriptPath });
+
+    try {
+      const result = await runScript(path.join(scriptsDir, 'session-end.js'), stdinJson, {
+        HOME: isoHome, USERPROFILE: isoHome
+      });
+      assert.strictEqual(result.code, 0);
+
+      const files = fs.readdirSync(sessionsDir).filter(f => f.endsWith('-session.tmp'));
+      assert.ok(files.length > 0, 'Should create session file');
+      const content = fs.readFileSync(path.join(sessionsDir, files[0]), 'utf8');
+      assert.ok(content.includes('authentication'), 'Should include user message');
+      assert.ok(!content.includes('### Files Modified'), 'Should omit Files Modified when empty');
+      assert.ok(!content.includes('### Tools Used'), 'Should omit Tools Used when empty');
+    } finally {
+      fs.rmSync(isoHome, { recursive: true, force: true });
+      cleanupTestDir(testDir);
+    }
+  })) passed++; else failed++;
+
   // Summary
   console.log('\n=== Test Results ===');
   console.log(`Passed: ${passed}`);
