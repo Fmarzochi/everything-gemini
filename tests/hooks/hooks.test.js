@@ -814,6 +814,75 @@ async function runTests() {
     cleanupTestDir(testDir);
   })) passed++; else failed++;
 
+  if (await asyncTest('parses Claude Code JSONL format (entry.message.content)', async () => {
+    const testDir = createTestDir();
+    const transcriptPath = path.join(testDir, 'transcript.jsonl');
+
+    // Claude Code v2.1.41+ JSONL format: user messages nested in entry.message
+    const lines = [
+      '{"type":"user","message":{"role":"user","content":"Fix the build error"}}',
+      '{"type":"user","message":{"role":"user","content":[{"type":"text","text":"Also update tests"}]}}',
+    ];
+    fs.writeFileSync(transcriptPath, lines.join('\n'));
+
+    const stdinJson = JSON.stringify({ transcript_path: transcriptPath });
+    const result = await runScript(path.join(scriptsDir, 'session-end.js'), stdinJson, {
+      HOME: testDir
+    });
+    assert.strictEqual(result.code, 0);
+
+    const claudeDir = path.join(testDir, '.claude', 'sessions');
+    if (fs.existsSync(claudeDir)) {
+      const files = fs.readdirSync(claudeDir).filter(f => f.endsWith('.tmp'));
+      if (files.length > 0) {
+        const content = fs.readFileSync(path.join(claudeDir, files[0]), 'utf8');
+        assert.ok(content.includes('Fix the build error'), 'Should extract string content from message');
+        assert.ok(content.includes('Also update tests'), 'Should extract array content from message');
+      }
+    }
+    cleanupTestDir(testDir);
+  })) passed++; else failed++;
+
+  if (await asyncTest('extracts tool_use from assistant message content blocks', async () => {
+    const testDir = createTestDir();
+    const transcriptPath = path.join(testDir, 'transcript.jsonl');
+
+    // Claude Code JSONL: tool uses nested in assistant message content array
+    const lines = [
+      '{"type":"user","content":"Edit the config"}',
+      JSON.stringify({
+        type: 'assistant',
+        message: {
+          role: 'assistant',
+          content: [
+            { type: 'text', text: 'I will edit the file.' },
+            { type: 'tool_use', name: 'Edit', input: { file_path: '/src/app.ts' } },
+            { type: 'tool_use', name: 'Write', input: { file_path: '/src/new.ts' } },
+          ]
+        }
+      }),
+    ];
+    fs.writeFileSync(transcriptPath, lines.join('\n'));
+
+    const stdinJson = JSON.stringify({ transcript_path: transcriptPath });
+    const result = await runScript(path.join(scriptsDir, 'session-end.js'), stdinJson, {
+      HOME: testDir
+    });
+    assert.strictEqual(result.code, 0);
+
+    const claudeDir = path.join(testDir, '.claude', 'sessions');
+    if (fs.existsSync(claudeDir)) {
+      const files = fs.readdirSync(claudeDir).filter(f => f.endsWith('.tmp'));
+      if (files.length > 0) {
+        const content = fs.readFileSync(path.join(claudeDir, files[0]), 'utf8');
+        assert.ok(content.includes('Edit'), 'Should extract Edit tool from content blocks');
+        assert.ok(content.includes('/src/app.ts'), 'Should extract file path from Edit block');
+        assert.ok(content.includes('/src/new.ts'), 'Should extract file path from Write block');
+      }
+    }
+    cleanupTestDir(testDir);
+  })) passed++; else failed++;
+
   // hooks.json validation
   console.log('\nhooks.json Validation:');
 
