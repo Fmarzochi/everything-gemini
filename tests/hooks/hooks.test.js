@@ -1349,15 +1349,15 @@ async function runTests() {
     const sessionId = `test-periodic-${Date.now()}`;
     const counterFile = path.join(os.tmpdir(), `claude-tool-count-${sessionId}`);
     try {
-      // Pre-seed at 74 so next call = 75 (threshold 5 + 70, 70 % 25 === 20, not a hit)
-      // Actually: count > threshold && count % 25 === 0 → need count = 75
-      fs.writeFileSync(counterFile, '74');
+      // Pre-seed at 29 so next call = 30 (threshold 5 + 25 = 30)
+      // (30 - 5) % 25 === 0 → should trigger periodic suggestion
+      fs.writeFileSync(counterFile, '29');
       const result = await runScript(path.join(scriptsDir, 'suggest-compact.js'), '', {
         CLAUDE_SESSION_ID: sessionId,
         COMPACT_THRESHOLD: '5'
       });
       assert.strictEqual(result.code, 0);
-      assert.ok(result.stderr.includes('75 tool calls'), 'Should suggest at multiples of 25');
+      assert.ok(result.stderr.includes('30 tool calls'), 'Should suggest at threshold + 25n intervals');
     } finally {
       try { fs.unlinkSync(counterFile); } catch {}
     }
@@ -1863,6 +1863,154 @@ async function runTests() {
       }
     }
     cleanupTestDir(testDir);
+  })) passed++; else failed++;
+
+  // ─── Round 24: suggest-compact interval fix, fd fallback, session-start maxAge ───
+  console.log('\nRound 24: suggest-compact.js (interval fix & fd fallback):');
+
+  if (await asyncTest('periodic intervals are consistent with non-25-divisible threshold', async () => {
+    // Regression test: with threshold=13, periodic suggestions should fire at 38, 63, 88...
+    // (count - 13) % 25 === 0 → 38-13=25, 63-13=50, etc.
+    const sessionId = `test-interval-fix-${Date.now()}`;
+    const counterFile = path.join(os.tmpdir(), `claude-tool-count-${sessionId}`);
+    try {
+      // Pre-seed at 37 so next call = 38 (13 + 25 = 38)
+      fs.writeFileSync(counterFile, '37');
+      const result = await runScript(path.join(scriptsDir, 'suggest-compact.js'), '', {
+        CLAUDE_SESSION_ID: sessionId,
+        COMPACT_THRESHOLD: '13'
+      });
+      assert.strictEqual(result.code, 0);
+      assert.ok(result.stderr.includes('38 tool calls'), 'Should suggest at threshold(13) + 25 = 38');
+    } finally {
+      try { fs.unlinkSync(counterFile); } catch {}
+    }
+  })) passed++; else failed++;
+
+  if (await asyncTest('does not suggest at old-style multiples that skip threshold offset', async () => {
+    // With threshold=13, count=50 should NOT trigger (old behavior would: 50%25===0)
+    // New behavior: (50-13)%25 = 37%25 = 12 → no suggestion
+    const sessionId = `test-no-false-suggest-${Date.now()}`;
+    const counterFile = path.join(os.tmpdir(), `claude-tool-count-${sessionId}`);
+    try {
+      fs.writeFileSync(counterFile, '49');
+      const result = await runScript(path.join(scriptsDir, 'suggest-compact.js'), '', {
+        CLAUDE_SESSION_ID: sessionId,
+        COMPACT_THRESHOLD: '13'
+      });
+      assert.strictEqual(result.code, 0);
+      assert.ok(!result.stderr.includes('checkpoint'), 'Should NOT suggest at count=50 with threshold=13');
+    } finally {
+      try { fs.unlinkSync(counterFile); } catch {}
+    }
+  })) passed++; else failed++;
+
+  if (await asyncTest('fd fallback: handles corrupted counter file gracefully', async () => {
+    const sessionId = `test-corrupt-${Date.now()}`;
+    const counterFile = path.join(os.tmpdir(), `claude-tool-count-${sessionId}`);
+    try {
+      // Write non-numeric data to trigger parseInt → NaN → reset to 1
+      fs.writeFileSync(counterFile, 'corrupted data here!!!');
+      const result = await runScript(path.join(scriptsDir, 'suggest-compact.js'), '', {
+        CLAUDE_SESSION_ID: sessionId
+      });
+      assert.strictEqual(result.code, 0);
+      const newCount = parseInt(fs.readFileSync(counterFile, 'utf8').trim(), 10);
+      assert.strictEqual(newCount, 1, 'Should reset to 1 on corrupted file content');
+    } finally {
+      try { fs.unlinkSync(counterFile); } catch {}
+    }
+  })) passed++; else failed++;
+
+  if (await asyncTest('handles counter at exact 1000000 boundary', async () => {
+    const sessionId = `test-boundary-${Date.now()}`;
+    const counterFile = path.join(os.tmpdir(), `claude-tool-count-${sessionId}`);
+    try {
+      // 1000000 is the upper clamp boundary — should still increment
+      fs.writeFileSync(counterFile, '1000000');
+      const result = await runScript(path.join(scriptsDir, 'suggest-compact.js'), '', {
+        CLAUDE_SESSION_ID: sessionId
+      });
+      assert.strictEqual(result.code, 0);
+      const newCount = parseInt(fs.readFileSync(counterFile, 'utf8').trim(), 10);
+      assert.strictEqual(newCount, 1000001, 'Should increment from exactly 1000000');
+    } finally {
+      try { fs.unlinkSync(counterFile); } catch {}
+    }
+  })) passed++; else failed++;
+
+  console.log('\nRound 24: post-edit-format.js (edge cases):');
+
+  if (await asyncTest('passes through malformed JSON unchanged', async () => {
+    const malformedJson = '{"tool_input": {"file_path": "/test.ts"';
+    const result = await runScript(path.join(scriptsDir, 'post-edit-format.js'), malformedJson);
+    assert.strictEqual(result.code, 0);
+    // Should pass through the malformed data (console.log adds \n)
+    assert.ok(result.stdout.includes(malformedJson), 'Should pass through malformed JSON');
+  })) passed++; else failed++;
+
+  if (await asyncTest('passes through data for non-JS/TS file extensions', async () => {
+    const stdinJson = JSON.stringify({ tool_input: { file_path: '/path/to/file.py' } });
+    const result = await runScript(path.join(scriptsDir, 'post-edit-format.js'), stdinJson);
+    assert.strictEqual(result.code, 0);
+    assert.ok(result.stdout.includes('file.py'), 'Should pass through for .py files');
+  })) passed++; else failed++;
+
+  console.log('\nRound 24: post-edit-typecheck.js (edge cases):');
+
+  if (await asyncTest('skips typecheck for non-existent file and still passes through', async () => {
+    const stdinJson = JSON.stringify({ tool_input: { file_path: '/nonexistent/deep/file.ts' } });
+    const result = await runScript(path.join(scriptsDir, 'post-edit-typecheck.js'), stdinJson);
+    assert.strictEqual(result.code, 0);
+    assert.ok(result.stdout.includes('file.ts'), 'Should pass through for non-existent .ts file');
+  })) passed++; else failed++;
+
+  if (await asyncTest('passes through for non-TS extensions without running tsc', async () => {
+    const stdinJson = JSON.stringify({ tool_input: { file_path: '/path/to/file.js' } });
+    const result = await runScript(path.join(scriptsDir, 'post-edit-typecheck.js'), stdinJson);
+    assert.strictEqual(result.code, 0);
+    assert.ok(result.stdout.includes('file.js'), 'Should pass through for .js file without running tsc');
+  })) passed++; else failed++;
+
+  console.log('\nRound 24: session-start.js (edge cases):');
+
+  if (await asyncTest('exits 0 with empty sessions directory (no recent sessions)', async () => {
+    const isoHome = path.join(os.tmpdir(), `ecc-start-empty-${Date.now()}`);
+    fs.mkdirSync(path.join(isoHome, '.claude', 'sessions'), { recursive: true });
+    fs.mkdirSync(path.join(isoHome, '.claude', 'skills', 'learned'), { recursive: true });
+    try {
+      const result = await runScript(path.join(scriptsDir, 'session-start.js'), '', {
+        HOME: isoHome, USERPROFILE: isoHome
+      });
+      assert.strictEqual(result.code, 0, 'Should exit 0 with no sessions');
+      // Should NOT inject any previous session data (stdout should be empty or minimal)
+      assert.ok(!result.stdout.includes('Previous session summary'), 'Should not inject when no sessions');
+    } finally {
+      fs.rmSync(isoHome, { recursive: true, force: true });
+    }
+  })) passed++; else failed++;
+
+  if (await asyncTest('does not inject blank template session into context', async () => {
+    const isoHome = path.join(os.tmpdir(), `ecc-start-blank-${Date.now()}`);
+    const sessionsDir = path.join(isoHome, '.claude', 'sessions');
+    fs.mkdirSync(sessionsDir, { recursive: true });
+    fs.mkdirSync(path.join(isoHome, '.claude', 'skills', 'learned'), { recursive: true });
+
+    // Create a session file with the blank template marker
+    const today = new Date().toISOString().slice(0, 10);
+    const sessionFile = path.join(sessionsDir, `${today}-blank-session.tmp`);
+    fs.writeFileSync(sessionFile, '# Session\n[Session context goes here]\n');
+
+    try {
+      const result = await runScript(path.join(scriptsDir, 'session-start.js'), '', {
+        HOME: isoHome, USERPROFILE: isoHome
+      });
+      assert.strictEqual(result.code, 0);
+      // Should NOT inject blank template
+      assert.ok(!result.stdout.includes('Previous session summary'), 'Should skip blank template sessions');
+    } finally {
+      fs.rmSync(isoHome, { recursive: true, force: true });
+    }
   })) passed++; else failed++;
 
   // Summary

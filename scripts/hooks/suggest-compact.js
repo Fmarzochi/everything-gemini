@@ -66,8 +66,8 @@ async function main() {
     log(`[StrategicCompact] ${threshold} tool calls reached - consider /compact if transitioning phases`);
   }
 
-  // Suggest at regular intervals after threshold
-  if (count > threshold && count % 25 === 0) {
+  // Suggest at regular intervals after threshold (every 25 calls from threshold)
+  if (count > threshold && (count - threshold) % 25 === 0) {
     log(`[StrategicCompact] ${count} tool calls - good checkpoint for /compact if context is stale`);
   }
 
