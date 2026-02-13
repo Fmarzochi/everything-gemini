@@ -3446,6 +3446,41 @@ Some random content without the expected ### Context to Load section
     }
   })) passed++; else failed++;
 
+  // ── Round 87: post-edit-format.js and post-edit-typecheck.js stdin overflow (1MB) ──
+  console.log('\nRound 87: post-edit-format.js (stdin exceeding 1MB — truncation):');
+
+  if (await asyncTest('truncates stdin at 1MB limit and still passes through data (post-edit-format)', async () => {
+    // Send 1.2MB of data — exceeds the 1MB MAX_STDIN limit (lines 14-22)
+    const payload = 'x'.repeat(1024 * 1024 + 200000);
+    const result = await runScript(path.join(scriptsDir, 'post-edit-format.js'), payload);
+
+    assert.strictEqual(result.code, 0, 'Should exit 0 even with oversized stdin');
+    // Output should be truncated — significantly less than input
+    assert.ok(result.stdout.length < payload.length,
+      `stdout (${result.stdout.length}) should be shorter than input (${payload.length})`);
+    // Output should be approximately 1MB (last accepted chunk may push slightly over)
+    assert.ok(result.stdout.length <= 1024 * 1024 + 65536,
+      `stdout (${result.stdout.length}) should be near 1MB, not unbounded`);
+    assert.ok(result.stdout.length > 0, 'Should still pass through truncated data');
+  })) passed++; else failed++;
+
+  console.log('\nRound 87: post-edit-typecheck.js (stdin exceeding 1MB — truncation):');
+
+  if (await asyncTest('truncates stdin at 1MB limit and still passes through data (post-edit-typecheck)', async () => {
+    // Send 1.2MB of data — exceeds the 1MB MAX_STDIN limit (lines 16-24)
+    const payload = 'x'.repeat(1024 * 1024 + 200000);
+    const result = await runScript(path.join(scriptsDir, 'post-edit-typecheck.js'), payload);
+
+    assert.strictEqual(result.code, 0, 'Should exit 0 even with oversized stdin');
+    // Output should be truncated — significantly less than input
+    assert.ok(result.stdout.length < payload.length,
+      `stdout (${result.stdout.length}) should be shorter than input (${payload.length})`);
+    // Output should be approximately 1MB (last accepted chunk may push slightly over)
+    assert.ok(result.stdout.length <= 1024 * 1024 + 65536,
+      `stdout (${result.stdout.length}) should be near 1MB, not unbounded`);
+    assert.ok(result.stdout.length > 0, 'Should still pass through truncated data');
+  })) passed++; else failed++;
+
   // Summary
   console.log('\n=== Test Results ===');
   console.log(`Passed: ${passed}`);
