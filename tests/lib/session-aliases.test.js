@@ -1154,6 +1154,54 @@ function runTests() {
     }
   })) passed++; else failed++;
 
+  // ── Round 84: listAliases sort NaN date fallback (getTime() || 0) ──
+  console.log('\nRound 84: listAliases (NaN date fallback in sort comparator):');
+
+  if (test('listAliases sorts entries with invalid/missing dates to the end via || 0 fallback', () => {
+    // session-aliases.js line 257:
+    //   (new Date(b.updatedAt || b.createdAt || 0).getTime() || 0) - ...
+    // When updatedAt and createdAt are both invalid strings, getTime() returns NaN.
+    // The outer || 0 converts NaN to 0 (epoch time), pushing the entry to the end.
+    resetAliases();
+    const data = aliases.loadAliases();
+
+    // Entry with valid dates — should sort first (newest)
+    data.aliases['valid-alias'] = {
+      sessionPath: '/sessions/valid',
+      createdAt: '2026-02-10T12:00:00.000Z',
+      updatedAt: '2026-02-10T12:00:00.000Z',
+      title: 'Valid'
+    };
+
+    // Entry with invalid date strings — getTime() → NaN → || 0 → epoch (oldest)
+    data.aliases['nan-alias'] = {
+      sessionPath: '/sessions/nan',
+      createdAt: 'not-a-date',
+      updatedAt: 'also-invalid',
+      title: 'NaN dates'
+    };
+
+    // Entry with missing date fields — undefined || undefined || 0 → new Date(0) → epoch
+    data.aliases['missing-alias'] = {
+      sessionPath: '/sessions/missing',
+      title: 'Missing dates'
+      // No createdAt or updatedAt
+    };
+
+    aliases.saveAliases(data);
+    const list = aliases.listAliases();
+
+    assert.strictEqual(list.length, 3, 'Should list all 3 aliases');
+    // Valid-dated entry should be first (newest by updatedAt)
+    assert.strictEqual(list[0].name, 'valid-alias',
+      'Entry with valid dates should sort first');
+    // The two invalid-dated entries sort to epoch (0), so they come after
+    assert.ok(
+      (list[1].name === 'nan-alias' || list[1].name === 'missing-alias') &&
+      (list[2].name === 'nan-alias' || list[2].name === 'missing-alias'),
+      'Entries with invalid/missing dates should sort to the end');
+  })) passed++; else failed++;
+
   // Summary
   console.log(`\nResults: Passed: ${passed}, Failed: ${failed}`);
   process.exit(failed > 0 ? 1 : 0);

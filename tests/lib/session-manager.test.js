@@ -1349,6 +1349,42 @@ src/main.ts
     }
   })) passed++; else failed++;
 
+  // ── Round 84: getSessionById TOCTOU — statSync catch returns null for broken symlink ──
+  console.log('\nRound 84: getSessionById (broken symlink — statSync catch):');
+
+  if (test('getSessionById returns null when matching session is a broken symlink', () => {
+    // getSessionById at line 307-310: statSync throws for broken symlinks,
+    // the catch returns null (file deleted between readdir and stat).
+    const isoHome = path.join(os.tmpdir(), `ecc-r84-getbyid-toctou-${Date.now()}`);
+    const sessionsDir = path.join(isoHome, '.claude', 'sessions');
+    fs.mkdirSync(sessionsDir, { recursive: true });
+
+    // Create a broken symlink that matches a session ID pattern
+    const brokenFile = '2026-02-11-deadbeef-session.tmp';
+    fs.symlinkSync('/nonexistent/target/that/does/not/exist', path.join(sessionsDir, brokenFile));
+
+    const origHome = process.env.HOME;
+    const origUserProfile = process.env.USERPROFILE;
+    try {
+      process.env.HOME = isoHome;
+      process.env.USERPROFILE = isoHome;
+      delete require.cache[require.resolve('../../scripts/lib/session-manager')];
+      delete require.cache[require.resolve('../../scripts/lib/utils')];
+      const freshSM = require('../../scripts/lib/session-manager');
+
+      // Search by the short ID "deadbeef" — should match the broken symlink
+      const result = freshSM.getSessionById('deadbeef');
+      assert.strictEqual(result, null,
+        'Should return null when matching session file is a broken symlink');
+    } finally {
+      process.env.HOME = origHome;
+      process.env.USERPROFILE = origUserProfile;
+      delete require.cache[require.resolve('../../scripts/lib/session-manager')];
+      delete require.cache[require.resolve('../../scripts/lib/utils')];
+      fs.rmSync(isoHome, { recursive: true, force: true });
+    }
+  })) passed++; else failed++;
+
   // Summary
   console.log(`\nResults: Passed: ${passed}, Failed: ${failed}`);
   process.exit(failed > 0 ? 1 : 0);

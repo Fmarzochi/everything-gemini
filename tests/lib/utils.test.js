@@ -1131,6 +1131,40 @@ function runTests() {
     }
   })) passed++; else failed++;
 
+  // ── Round 84: findFiles inner statSync catch (TOCTOU — broken symlink) ──
+  console.log('\nRound 84: findFiles (inner statSync catch — broken symlink):');
+
+  if (test('findFiles skips broken symlinks that match the pattern', () => {
+    // findFiles at utils.js:170-173: readdirSync returns entries including broken
+    // symlinks (entry.isFile() returns false for broken symlinks, but the test also
+    // verifies the overall robustness). On some systems, broken symlinks can be
+    // returned by readdirSync and pass through isFile() depending on the driver.
+    // More importantly: if statSync throws inside the inner loop, catch continues.
+    //
+    // To reliably trigger the statSync catch: create a real file, list it, then
+    // simulate the race. Since we can't truly race, we use a broken symlink which
+    // will at minimum verify the function doesn't crash on unusual dir entries.
+    const tmpDir = path.join(utils.getTempDir(), `ecc-r84-findfiles-toctou-${Date.now()}`);
+    fs.mkdirSync(tmpDir, { recursive: true });
+
+    // Create a real file and a broken symlink, both matching *.txt
+    const realFile = path.join(tmpDir, 'real.txt');
+    fs.writeFileSync(realFile, 'content');
+    const brokenLink = path.join(tmpDir, 'broken.txt');
+    fs.symlinkSync('/nonexistent/path/does/not/exist', brokenLink);
+
+    try {
+      const results = utils.findFiles(tmpDir, '*.txt');
+      // The real file should be found; the broken symlink should be skipped
+      const paths = results.map(r => r.path);
+      assert.ok(paths.some(p => p.includes('real.txt')), 'Should find the real file');
+      assert.ok(!paths.some(p => p.includes('broken.txt')),
+        'Should not include broken symlink in results');
+    } finally {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  })) passed++; else failed++;
+
   // Summary
   console.log('\n=== Test Results ===');
   console.log(`Passed: ${passed}`);
