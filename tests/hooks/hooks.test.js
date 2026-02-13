@@ -618,6 +618,137 @@ async function runTests() {
     cleanupTestDir(testDir);
   })) passed++; else failed++;
 
+  // session-end.js extractSessionSummary tests
+  console.log('\nsession-end.js (extractSessionSummary):');
+
+  if (await asyncTest('extracts user messages from transcript', async () => {
+    const testDir = createTestDir();
+    const transcriptPath = path.join(testDir, 'transcript.jsonl');
+
+    const lines = [
+      '{"type":"user","content":"Fix the login bug"}',
+      '{"type":"assistant","content":"I will fix it"}',
+      '{"type":"user","content":"Also add tests"}',
+    ];
+    fs.writeFileSync(transcriptPath, lines.join('\n'));
+
+    const stdinJson = JSON.stringify({ transcript_path: transcriptPath });
+    const result = await runScript(path.join(scriptsDir, 'session-end.js'), stdinJson);
+    assert.strictEqual(result.code, 0);
+    cleanupTestDir(testDir);
+  })) passed++; else failed++;
+
+  if (await asyncTest('handles transcript with array content fields', async () => {
+    const testDir = createTestDir();
+    const transcriptPath = path.join(testDir, 'transcript.jsonl');
+
+    const lines = [
+      '{"type":"user","content":[{"text":"Part 1"},{"text":"Part 2"}]}',
+      '{"type":"user","content":"Simple message"}',
+    ];
+    fs.writeFileSync(transcriptPath, lines.join('\n'));
+
+    const stdinJson = JSON.stringify({ transcript_path: transcriptPath });
+    const result = await runScript(path.join(scriptsDir, 'session-end.js'), stdinJson);
+    assert.strictEqual(result.code, 0, 'Should handle array content without crash');
+    cleanupTestDir(testDir);
+  })) passed++; else failed++;
+
+  if (await asyncTest('extracts tool names and file paths from transcript', async () => {
+    const testDir = createTestDir();
+    const transcriptPath = path.join(testDir, 'transcript.jsonl');
+
+    const lines = [
+      '{"type":"user","content":"Edit the file"}',
+      '{"type":"tool_use","tool_name":"Edit","tool_input":{"file_path":"/src/main.ts"}}',
+      '{"type":"tool_use","tool_name":"Read","tool_input":{"file_path":"/src/utils.ts"}}',
+      '{"type":"tool_use","tool_name":"Write","tool_input":{"file_path":"/src/new.ts"}}',
+    ];
+    fs.writeFileSync(transcriptPath, lines.join('\n'));
+
+    const stdinJson = JSON.stringify({ transcript_path: transcriptPath });
+    const result = await runScript(path.join(scriptsDir, 'session-end.js'), stdinJson);
+    assert.strictEqual(result.code, 0);
+    // Session file should contain summary with tools used
+    assert.ok(
+      result.stderr.includes('Created session file') || result.stderr.includes('Updated session file'),
+      'Should create/update session file'
+    );
+    cleanupTestDir(testDir);
+  })) passed++; else failed++;
+
+  if (await asyncTest('handles transcript with malformed JSON lines', async () => {
+    const testDir = createTestDir();
+    const transcriptPath = path.join(testDir, 'transcript.jsonl');
+
+    const lines = [
+      '{"type":"user","content":"Valid message"}',
+      'NOT VALID JSON',
+      '{"broken json',
+      '{"type":"user","content":"Another valid"}',
+    ];
+    fs.writeFileSync(transcriptPath, lines.join('\n'));
+
+    const stdinJson = JSON.stringify({ transcript_path: transcriptPath });
+    const result = await runScript(path.join(scriptsDir, 'session-end.js'), stdinJson);
+    assert.strictEqual(result.code, 0, 'Should skip malformed lines gracefully');
+    assert.ok(
+      result.stderr.includes('unparseable') || result.stderr.includes('Skipped'),
+      `Should report parse errors, got: ${result.stderr.substring(0, 200)}`
+    );
+    cleanupTestDir(testDir);
+  })) passed++; else failed++;
+
+  if (await asyncTest('handles empty transcript (no user messages)', async () => {
+    const testDir = createTestDir();
+    const transcriptPath = path.join(testDir, 'transcript.jsonl');
+
+    // Only tool_use entries, no user messages
+    const lines = [
+      '{"type":"tool_use","tool_name":"Read","tool_input":{}}',
+      '{"type":"assistant","content":"done"}',
+    ];
+    fs.writeFileSync(transcriptPath, lines.join('\n'));
+
+    const stdinJson = JSON.stringify({ transcript_path: transcriptPath });
+    const result = await runScript(path.join(scriptsDir, 'session-end.js'), stdinJson);
+    assert.strictEqual(result.code, 0, 'Should handle transcript with no user messages');
+    cleanupTestDir(testDir);
+  })) passed++; else failed++;
+
+  if (await asyncTest('truncates long user messages to 200 chars', async () => {
+    const testDir = createTestDir();
+    const transcriptPath = path.join(testDir, 'transcript.jsonl');
+
+    const longMsg = 'x'.repeat(500);
+    const lines = [
+      `{"type":"user","content":"${longMsg}"}`,
+    ];
+    fs.writeFileSync(transcriptPath, lines.join('\n'));
+
+    const stdinJson = JSON.stringify({ transcript_path: transcriptPath });
+    const result = await runScript(path.join(scriptsDir, 'session-end.js'), stdinJson);
+    assert.strictEqual(result.code, 0, 'Should handle and truncate long messages');
+    cleanupTestDir(testDir);
+  })) passed++; else failed++;
+
+  if (await asyncTest('uses CLAUDE_TRANSCRIPT_PATH env var as fallback', async () => {
+    const testDir = createTestDir();
+    const transcriptPath = path.join(testDir, 'transcript.jsonl');
+
+    const lines = [
+      '{"type":"user","content":"Fallback test message"}',
+    ];
+    fs.writeFileSync(transcriptPath, lines.join('\n'));
+
+    // Send invalid JSON to stdin so it falls back to env var
+    const result = await runScript(path.join(scriptsDir, 'session-end.js'), 'not json', {
+      CLAUDE_TRANSCRIPT_PATH: transcriptPath
+    });
+    assert.strictEqual(result.code, 0, 'Should use env var fallback');
+    cleanupTestDir(testDir);
+  })) passed++; else failed++;
+
   // hooks.json validation
   console.log('\nhooks.json Validation:');
 

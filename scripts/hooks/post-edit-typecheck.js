@@ -54,7 +54,7 @@ process.stdin.on('end', () => {
           });
         } catch (err) {
           // tsc exits non-zero when there are errors — filter to edited file
-          const output = err.stdout || '';
+          const output = (err.stdout || '') + (err.stderr || '');
           const relevantLines = output
             .split('\n')
             .filter(line => line.includes(filePath) || line.includes(path.basename(filePath)))

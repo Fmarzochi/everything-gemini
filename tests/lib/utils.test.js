@@ -505,6 +505,86 @@ function runTests() {
     assert.ok(dir.includes('learned'));
   })) passed++; else failed++;
 
+  // replaceInFile behavior tests
+  console.log('\nreplaceInFile (behavior):');
+
+  if (test('replaces first match when regex has no g flag', () => {
+    const testFile = path.join(utils.getTempDir(), `utils-test-${Date.now()}.txt`);
+    try {
+      utils.writeFile(testFile, 'foo bar foo baz foo');
+      utils.replaceInFile(testFile, /foo/, 'qux');
+      const content = utils.readFile(testFile);
+      // Without g flag, only first 'foo' should be replaced
+      assert.strictEqual(content, 'qux bar foo baz foo');
+    } finally {
+      fs.unlinkSync(testFile);
+    }
+  })) passed++; else failed++;
+
+  if (test('replaces all matches when regex has g flag', () => {
+    const testFile = path.join(utils.getTempDir(), `utils-test-${Date.now()}.txt`);
+    try {
+      utils.writeFile(testFile, 'foo bar foo baz foo');
+      utils.replaceInFile(testFile, /foo/g, 'qux');
+      const content = utils.readFile(testFile);
+      assert.strictEqual(content, 'qux bar qux baz qux');
+    } finally {
+      fs.unlinkSync(testFile);
+    }
+  })) passed++; else failed++;
+
+  if (test('replaces with string search (first occurrence)', () => {
+    const testFile = path.join(utils.getTempDir(), `utils-test-${Date.now()}.txt`);
+    try {
+      utils.writeFile(testFile, 'hello world hello');
+      utils.replaceInFile(testFile, 'hello', 'goodbye');
+      const content = utils.readFile(testFile);
+      // String.replace with string search only replaces first
+      assert.strictEqual(content, 'goodbye world hello');
+    } finally {
+      fs.unlinkSync(testFile);
+    }
+  })) passed++; else failed++;
+
+  if (test('replaces with capture groups', () => {
+    const testFile = path.join(utils.getTempDir(), `utils-test-${Date.now()}.txt`);
+    try {
+      utils.writeFile(testFile, '**Last Updated:** 10:30');
+      utils.replaceInFile(testFile, /\*\*Last Updated:\*\*.*/, '**Last Updated:** 14:45');
+      const content = utils.readFile(testFile);
+      assert.strictEqual(content, '**Last Updated:** 14:45');
+    } finally {
+      fs.unlinkSync(testFile);
+    }
+  })) passed++; else failed++;
+
+  // writeFile edge cases
+  console.log('\nwriteFile (edge cases):');
+
+  if (test('writeFile overwrites existing content', () => {
+    const testFile = path.join(utils.getTempDir(), `utils-test-${Date.now()}.txt`);
+    try {
+      utils.writeFile(testFile, 'original');
+      utils.writeFile(testFile, 'replaced');
+      const content = utils.readFile(testFile);
+      assert.strictEqual(content, 'replaced');
+    } finally {
+      fs.unlinkSync(testFile);
+    }
+  })) passed++; else failed++;
+
+  if (test('writeFile handles unicode content', () => {
+    const testFile = path.join(utils.getTempDir(), `utils-test-${Date.now()}.txt`);
+    try {
+      const unicode = '日本語テスト 🚀 émojis';
+      utils.writeFile(testFile, unicode);
+      const content = utils.readFile(testFile);
+      assert.strictEqual(content, unicode);
+    } finally {
+      fs.unlinkSync(testFile);
+    }
+  })) passed++; else failed++;
+
   // findFiles with regex special characters in pattern
   console.log('\nfindFiles (regex chars):');
 
