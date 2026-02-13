@@ -25,7 +25,7 @@ async function main() {
   // Track tool call count (increment in a temp file)
   // Use a session-specific counter file based on session ID from environment
   // or parent PID as fallback
-  const sessionId = process.env.CLAUDE_SESSION_ID || String(process.ppid) || 'default';
+  const sessionId = process.env.CLAUDE_SESSION_ID || 'default';
   const counterFile = path.join(getTempDir(), `claude-tool-count-${sessionId}`);
   const rawThreshold = parseInt(process.env.COMPACT_THRESHOLD || '50', 10);
   const threshold = Number.isFinite(rawThreshold) && rawThreshold > 0 && rawThreshold <= 10000
@@ -44,7 +44,11 @@ async function main() {
       const bytesRead = fs.readSync(fd, buf, 0, 64, 0);
       if (bytesRead > 0) {
         const parsed = parseInt(buf.toString('utf8', 0, bytesRead).trim(), 10);
-        count = Number.isFinite(parsed) ? parsed + 1 : 1;
+        // Clamp to reasonable range — corrupted files could contain huge values
+        // that pass Number.isFinite() (e.g., parseInt('9'.repeat(30)) => 1e+29)
+        count = (Number.isFinite(parsed) && parsed > 0 && parsed <= 1000000)
+          ? parsed + 1
+          : 1;
       }
       // Truncate and write new value
       fs.ftruncateSync(fd, 0);
@@ -62,8 +66,8 @@ async function main() {
     log(`[StrategicCompact] ${threshold} tool calls reached - consider /compact if transitioning phases`);
   }
 
-  // Suggest at regular intervals after threshold
-  if (count > threshold && count % 25 === 0) {
+  // Suggest at regular intervals after threshold (every 25 calls from threshold)
+  if (count > threshold && (count - threshold) % 25 === 0) {
     log(`[StrategicCompact] ${count} tool calls - good checkpoint for /compact if context is stale`);
   }
 
