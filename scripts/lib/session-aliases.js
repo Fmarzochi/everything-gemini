@@ -110,8 +110,10 @@ function saveAliases(aliases) {
     // Atomic write: write to temp file, then rename
     fs.writeFileSync(tempPath, content, 'utf8');
 
-    // On Windows, we need to delete the target file before renaming
-    if (fs.existsSync(aliasesPath)) {
+    // On Windows, rename fails with EEXIST if destination exists, so delete first.
+    // On Unix/macOS, rename(2) atomically replaces the destination — skip the
+    // delete to avoid an unnecessary non-atomic window between unlink and rename.
+    if (process.platform === 'win32' && fs.existsSync(aliasesPath)) {
       fs.unlinkSync(aliasesPath);
     }
     fs.renameSync(tempPath, aliasesPath);

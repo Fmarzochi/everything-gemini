@@ -801,6 +801,31 @@ function runTests() {
       'Original aliases data should be preserved after failed save');
   })) passed++; else failed++;
 
+  // ── Round 39: atomic overwrite on Unix (no unlink before rename) ──
+  console.log('\nRound 39: atomic overwrite:');
+
+  if (test('saveAliases overwrites existing file atomically', () => {
+    // Create initial aliases
+    aliases.setAlias('atomic-test', '2026-01-01-abc123-session.tmp');
+    const aliasesPath = aliases.getAliasesPath();
+    assert.ok(fs.existsSync(aliasesPath), 'Aliases file should exist');
+    const sizeBefore = fs.statSync(aliasesPath).size;
+    assert.ok(sizeBefore > 0, 'Aliases file should have content');
+
+    // Overwrite with different data
+    aliases.setAlias('atomic-test-2', '2026-02-01-def456-session.tmp');
+
+    // The file should still exist and be valid JSON
+    const content = fs.readFileSync(aliasesPath, 'utf8');
+    const parsed = JSON.parse(content);
+    assert.ok(parsed.aliases['atomic-test'], 'First alias should exist');
+    assert.ok(parsed.aliases['atomic-test-2'], 'Second alias should exist');
+
+    // Cleanup
+    aliases.deleteAlias('atomic-test');
+    aliases.deleteAlias('atomic-test-2');
+  })) passed++; else failed++;
+
   // Cleanup — restore both HOME and USERPROFILE (Windows)
   process.env.HOME = origHome;
   if (origUserProfile !== undefined) {
