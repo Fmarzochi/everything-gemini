@@ -3562,6 +3562,65 @@ Some random content without the expected ### Context to Load section
     cleanupTestDir(testDir);
   })) passed++; else failed++;
 
+  // ── Round 90: readStdinJson timeout path (utils.js lines 215-229) ──
+  console.log('\nRound 90: readStdinJson (timeout fires when stdin stays open):');
+
+  if (await asyncTest('readStdinJson resolves with {} when stdin never closes (timeout fires, no data)', async () => {
+    // utils.js line 215: setTimeout fires because stdin 'end' never arrives.
+    // Line 225: data.trim() is empty → resolves with {}.
+    // Exercises: removeAllListeners, process.stdin.unref(), and the empty-data timeout resolution.
+    const script = 'const u=require("./scripts/lib/utils");u.readStdinJson({timeoutMs:100}).then(d=>{process.stdout.write(JSON.stringify(d));process.exit(0)})';
+    return new Promise((resolve, reject) => {
+      const child = spawn('node', ['-e', script], {
+        cwd: path.resolve(__dirname, '..', '..'),
+        stdio: ['pipe', 'pipe', 'pipe']
+      });
+      // Don't write anything or close stdin — force the timeout to fire
+      let stdout = '';
+      child.stdout.on('data', d => stdout += d);
+      const timer = setTimeout(() => { child.kill(); reject(new Error('Test timed out')); }, 5000);
+      child.on('close', (code) => {
+        clearTimeout(timer);
+        try {
+          assert.strictEqual(code, 0, 'Should exit 0 via timeout resolution');
+          const parsed = JSON.parse(stdout);
+          assert.deepStrictEqual(parsed, {}, 'Should resolve with {} when no data received before timeout');
+          resolve();
+        } catch (err) {
+          reject(err);
+        }
+      });
+    });
+  })) passed++; else failed++;
+
+  if (await asyncTest('readStdinJson resolves with {} when timeout fires with invalid partial JSON', async () => {
+    // utils.js lines 224-228: setTimeout fires, data.trim() is non-empty,
+    // JSON.parse(data) throws → catch at line 226 resolves with {}.
+    const script = 'const u=require("./scripts/lib/utils");u.readStdinJson({timeoutMs:100}).then(d=>{process.stdout.write(JSON.stringify(d));process.exit(0)})';
+    return new Promise((resolve, reject) => {
+      const child = spawn('node', ['-e', script], {
+        cwd: path.resolve(__dirname, '..', '..'),
+        stdio: ['pipe', 'pipe', 'pipe']
+      });
+      // Write partial invalid JSON but don't close stdin — timeout fires with unparseable data
+      child.stdin.write('{"incomplete":');
+      let stdout = '';
+      child.stdout.on('data', d => stdout += d);
+      const timer = setTimeout(() => { child.kill(); reject(new Error('Test timed out')); }, 5000);
+      child.on('close', (code) => {
+        clearTimeout(timer);
+        try {
+          assert.strictEqual(code, 0, 'Should exit 0 via timeout resolution');
+          const parsed = JSON.parse(stdout);
+          assert.deepStrictEqual(parsed, {}, 'Should resolve with {} when partial JSON cannot be parsed');
+          resolve();
+        } catch (err) {
+          reject(err);
+        }
+      });
+    });
+  })) passed++; else failed++;
+
   // Summary
   console.log('\n=== Test Results ===');
   console.log(`Passed: ${passed}`);

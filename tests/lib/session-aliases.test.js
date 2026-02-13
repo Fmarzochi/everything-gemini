@@ -1223,6 +1223,55 @@ function runTests() {
     resetAliases();
   })) passed++; else failed++;
 
+  // ── Round 90: saveAliases backup restore double failure (inner catch restoreErr) ──
+  console.log('\nRound 90: saveAliases (backup restore double failure):');
+
+  if (test('saveAliases triggers inner restoreErr catch when both save and restore fail', () => {
+    // session-aliases.js lines 131-137: When saveAliases fails (outer catch),
+    // it tries to restore from backup. If the restore ALSO fails, the inner
+    // catch at line 135 logs restoreErr. No existing test creates this double-fault.
+    if (process.platform === 'win32') {
+      console.log('    (skipped — chmod not reliable on Windows)');
+      return;
+    }
+    const isoHome = path.join(os.tmpdir(), `ecc-r90-restore-fail-${Date.now()}`);
+    const claudeDir = path.join(isoHome, '.claude');
+    fs.mkdirSync(claudeDir, { recursive: true });
+
+    // Pre-create a backup file while directory is still writable
+    const backupPath = path.join(claudeDir, 'session-aliases.json.bak');
+    fs.writeFileSync(backupPath, JSON.stringify({ aliases: {}, version: '1.0' }));
+
+    // Make .claude directory read-only (0o555):
+    // 1. writeFileSync(tempPath) → EACCES (can't create file in read-only dir) — outer catch
+    // 2. copyFileSync(backupPath, aliasesPath) → EACCES (can't create target) — inner catch (line 135)
+    fs.chmodSync(claudeDir, 0o555);
+
+    const origH = process.env.HOME;
+    const origP = process.env.USERPROFILE;
+    process.env.HOME = isoHome;
+    process.env.USERPROFILE = isoHome;
+
+    try {
+      delete require.cache[require.resolve('../../scripts/lib/session-aliases')];
+      delete require.cache[require.resolve('../../scripts/lib/utils')];
+      const freshAliases = require('../../scripts/lib/session-aliases');
+
+      const result = freshAliases.saveAliases({ aliases: { x: 1 }, version: '1.0' });
+      assert.strictEqual(result, false, 'Should return false when save fails');
+
+      // Backup should still exist (restore also failed, so backup was not consumed)
+      assert.ok(fs.existsSync(backupPath), 'Backup should still exist after double failure');
+    } finally {
+      process.env.HOME = origH;
+      process.env.USERPROFILE = origP;
+      delete require.cache[require.resolve('../../scripts/lib/session-aliases')];
+      delete require.cache[require.resolve('../../scripts/lib/utils')];
+      try { fs.chmodSync(claudeDir, 0o755); } catch { /* best-effort */ }
+      fs.rmSync(isoHome, { recursive: true, force: true });
+    }
+  })) passed++; else failed++;
+
   // Summary
   console.log(`\nResults: Passed: ${passed}, Failed: ${failed}`);
   process.exit(failed > 0 ? 1 : 0);
