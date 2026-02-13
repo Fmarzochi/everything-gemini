@@ -189,11 +189,20 @@ function getSessionStats(sessionPathOrContent) {
  */
 function getAllSessions(options = {}) {
   const {
-    limit = 50,
-    offset = 0,
+    limit: rawLimit = 50,
+    offset: rawOffset = 0,
     date = null,
     search = null
   } = options;
+
+  // Clamp offset and limit to safe non-negative integers.
+  // Without this, negative offset causes slice() to count from the end,
+  // and NaN values cause slice() to return empty or unexpected results.
+  // Note: cannot use `|| default` because 0 is falsy — use isNaN instead.
+  const offsetNum = Number(rawOffset);
+  const offset = Number.isNaN(offsetNum) ? 0 : Math.max(0, Math.floor(offsetNum));
+  const limitNum = Number(rawLimit);
+  const limit = Number.isNaN(limitNum) ? 50 : Math.max(1, Math.floor(limitNum));
 
   const sessionsDir = getSessionsDir();
 

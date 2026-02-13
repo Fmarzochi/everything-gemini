@@ -561,9 +561,26 @@ function runTests() {
     assert.strictEqual(remaining.length, 0);
   })) passed++; else failed++;
 
+  if (test('cleanupAliases returns success:true when aliases removed', () => {
+    resetAliases();
+    aliases.setAlias('dead', '/sessions/dead');
+    const result = aliases.cleanupAliases(() => false);
+    assert.strictEqual(result.success, true);
+    assert.strictEqual(result.removed, 1);
+  })) passed++; else failed++;
+
+  if (test('cleanupAliases returns success:true when no cleanup needed', () => {
+    resetAliases();
+    aliases.setAlias('alive', '/sessions/alive');
+    const result = aliases.cleanupAliases(() => true);
+    assert.strictEqual(result.success, true);
+    assert.strictEqual(result.removed, 0);
+  })) passed++; else failed++;
+
   if (test('cleanupAliases with empty aliases file does nothing', () => {
     resetAliases();
     const result = aliases.cleanupAliases(() => true);
+    assert.strictEqual(result.success, true);
     assert.strictEqual(result.removed, 0);
     assert.strictEqual(result.totalChecked, 0);
     assert.strictEqual(result.removedAliases.length, 0);

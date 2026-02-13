@@ -446,9 +446,17 @@ function cleanupAliases(sessionExists) {
 
   if (removed.length > 0 && !saveAliases(data)) {
     log('[Aliases] Failed to save after cleanup');
+    return {
+      success: false,
+      totalChecked: Object.keys(data.aliases).length + removed.length,
+      removed: removed.length,
+      removedAliases: removed,
+      error: 'Failed to save after cleanup'
+    };
   }
 
   return {
+    success: true,
     totalChecked: Object.keys(data.aliases).length + removed.length,
     removed: removed.length,
     removedAliases: removed

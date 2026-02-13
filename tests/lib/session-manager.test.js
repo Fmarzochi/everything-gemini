@@ -754,6 +754,67 @@ src/main.ts
     }
   })) passed++; else failed++;
 
+  // getAllSessions pagination edge cases (offset/limit clamping)
+  console.log('\ngetAllSessions (pagination edge cases):');
+
+  if (test('getAllSessions clamps negative offset to 0', () => {
+    const result = sessionManager.getAllSessions({ offset: -5, limit: 2 });
+    // Negative offset should be clamped to 0, returning the first 2 sessions
+    assert.strictEqual(result.sessions.length, 2);
+    assert.strictEqual(result.offset, 0);
+    assert.strictEqual(result.total, 5);
+  })) passed++; else failed++;
+
+  if (test('getAllSessions clamps NaN offset to 0', () => {
+    const result = sessionManager.getAllSessions({ offset: NaN, limit: 3 });
+    assert.strictEqual(result.sessions.length, 3);
+    assert.strictEqual(result.offset, 0);
+  })) passed++; else failed++;
+
+  if (test('getAllSessions clamps NaN limit to default', () => {
+    const result = sessionManager.getAllSessions({ offset: 0, limit: NaN });
+    // NaN limit should be clamped to default (50), returning all 5 sessions
+    assert.ok(result.sessions.length > 0);
+    assert.strictEqual(result.total, 5);
+  })) passed++; else failed++;
+
+  if (test('getAllSessions clamps negative limit to 1', () => {
+    const result = sessionManager.getAllSessions({ offset: 0, limit: -10 });
+    // Negative limit should be clamped to 1
+    assert.strictEqual(result.sessions.length, 1);
+    assert.strictEqual(result.limit, 1);
+  })) passed++; else failed++;
+
+  if (test('getAllSessions clamps zero limit to 1', () => {
+    const result = sessionManager.getAllSessions({ offset: 0, limit: 0 });
+    assert.strictEqual(result.sessions.length, 1);
+    assert.strictEqual(result.limit, 1);
+  })) passed++; else failed++;
+
+  if (test('getAllSessions handles string offset/limit gracefully', () => {
+    const result = sessionManager.getAllSessions({ offset: 'abc', limit: 'xyz' });
+    // String non-numeric should be treated as 0/default
+    assert.strictEqual(result.offset, 0);
+    assert.ok(result.sessions.length > 0);
+  })) passed++; else failed++;
+
+  if (test('getAllSessions handles fractional offset (floors to integer)', () => {
+    const result = sessionManager.getAllSessions({ offset: 1.7, limit: 2 });
+    // 1.7 should floor to 1, skip first session, return next 2
+    assert.strictEqual(result.offset, 1);
+    assert.strictEqual(result.sessions.length, 2);
+  })) passed++; else failed++;
+
+  if (test('getAllSessions handles Infinity offset', () => {
+    // Infinity should clamp to 0 since Number(Infinity) is Infinity but
+    // Math.floor(Infinity) is Infinity — however slice(Infinity) returns []
+    // Actually: Number(Infinity) || 0 = Infinity, Math.floor(Infinity) = Infinity
+    // Math.max(0, Infinity) = Infinity, so slice(Infinity) = []
+    const result = sessionManager.getAllSessions({ offset: Infinity, limit: 2 });
+    assert.strictEqual(result.sessions.length, 0);
+    assert.strictEqual(result.total, 5);
+  })) passed++; else failed++;
+
   // getSessionStats with code blocks and special characters
   console.log('\ngetSessionStats (code blocks & special chars):');
 
