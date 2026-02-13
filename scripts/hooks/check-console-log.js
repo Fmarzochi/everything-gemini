@@ -39,7 +39,7 @@ process.stdin.on('data', chunk => {
 process.stdin.on('end', () => {
   try {
     if (!isGitRepo()) {
-      console.log(data);
+      process.stdout.write(data);
       process.exit(0);
     }
 
@@ -65,5 +65,5 @@ process.stdin.on('end', () => {
   }
 
   // Always output the original data
-  console.log(data);
+  process.stdout.write(data);
 });

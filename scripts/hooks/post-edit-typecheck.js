@@ -49,12 +49,13 @@ process.stdin.on("end", () => {
 
       if (fs.existsSync(path.join(dir, "tsconfig.json"))) {
         try {
-          execFileSync("npx", ["tsc", "--noEmit", "--pretty", "false"], {
+          // Use npx.cmd on Windows to avoid shell: true which enables command injection
+          const npxBin = process.platform === "win32" ? "npx.cmd" : "npx";
+          execFileSync(npxBin, ["tsc", "--noEmit", "--pretty", "false"], {
             cwd: dir,
             encoding: "utf8",
             stdio: ["pipe", "pipe", "pipe"],
             timeout: 30000,
-            shell: process.platform === "win32",
           });
         } catch (err) {
           // tsc exits non-zero when there are errors — filter to edited file

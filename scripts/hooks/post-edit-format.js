@@ -27,10 +27,11 @@ process.stdin.on('end', () => {
 
     if (filePath && /\.(ts|tsx|js|jsx)$/.test(filePath)) {
       try {
-        execFileSync('npx', ['prettier', '--write', filePath], {
+        // Use npx.cmd on Windows to avoid shell: true which enables command injection
+        const npxBin = process.platform === 'win32' ? 'npx.cmd' : 'npx';
+        execFileSync(npxBin, ['prettier', '--write', filePath], {
           stdio: ['pipe', 'pipe', 'pipe'],
-          timeout: 15000,
-          shell: process.platform === 'win32'
+          timeout: 15000
         });
       } catch {
         // Prettier not installed, file missing, or failed — non-blocking

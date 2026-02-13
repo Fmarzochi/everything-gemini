@@ -1447,6 +1447,79 @@ async function runTests() {
     }
   })) passed++; else failed++;
 
+  // ─── Round 20 bug fix tests ───
+  console.log('\ncheck-console-log.js (exact pass-through):');
+
+  if (await asyncTest('stdout is exact byte match of stdin (no trailing newline)', async () => {
+    // Before the fix, console.log(data) added a trailing \n.
+    // process.stdout.write(data) should preserve exact bytes.
+    const stdinData = '{"tool":"test","value":42}';
+    const result = await runScript(path.join(scriptsDir, 'check-console-log.js'), stdinData);
+    assert.strictEqual(result.code, 0);
+    // stdout should be exactly the input — no extra newline appended
+    assert.strictEqual(result.stdout, stdinData, 'Should not append extra newline to output');
+  })) passed++; else failed++;
+
+  if (await asyncTest('preserves empty string stdin without adding newline', async () => {
+    const result = await runScript(path.join(scriptsDir, 'check-console-log.js'), '');
+    assert.strictEqual(result.code, 0);
+    assert.strictEqual(result.stdout, '', 'Empty input should produce empty output');
+  })) passed++; else failed++;
+
+  if (await asyncTest('preserves data with embedded newlines exactly', async () => {
+    const stdinData = 'line1\nline2\nline3';
+    const result = await runScript(path.join(scriptsDir, 'check-console-log.js'), stdinData);
+    assert.strictEqual(result.code, 0);
+    assert.strictEqual(result.stdout, stdinData, 'Should preserve embedded newlines without adding extra');
+  })) passed++; else failed++;
+
+  console.log('\npost-edit-format.js (security & extension tests):');
+
+  if (await asyncTest('source code does not pass shell option to execFileSync (security)', async () => {
+    const formatSource = fs.readFileSync(path.join(scriptsDir, 'post-edit-format.js'), 'utf8');
+    // Strip comments to avoid matching "shell: true" in comment text
+    const codeOnly = formatSource.replace(/\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '');
+    assert.ok(!codeOnly.includes('shell:'), 'post-edit-format.js should not pass shell option in code');
+    assert.ok(formatSource.includes('npx.cmd'), 'Should use npx.cmd for Windows cross-platform safety');
+  })) passed++; else failed++;
+
+  if (await asyncTest('matches .tsx extension for formatting', async () => {
+    const stdinJson = JSON.stringify({ tool_input: { file_path: '/nonexistent/component.tsx' } });
+    const result = await runScript(path.join(scriptsDir, 'post-edit-format.js'), stdinJson);
+    assert.strictEqual(result.code, 0);
+    // Should attempt to format (will fail silently since file doesn't exist, but should pass through)
+    assert.ok(result.stdout.includes('component.tsx'), 'Should pass through data for .tsx files');
+  })) passed++; else failed++;
+
+  if (await asyncTest('matches .jsx extension for formatting', async () => {
+    const stdinJson = JSON.stringify({ tool_input: { file_path: '/nonexistent/component.jsx' } });
+    const result = await runScript(path.join(scriptsDir, 'post-edit-format.js'), stdinJson);
+    assert.strictEqual(result.code, 0);
+    assert.ok(result.stdout.includes('component.jsx'), 'Should pass through data for .jsx files');
+  })) passed++; else failed++;
+
+  console.log('\npost-edit-typecheck.js (security & extension tests):');
+
+  if (await asyncTest('source code does not pass shell option to execFileSync (security)', async () => {
+    const typecheckSource = fs.readFileSync(path.join(scriptsDir, 'post-edit-typecheck.js'), 'utf8');
+    // Strip comments to avoid matching "shell: true" in comment text
+    const codeOnly = typecheckSource.replace(/\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '');
+    assert.ok(!codeOnly.includes('shell:'), 'post-edit-typecheck.js should not pass shell option in code');
+    assert.ok(typecheckSource.includes('npx.cmd'), 'Should use npx.cmd for Windows cross-platform safety');
+  })) passed++; else failed++;
+
+  if (await asyncTest('matches .tsx extension for type checking', async () => {
+    const testDir = createTestDir();
+    const testFile = path.join(testDir, 'component.tsx');
+    fs.writeFileSync(testFile, 'const x: number = 1;');
+
+    const stdinJson = JSON.stringify({ tool_input: { file_path: testFile } });
+    const result = await runScript(path.join(scriptsDir, 'post-edit-typecheck.js'), stdinJson);
+    assert.strictEqual(result.code, 0);
+    assert.ok(result.stdout.includes('tool_input'), 'Should pass through data for .tsx files');
+    cleanupTestDir(testDir);
+  })) passed++; else failed++;
+
   // Summary
   console.log('\n=== Test Results ===');
   console.log(`Passed: ${passed}`);
