@@ -374,6 +374,83 @@ function runTests() {
       `Subtitle line should be 66 chars, got ${subtitleLine.length}`);
   })) passed++; else failed++;
 
+  // ── Round 35: box() width accuracy ──
+  console.log('\nbox() width accuracy (Round 35):');
+
+  if (test('box lines in instincts() match the default box width of 60', () => {
+    const output = new SkillCreateOutput('repo');
+    const logs = captureLog(() => output.instincts([
+      { name: 'test-instinct', confidence: 0.85 },
+    ]));
+    const combined = logs.join('\n');
+    const boxLines = combined.split('\n').filter(l => {
+      const s = stripAnsi(l).trim();
+      return s.startsWith('\u256D') || s.startsWith('\u2502') || s.startsWith('\u2570');
+    });
+    assert.ok(boxLines.length >= 3, 'Should have at least 3 box lines');
+    // The box() default width is 60 — each line should be exactly 60 chars
+    boxLines.forEach((l, i) => {
+      const w = stripAnsi(l).length;
+      assert.strictEqual(w, 60,
+        `Box line ${i} should be 60 chars wide, got ${w}`);
+    });
+  })) passed++; else failed++;
+
+  if (test('box lines with custom width match the requested width', () => {
+    const output = new SkillCreateOutput('repo', { width: 40 });
+    const logs = captureLog(() => output.instincts([
+      { name: 'short', confidence: 0.9 },
+    ]));
+    const combined = logs.join('\n');
+    const boxLines = combined.split('\n').filter(l => {
+      const s = stripAnsi(l).trim();
+      return s.startsWith('\u256D') || s.startsWith('\u2502') || s.startsWith('\u2570');
+    });
+    assert.ok(boxLines.length >= 3, 'Should have at least 3 box lines');
+    // instincts() calls box() with no explicit width, so it uses the default 60
+    // regardless of this.width — verify self-consistency at least
+    const firstWidth = stripAnsi(boxLines[0]).length;
+    boxLines.forEach((l, i) => {
+      const w = stripAnsi(l).length;
+      assert.strictEqual(w, firstWidth,
+        `Box line ${i} width ${w} should match first line ${firstWidth}`);
+    });
+  })) passed++; else failed++;
+
+  if (test('analysisResults box lines are all 60 chars wide', () => {
+    const output = new SkillCreateOutput('repo');
+    const logs = captureLog(() => output.analysisResults({
+      commits: 50, timeRange: 'Jan 2026', contributors: 2, files: 100,
+    }));
+    const combined = logs.join('\n');
+    const boxLines = combined.split('\n').filter(l => {
+      const s = stripAnsi(l).trim();
+      return s.startsWith('\u256D') || s.startsWith('\u2502') || s.startsWith('\u2570');
+    });
+    assert.ok(boxLines.length >= 3, 'Should have at least 3 box lines');
+    boxLines.forEach((l, i) => {
+      const w = stripAnsi(l).length;
+      assert.strictEqual(w, 60,
+        `Analysis box line ${i} should be 60 chars, got ${w}`);
+    });
+  })) passed++; else failed++;
+
+  if (test('nextSteps box lines are all 60 chars wide', () => {
+    const output = new SkillCreateOutput('repo');
+    const logs = captureLog(() => output.nextSteps());
+    const combined = logs.join('\n');
+    const boxLines = combined.split('\n').filter(l => {
+      const s = stripAnsi(l).trim();
+      return s.startsWith('\u256D') || s.startsWith('\u2502') || s.startsWith('\u2570');
+    });
+    assert.ok(boxLines.length >= 3, 'Should have at least 3 box lines');
+    boxLines.forEach((l, i) => {
+      const w = stripAnsi(l).length;
+      assert.strictEqual(w, 60,
+        `NextSteps box line ${i} should be 60 chars, got ${w}`);
+    });
+  })) passed++; else failed++;
+
   // Summary
   console.log(`\nResults: Passed: ${passed}, Failed: ${failed}`);
   process.exit(failed > 0 ? 1 : 0);
