@@ -1504,6 +1504,46 @@ src/main.ts
       'Should return at most 1 session (slice(0, 1))');
   })) passed++; else failed++;
 
+  // ── Round 96: parseSessionFilename with Feb 30 (impossible date) ──
+  console.log('\nRound 96: parseSessionFilename (Feb 30 — impossible date):');
+
+  if (test('parseSessionFilename rejects Feb 30 (passes day<=31 but fails Date rollover)', () => {
+    // Feb 30 passes the bounds check (month 1-12, day 1-31) at line 37
+    // but new Date(2026, 1, 30) → March 2 (rollover), so getMonth() !== 1 → returns null
+    const result = sessionManager.parseSessionFilename('2026-02-30-abcd1234-session.tmp');
+    assert.strictEqual(result, null,
+      'Feb 30 should be rejected by Date constructor rollover check (line 41)');
+  })) passed++; else failed++;
+
+  // ── Round 96: getAllSessions with limit: Infinity ──
+  console.log('\nRound 96: getAllSessions (limit: Infinity — pagination bypass):');
+
+  if (test('getAllSessions with limit: Infinity returns all sessions (no pagination)', () => {
+    // Number(Infinity) = Infinity, Number.isNaN(Infinity) = false
+    // Math.max(1, Math.floor(Infinity)) = Math.max(1, Infinity) = Infinity
+    // slice(0, 0 + Infinity) returns all elements
+    const result = sessionManager.getAllSessions({ limit: Infinity });
+    assert.strictEqual(result.limit, Infinity,
+      'Infinity limit should pass through (not clamped or defaulted)');
+    assert.strictEqual(result.sessions.length, result.total,
+      'All sessions should be returned (no pagination truncation)');
+    assert.strictEqual(result.hasMore, false,
+      'hasMore should be false since all sessions are returned');
+  })) passed++; else failed++;
+
+  // ── Round 96: getAllSessions with limit: null ──
+  console.log('\nRound 96: getAllSessions (limit: null — destructuring default bypass):');
+
+  if (test('getAllSessions with limit: null clamps to 1 (null bypasses destructuring default)', () => {
+    // Destructuring default only fires for undefined, NOT null
+    // rawLimit = null (not 50), Number(null) = 0, Math.max(1, 0) = 1
+    const result = sessionManager.getAllSessions({ limit: null });
+    assert.strictEqual(result.limit, 1,
+      'null limit should become 1 (Number(null)=0, clamped via Math.max(1,0))');
+    assert.ok(result.sessions.length <= 1,
+      'Should return at most 1 session (clamped limit)');
+  })) passed++; else failed++;
+
   // Summary
   console.log(`\nResults: Passed: ${passed}, Failed: ${failed}`);
   process.exit(failed > 0 ? 1 : 0);
