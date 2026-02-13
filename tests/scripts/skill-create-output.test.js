@@ -319,6 +319,61 @@ function runTests() {
     assert.ok(combined.includes('Powered by'), 'Should include attribution text');
   })) passed++; else failed++;
 
+  // ── Round 34: header width alignment ──
+  console.log('\nheader() width alignment (Round 34):');
+
+  if (test('header subtitle line matches border width', () => {
+    const output = new SkillCreateOutput('test-repo');
+    const logs = captureLog(() => output.header());
+    // Find the border and subtitle lines
+    const lines = logs.map(l => stripAnsi(l));
+    const borderLine = lines.find(l => l.includes('═══'));
+    const subtitleLine = lines.find(l => l.includes('Extracting patterns'));
+    assert.ok(borderLine, 'Should find border line');
+    assert.ok(subtitleLine, 'Should find subtitle line');
+    // Both lines should have the same visible width
+    assert.strictEqual(subtitleLine.length, borderLine.length,
+      `Subtitle width (${subtitleLine.length}) should match border width (${borderLine.length})`);
+  })) passed++; else failed++;
+
+  if (test('header all lines have consistent width for short repo name', () => {
+    const output = new SkillCreateOutput('abc');
+    const logs = captureLog(() => output.header());
+    const lines = logs.map(l => stripAnsi(l)).filter(l => l.includes('║') || l.includes('╔') || l.includes('╚'));
+    assert.ok(lines.length >= 4, 'Should have at least 4 box lines');
+    const widths = lines.map(l => l.length);
+    const first = widths[0];
+    widths.forEach((w, i) => {
+      assert.strictEqual(w, first,
+        `Line ${i} width (${w}) should match first line (${first})`);
+    });
+  })) passed++; else failed++;
+
+  if (test('header subtitle has correct content area width of 64 chars', () => {
+    const output = new SkillCreateOutput('myrepo');
+    const logs = captureLog(() => output.header());
+    const lines = logs.map(l => stripAnsi(l));
+    const subtitleLine = lines.find(l => l.includes('Extracting patterns'));
+    assert.ok(subtitleLine, 'Should find subtitle line');
+    // Content between ║ and ║ should be 64 chars (border is 66 total)
+    // Format: ║ + content(64) + ║ = 66
+    assert.strictEqual(subtitleLine.length, 66,
+      `Total subtitle line width should be 66, got ${subtitleLine.length}`);
+  })) passed++; else failed++;
+
+  if (test('header subtitle line does not truncate with medium-length repo name', () => {
+    const output = new SkillCreateOutput('my-medium-repo-name');
+    const logs = captureLog(() => output.header());
+    const combined = logs.join('\n');
+    assert.ok(combined.includes('my-medium-repo-name'), 'Should include full repo name');
+    const lines = logs.map(l => stripAnsi(l));
+    const subtitleLine = lines.find(l => l.includes('Extracting patterns'));
+    assert.ok(subtitleLine, 'Should have subtitle line');
+    // Should still be 66 chars even with a longer name
+    assert.strictEqual(subtitleLine.length, 66,
+      `Subtitle line should be 66 chars, got ${subtitleLine.length}`);
+  })) passed++; else failed++;
+
   // Summary
   console.log(`\nResults: Passed: ${passed}, Failed: ${failed}`);
   process.exit(failed > 0 ? 1 : 0);

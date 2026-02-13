@@ -1093,6 +1093,77 @@ function runTests() {
     }
   })) passed++; else failed++;
 
+  // ── Round 34: getExecCommand non-string args & packageManager type ──
+  console.log('\nRound 34: getExecCommand non-string args:');
+
+  if (test('getExecCommand with args=0 produces command without extra args', () => {
+    const originalEnv = process.env.CLAUDE_PACKAGE_MANAGER;
+    try {
+      process.env.CLAUDE_PACKAGE_MANAGER = 'npm';
+      const cmd = pm.getExecCommand('prettier', 0);
+      // 0 is falsy, so ternary `args ? ' ' + args : ''` yields ''
+      assert.ok(!cmd.includes(' 0'), 'Should not append 0 as args');
+      assert.ok(cmd.includes('prettier'), 'Should include binary name');
+    } finally {
+      if (originalEnv !== undefined) process.env.CLAUDE_PACKAGE_MANAGER = originalEnv;
+      else delete process.env.CLAUDE_PACKAGE_MANAGER;
+    }
+  })) passed++; else failed++;
+
+  if (test('getExecCommand with args=false produces command without extra args', () => {
+    const originalEnv = process.env.CLAUDE_PACKAGE_MANAGER;
+    try {
+      process.env.CLAUDE_PACKAGE_MANAGER = 'npm';
+      const cmd = pm.getExecCommand('eslint', false);
+      assert.ok(!cmd.includes('false'), 'Should not append false as args');
+      assert.ok(cmd.includes('eslint'), 'Should include binary name');
+    } finally {
+      if (originalEnv !== undefined) process.env.CLAUDE_PACKAGE_MANAGER = originalEnv;
+      else delete process.env.CLAUDE_PACKAGE_MANAGER;
+    }
+  })) passed++; else failed++;
+
+  if (test('getExecCommand with args=null produces command without extra args', () => {
+    const originalEnv = process.env.CLAUDE_PACKAGE_MANAGER;
+    try {
+      process.env.CLAUDE_PACKAGE_MANAGER = 'npm';
+      const cmd = pm.getExecCommand('tsc', null);
+      assert.ok(!cmd.includes('null'), 'Should not append null as args');
+      assert.ok(cmd.includes('tsc'), 'Should include binary name');
+    } finally {
+      if (originalEnv !== undefined) process.env.CLAUDE_PACKAGE_MANAGER = originalEnv;
+      else delete process.env.CLAUDE_PACKAGE_MANAGER;
+    }
+  })) passed++; else failed++;
+
+  console.log('\nRound 34: detectFromPackageJson with non-string packageManager:');
+
+  if (test('detectFromPackageJson handles array packageManager field gracefully', () => {
+    const tmpDir = createTestDir();
+    try {
+      // Write a malformed package.json with array instead of string
+      fs.writeFileSync(path.join(tmpDir, 'package.json'),
+        JSON.stringify({ packageManager: ['pnpm@8', 'yarn@3'] }));
+      // Should not crash — try/catch in detectFromPackageJson catches TypeError
+      const result = pm.getPackageManager({ projectDir: tmpDir });
+      assert.ok(result.name, 'Should fallback to a valid package manager');
+    } finally {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  })) passed++; else failed++;
+
+  if (test('detectFromPackageJson handles numeric packageManager field gracefully', () => {
+    const tmpDir = createTestDir();
+    try {
+      fs.writeFileSync(path.join(tmpDir, 'package.json'),
+        JSON.stringify({ packageManager: 42 }));
+      const result = pm.getPackageManager({ projectDir: tmpDir });
+      assert.ok(result.name, 'Should fallback to a valid package manager');
+    } finally {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  })) passed++; else failed++;
+
   // Summary
   console.log('\n=== Test Results ===');
   console.log(`Passed: ${passed}`);

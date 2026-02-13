@@ -91,7 +91,7 @@ class SkillCreateOutput {
     console.log('\n');
     console.log(chalk.bold(chalk.magenta('╔════════════════════════════════════════════════════════════════╗')));
     console.log(chalk.bold(chalk.magenta('║')) + chalk.bold('  🔮 ECC Skill Creator                                          ') + chalk.bold(chalk.magenta('║')));
-    console.log(chalk.bold(chalk.magenta('║')) + `     ${subtitle}${' '.repeat(Math.max(0, 55 - stripAnsi(subtitle).length))}` + chalk.bold(chalk.magenta('║')));
+    console.log(chalk.bold(chalk.magenta('║')) + `     ${subtitle}${' '.repeat(Math.max(0, 59 - stripAnsi(subtitle).length))}` + chalk.bold(chalk.magenta('║')));
     console.log(chalk.bold(chalk.magenta('╚════════════════════════════════════════════════════════════════╝')));
     console.log('');
   }
