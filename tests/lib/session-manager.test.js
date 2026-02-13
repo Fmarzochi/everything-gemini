@@ -1593,6 +1593,19 @@ src/main.ts
     );
   })) passed++; else failed++;
 
+  // ── Round 99: writeSessionContent with null path returns false (error caught) ──
+  console.log('\nRound 99: writeSessionContent (null path — error handling):');
+
+  if (test('writeSessionContent(null, content) returns false (TypeError caught by try/catch)', () => {
+    // session-manager.js lines 372-378: writeSessionContent wraps fs.writeFileSync
+    // in a try/catch. When sessionPath is null, fs.writeFileSync throws TypeError:
+    // 'The "path" argument must be of type string or Buffer or URL. Received null'
+    // The catch block catches this and returns false (does not propagate).
+    const result = sessionManager.writeSessionContent(null, 'some content');
+    assert.strictEqual(result, false,
+      'null path should be caught by try/catch and return false');
+  })) passed++; else failed++;
+
   // Summary
   console.log(`\nResults: Passed: ${passed}, Failed: ${failed}`);
   process.exit(failed > 0 ? 1 : 0);

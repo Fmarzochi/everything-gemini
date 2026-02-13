@@ -1373,6 +1373,55 @@ function runTests() {
     }
   })) passed++; else failed++;
 
+  // ── Round 99: replaceInFile returns true even when pattern not found ──
+  console.log('\nRound 99: replaceInFile (no-match still returns true):');
+
+  if (test('replaceInFile returns true and rewrites file even when search does not match', () => {
+    // utils.js lines 405-417: replaceInFile reads content, calls content.replace(search, replace),
+    // and writes back the result. When the search pattern doesn't match anything,
+    // String.replace() returns the original string unchanged, but the function still
+    // writes it back to disk (changing mtime) and returns true. This means callers
+    // cannot distinguish "replacement made" from "no match found."
+    const tmpDir = fs.mkdtempSync(path.join(utils.getTempDir(), 'r99-no-match-'));
+    const testFile = path.join(tmpDir, 'test.txt');
+    try {
+      fs.writeFileSync(testFile, 'hello world');
+      const result = utils.replaceInFile(testFile, 'NONEXISTENT_PATTERN', 'replacement');
+      assert.strictEqual(result, true,
+        'replaceInFile returns true even when pattern is not found (no match guard)');
+      const content = fs.readFileSync(testFile, 'utf8');
+      assert.strictEqual(content, 'hello world',
+        'Content should be unchanged since pattern did not match');
+    } finally {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  })) passed++; else failed++;
+
+  // ── Round 99: grepFile with CR-only line endings (\r without \n) ──
+  console.log('\nRound 99: grepFile (CR-only line endings — classic Mac format):');
+
+  if (test('grepFile treats CR-only file as a single line (splits on \\n only)', () => {
+    // utils.js line 474: `content.split('\\n')` splits only on \\n (LF).
+    // A file using \\r (CR) line endings (classic Mac format) has no \\n characters,
+    // so split('\\n') returns the entire content as a single element array.
+    // This means grepFile reports everything on "line 1" regardless of \\r positions.
+    const tmpDir = fs.mkdtempSync(path.join(utils.getTempDir(), 'r99-cr-only-'));
+    const testFile = path.join(tmpDir, 'cr-only.txt');
+    try {
+      // Write file with CR-only line endings (no LF)
+      fs.writeFileSync(testFile, 'alpha\rbeta\rgamma');
+      const matches = utils.grepFile(testFile, 'beta');
+      assert.strictEqual(matches.length, 1,
+        'Should find exactly 1 match (entire file is one "line")');
+      assert.strictEqual(matches[0].lineNumber, 1,
+        'Match should be reported on line 1 (no \\n splitting occurred)');
+      assert.ok(matches[0].content.includes('\r'),
+        'Content should contain \\r characters (unsplit)');
+    } finally {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  })) passed++; else failed++;
+
   // Summary
   console.log('\n=== Test Results ===');
   console.log(`Passed: ${passed}`);
