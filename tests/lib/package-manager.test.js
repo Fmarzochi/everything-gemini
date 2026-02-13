@@ -607,6 +607,137 @@ function runTests() {
     }
   })) passed++; else failed++;
 
+  // getPackageManager source detection tests
+  console.log('\ngetPackageManager (source detection):');
+
+  if (test('detects from valid project-config (.claude/package-manager.json)', () => {
+    const testDir = fs.mkdtempSync(path.join(os.tmpdir(), 'pm-projcfg-'));
+    const claudeDir = path.join(testDir, '.claude');
+    fs.mkdirSync(claudeDir, { recursive: true });
+    fs.writeFileSync(path.join(claudeDir, 'package-manager.json'),
+      JSON.stringify({ packageManager: 'pnpm' }));
+
+    const originalEnv = process.env.CLAUDE_PACKAGE_MANAGER;
+    try {
+      delete process.env.CLAUDE_PACKAGE_MANAGER;
+      const result = pm.getPackageManager({ projectDir: testDir });
+      assert.strictEqual(result.name, 'pnpm', 'Should detect pnpm from project config');
+      assert.strictEqual(result.source, 'project-config', 'Source should be project-config');
+    } finally {
+      if (originalEnv !== undefined) {
+        process.env.CLAUDE_PACKAGE_MANAGER = originalEnv;
+      }
+      fs.rmSync(testDir, { recursive: true, force: true });
+    }
+  })) passed++; else failed++;
+
+  if (test('project-config takes priority over package.json', () => {
+    const testDir = fs.mkdtempSync(path.join(os.tmpdir(), 'pm-priority-'));
+    const claudeDir = path.join(testDir, '.claude');
+    fs.mkdirSync(claudeDir, { recursive: true });
+
+    // Project config says bun
+    fs.writeFileSync(path.join(claudeDir, 'package-manager.json'),
+      JSON.stringify({ packageManager: 'bun' }));
+    // package.json says yarn
+    fs.writeFileSync(path.join(testDir, 'package.json'),
+      JSON.stringify({ packageManager: 'yarn@4.0.0' }));
+    // Lock file says npm
+    fs.writeFileSync(path.join(testDir, 'package-lock.json'), '{}');
+
+    const originalEnv = process.env.CLAUDE_PACKAGE_MANAGER;
+    try {
+      delete process.env.CLAUDE_PACKAGE_MANAGER;
+      const result = pm.getPackageManager({ projectDir: testDir });
+      assert.strictEqual(result.name, 'bun', 'Project config should win over package.json and lock file');
+      assert.strictEqual(result.source, 'project-config');
+    } finally {
+      if (originalEnv !== undefined) {
+        process.env.CLAUDE_PACKAGE_MANAGER = originalEnv;
+      }
+      fs.rmSync(testDir, { recursive: true, force: true });
+    }
+  })) passed++; else failed++;
+
+  if (test('package.json takes priority over lock file', () => {
+    const testDir = fs.mkdtempSync(path.join(os.tmpdir(), 'pm-pj-lock-'));
+    // package.json says yarn
+    fs.writeFileSync(path.join(testDir, 'package.json'),
+      JSON.stringify({ packageManager: 'yarn@4.0.0' }));
+    // Lock file says npm
+    fs.writeFileSync(path.join(testDir, 'package-lock.json'), '{}');
+
+    const originalEnv = process.env.CLAUDE_PACKAGE_MANAGER;
+    try {
+      delete process.env.CLAUDE_PACKAGE_MANAGER;
+      const result = pm.getPackageManager({ projectDir: testDir });
+      assert.strictEqual(result.name, 'yarn', 'package.json should win over lock file');
+      assert.strictEqual(result.source, 'package.json');
+    } finally {
+      if (originalEnv !== undefined) {
+        process.env.CLAUDE_PACKAGE_MANAGER = originalEnv;
+      }
+      fs.rmSync(testDir, { recursive: true, force: true });
+    }
+  })) passed++; else failed++;
+
+  if (test('defaults to npm when no config found', () => {
+    const testDir = fs.mkdtempSync(path.join(os.tmpdir(), 'pm-default-'));
+    const originalEnv = process.env.CLAUDE_PACKAGE_MANAGER;
+    try {
+      delete process.env.CLAUDE_PACKAGE_MANAGER;
+      const result = pm.getPackageManager({ projectDir: testDir });
+      assert.strictEqual(result.name, 'npm', 'Should default to npm');
+      assert.strictEqual(result.source, 'default');
+    } finally {
+      if (originalEnv !== undefined) {
+        process.env.CLAUDE_PACKAGE_MANAGER = originalEnv;
+      }
+      fs.rmSync(testDir, { recursive: true, force: true });
+    }
+  })) passed++; else failed++;
+
+  // setPreferredPackageManager success
+  console.log('\nsetPreferredPackageManager (success):');
+
+  if (test('successfully saves preferred package manager', () => {
+    // This writes to ~/.claude/package-manager.json — read original to restore
+    const utils = require('../../scripts/lib/utils');
+    const configPath = path.join(utils.getClaudeDir(), 'package-manager.json');
+    const original = utils.readFile(configPath);
+    try {
+      const config = pm.setPreferredPackageManager('bun');
+      assert.strictEqual(config.packageManager, 'bun');
+      assert.ok(config.setAt, 'Should have setAt timestamp');
+      // Verify it was persisted
+      const saved = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+      assert.strictEqual(saved.packageManager, 'bun');
+    } finally {
+      // Restore original config
+      if (original) {
+        fs.writeFileSync(configPath, original, 'utf8');
+      } else {
+        try { fs.unlinkSync(configPath); } catch {}
+      }
+    }
+  })) passed++; else failed++;
+
+  // getCommandPattern completeness
+  console.log('\ngetCommandPattern (completeness):');
+
+  if (test('generates pattern for test command', () => {
+    const pattern = pm.getCommandPattern('test');
+    assert.ok(pattern.includes('npm test'), 'Should include npm test');
+    assert.ok(pattern.includes('pnpm test'), 'Should include pnpm test');
+    assert.ok(pattern.includes('bun test'), 'Should include bun test');
+  })) passed++; else failed++;
+
+  if (test('generates pattern for build command', () => {
+    const pattern = pm.getCommandPattern('build');
+    assert.ok(pattern.includes('npm run build'), 'Should include npm run build');
+    assert.ok(pattern.includes('yarn build'), 'Should include yarn build');
+  })) passed++; else failed++;
+
   if (test('ignores unknown env var package manager', () => {
     const originalEnv = process.env.CLAUDE_PACKAGE_MANAGER;
     try {
