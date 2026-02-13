@@ -749,6 +749,71 @@ async function runTests() {
     cleanupTestDir(testDir);
   })) passed++; else failed++;
 
+  if (await asyncTest('escapes backticks in user messages in session file', async () => {
+    const testDir = createTestDir();
+    const transcriptPath = path.join(testDir, 'transcript.jsonl');
+
+    // User messages with backticks that could break markdown
+    const lines = [
+      '{"type":"user","content":"Fix the `handleAuth` function in `auth.ts`"}',
+      '{"type":"user","content":"Run `npm test` to verify"}',
+    ];
+    fs.writeFileSync(transcriptPath, lines.join('\n'));
+
+    const stdinJson = JSON.stringify({ transcript_path: transcriptPath });
+    const result = await runScript(path.join(scriptsDir, 'session-end.js'), stdinJson, {
+      HOME: testDir
+    });
+    assert.strictEqual(result.code, 0, 'Should handle backticks without crash');
+
+    // Find the session file in the temp HOME
+    const claudeDir = path.join(testDir, '.claude', 'sessions');
+    if (fs.existsSync(claudeDir)) {
+      const files = fs.readdirSync(claudeDir).filter(f => f.endsWith('.tmp'));
+      if (files.length > 0) {
+        const content = fs.readFileSync(path.join(claudeDir, files[0]), 'utf8');
+        // Backticks should be escaped in the output
+        assert.ok(content.includes('\\`'), 'Should escape backticks in session file');
+        assert.ok(!content.includes('`handleAuth`'), 'Raw backticks should be escaped');
+      }
+    }
+    cleanupTestDir(testDir);
+  })) passed++; else failed++;
+
+  if (await asyncTest('session file contains tools used and files modified', async () => {
+    const testDir = createTestDir();
+    const transcriptPath = path.join(testDir, 'transcript.jsonl');
+
+    const lines = [
+      '{"type":"user","content":"Edit the config"}',
+      '{"type":"tool_use","tool_name":"Edit","tool_input":{"file_path":"/src/config.ts"}}',
+      '{"type":"tool_use","tool_name":"Read","tool_input":{"file_path":"/src/utils.ts"}}',
+      '{"type":"tool_use","tool_name":"Write","tool_input":{"file_path":"/src/new-file.ts"}}',
+    ];
+    fs.writeFileSync(transcriptPath, lines.join('\n'));
+
+    const stdinJson = JSON.stringify({ transcript_path: transcriptPath });
+    const result = await runScript(path.join(scriptsDir, 'session-end.js'), stdinJson, {
+      HOME: testDir
+    });
+    assert.strictEqual(result.code, 0);
+
+    const claudeDir = path.join(testDir, '.claude', 'sessions');
+    if (fs.existsSync(claudeDir)) {
+      const files = fs.readdirSync(claudeDir).filter(f => f.endsWith('.tmp'));
+      if (files.length > 0) {
+        const content = fs.readFileSync(path.join(claudeDir, files[0]), 'utf8');
+        // Should contain files modified (Edit and Write, not Read)
+        assert.ok(content.includes('/src/config.ts'), 'Should list edited file');
+        assert.ok(content.includes('/src/new-file.ts'), 'Should list written file');
+        // Should contain tools used
+        assert.ok(content.includes('Edit'), 'Should list Edit tool');
+        assert.ok(content.includes('Read'), 'Should list Read tool');
+      }
+    }
+    cleanupTestDir(testDir);
+  })) passed++; else failed++;
+
   // hooks.json validation
   console.log('\nhooks.json Validation:');
 
