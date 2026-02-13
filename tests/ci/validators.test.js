@@ -925,6 +925,286 @@ function runTests() {
     cleanupTestDir(testDir); cleanupTestDir(agentsDir); cleanupTestDir(skillsDir);
   })) passed++; else failed++;
 
+  // ==========================================
+  // Round 22: Hook schema edge cases & empty directory paths
+  // ==========================================
+
+  // --- validate-hooks.js: schema edge cases ---
+  console.log('\nvalidate-hooks.js (schema edge cases):');
+
+  if (test('rejects event type value that is not an array', () => {
+    const testDir = createTestDir();
+    const hooksFile = path.join(testDir, 'hooks.json');
+    fs.writeFileSync(hooksFile, JSON.stringify({
+      hooks: { PreToolUse: 'not-an-array' }
+    }));
+
+    const result = runValidatorWithDir('validate-hooks', 'HOOKS_FILE', hooksFile);
+    assert.strictEqual(result.code, 1, 'Should fail on non-array event type value');
+    assert.ok(result.stderr.includes('must be an array'), 'Should report must be an array');
+    cleanupTestDir(testDir);
+  })) passed++; else failed++;
+
+  if (test('rejects matcher entry that is null', () => {
+    const testDir = createTestDir();
+    const hooksFile = path.join(testDir, 'hooks.json');
+    fs.writeFileSync(hooksFile, JSON.stringify({
+      hooks: { PreToolUse: [null] }
+    }));
+
+    const result = runValidatorWithDir('validate-hooks', 'HOOKS_FILE', hooksFile);
+    assert.strictEqual(result.code, 1, 'Should fail on null matcher entry');
+    assert.ok(result.stderr.includes('is not an object'), 'Should report not an object');
+    cleanupTestDir(testDir);
+  })) passed++; else failed++;
+
+  if (test('rejects matcher entry that is a string', () => {
+    const testDir = createTestDir();
+    const hooksFile = path.join(testDir, 'hooks.json');
+    fs.writeFileSync(hooksFile, JSON.stringify({
+      hooks: { PreToolUse: ['just-a-string'] }
+    }));
+
+    const result = runValidatorWithDir('validate-hooks', 'HOOKS_FILE', hooksFile);
+    assert.strictEqual(result.code, 1, 'Should fail on string matcher entry');
+    assert.ok(result.stderr.includes('is not an object'), 'Should report not an object');
+    cleanupTestDir(testDir);
+  })) passed++; else failed++;
+
+  if (test('rejects top-level data that is a string', () => {
+    const testDir = createTestDir();
+    const hooksFile = path.join(testDir, 'hooks.json');
+    fs.writeFileSync(hooksFile, '"just a string"');
+
+    const result = runValidatorWithDir('validate-hooks', 'HOOKS_FILE', hooksFile);
+    assert.strictEqual(result.code, 1, 'Should fail on string data');
+    assert.ok(result.stderr.includes('must be an object or array'), 'Should report must be object or array');
+    cleanupTestDir(testDir);
+  })) passed++; else failed++;
+
+  if (test('rejects top-level data that is a number', () => {
+    const testDir = createTestDir();
+    const hooksFile = path.join(testDir, 'hooks.json');
+    fs.writeFileSync(hooksFile, '42');
+
+    const result = runValidatorWithDir('validate-hooks', 'HOOKS_FILE', hooksFile);
+    assert.strictEqual(result.code, 1, 'Should fail on numeric data');
+    assert.ok(result.stderr.includes('must be an object or array'), 'Should report must be object or array');
+    cleanupTestDir(testDir);
+  })) passed++; else failed++;
+
+  if (test('rejects empty string command', () => {
+    const testDir = createTestDir();
+    const hooksFile = path.join(testDir, 'hooks.json');
+    fs.writeFileSync(hooksFile, JSON.stringify({
+      hooks: {
+        PreToolUse: [{ matcher: 'test', hooks: [{ type: 'command', command: '' }] }]
+      }
+    }));
+
+    const result = runValidatorWithDir('validate-hooks', 'HOOKS_FILE', hooksFile);
+    assert.strictEqual(result.code, 1, 'Should reject empty string command');
+    assert.ok(result.stderr.includes('command'), 'Should report command field error');
+    cleanupTestDir(testDir);
+  })) passed++; else failed++;
+
+  if (test('rejects empty array command', () => {
+    const testDir = createTestDir();
+    const hooksFile = path.join(testDir, 'hooks.json');
+    fs.writeFileSync(hooksFile, JSON.stringify({
+      hooks: {
+        PreToolUse: [{ matcher: 'test', hooks: [{ type: 'command', command: [] }] }]
+      }
+    }));
+
+    const result = runValidatorWithDir('validate-hooks', 'HOOKS_FILE', hooksFile);
+    assert.strictEqual(result.code, 1, 'Should reject empty array command');
+    assert.ok(result.stderr.includes('command'), 'Should report command field error');
+    cleanupTestDir(testDir);
+  })) passed++; else failed++;
+
+  if (test('rejects array command with non-string elements', () => {
+    const testDir = createTestDir();
+    const hooksFile = path.join(testDir, 'hooks.json');
+    fs.writeFileSync(hooksFile, JSON.stringify({
+      hooks: {
+        PreToolUse: [{ matcher: 'test', hooks: [{ type: 'command', command: ['node', 123, null] }] }]
+      }
+    }));
+
+    const result = runValidatorWithDir('validate-hooks', 'HOOKS_FILE', hooksFile);
+    assert.strictEqual(result.code, 1, 'Should reject non-string array elements');
+    assert.ok(result.stderr.includes('command'), 'Should report command field error');
+    cleanupTestDir(testDir);
+  })) passed++; else failed++;
+
+  if (test('rejects non-string type field', () => {
+    const testDir = createTestDir();
+    const hooksFile = path.join(testDir, 'hooks.json');
+    fs.writeFileSync(hooksFile, JSON.stringify({
+      hooks: {
+        PreToolUse: [{ matcher: 'test', hooks: [{ type: 42, command: 'echo hi' }] }]
+      }
+    }));
+
+    const result = runValidatorWithDir('validate-hooks', 'HOOKS_FILE', hooksFile);
+    assert.strictEqual(result.code, 1, 'Should reject non-string type');
+    assert.ok(result.stderr.includes('type'), 'Should report type field error');
+    cleanupTestDir(testDir);
+  })) passed++; else failed++;
+
+  if (test('rejects non-number timeout type', () => {
+    const testDir = createTestDir();
+    const hooksFile = path.join(testDir, 'hooks.json');
+    fs.writeFileSync(hooksFile, JSON.stringify({
+      hooks: {
+        PreToolUse: [{ matcher: 'test', hooks: [{ type: 'command', command: 'echo', timeout: 'fast' }] }]
+      }
+    }));
+
+    const result = runValidatorWithDir('validate-hooks', 'HOOKS_FILE', hooksFile);
+    assert.strictEqual(result.code, 1, 'Should reject string timeout');
+    assert.ok(result.stderr.includes('timeout'), 'Should report timeout type error');
+    cleanupTestDir(testDir);
+  })) passed++; else failed++;
+
+  if (test('accepts timeout of exactly 0', () => {
+    const testDir = createTestDir();
+    const hooksFile = path.join(testDir, 'hooks.json');
+    fs.writeFileSync(hooksFile, JSON.stringify({
+      hooks: {
+        PreToolUse: [{ matcher: 'test', hooks: [{ type: 'command', command: 'echo', timeout: 0 }] }]
+      }
+    }));
+
+    const result = runValidatorWithDir('validate-hooks', 'HOOKS_FILE', hooksFile);
+    assert.strictEqual(result.code, 0, 'Should accept timeout of 0');
+    cleanupTestDir(testDir);
+  })) passed++; else failed++;
+
+  if (test('validates object format without wrapping hooks key', () => {
+    const testDir = createTestDir();
+    const hooksFile = path.join(testDir, 'hooks.json');
+    // data.hooks is undefined, so fallback to data itself
+    fs.writeFileSync(hooksFile, JSON.stringify({
+      PreToolUse: [{ matcher: 'test', hooks: [{ type: 'command', command: 'echo ok' }] }]
+    }));
+
+    const result = runValidatorWithDir('validate-hooks', 'HOOKS_FILE', hooksFile);
+    assert.strictEqual(result.code, 0, 'Should accept object format without hooks wrapper');
+    cleanupTestDir(testDir);
+  })) passed++; else failed++;
+
+  // --- validate-hooks.js: legacy format error paths ---
+  console.log('\nvalidate-hooks.js (legacy format errors):');
+
+  if (test('legacy format: rejects matcher missing matcher field', () => {
+    const testDir = createTestDir();
+    const hooksFile = path.join(testDir, 'hooks.json');
+    fs.writeFileSync(hooksFile, JSON.stringify([
+      { hooks: [{ type: 'command', command: 'echo ok' }] }
+    ]));
+
+    const result = runValidatorWithDir('validate-hooks', 'HOOKS_FILE', hooksFile);
+    assert.strictEqual(result.code, 1, 'Should fail on missing matcher in legacy format');
+    assert.ok(result.stderr.includes('matcher'), 'Should report missing matcher');
+    cleanupTestDir(testDir);
+  })) passed++; else failed++;
+
+  if (test('legacy format: rejects matcher missing hooks array', () => {
+    const testDir = createTestDir();
+    const hooksFile = path.join(testDir, 'hooks.json');
+    fs.writeFileSync(hooksFile, JSON.stringify([
+      { matcher: 'test' }
+    ]));
+
+    const result = runValidatorWithDir('validate-hooks', 'HOOKS_FILE', hooksFile);
+    assert.strictEqual(result.code, 1, 'Should fail on missing hooks array in legacy format');
+    assert.ok(result.stderr.includes('hooks'), 'Should report missing hooks');
+    cleanupTestDir(testDir);
+  })) passed++; else failed++;
+
+  // --- validate-agents.js: empty directory ---
+  console.log('\nvalidate-agents.js (empty directory):');
+
+  if (test('passes on empty agents directory', () => {
+    const testDir = createTestDir();
+    // No .md files, just an empty dir
+
+    const result = runValidatorWithDir('validate-agents', 'AGENTS_DIR', testDir);
+    assert.strictEqual(result.code, 0, 'Should pass on empty directory');
+    assert.ok(result.stdout.includes('Validated 0'), 'Should report 0 validated');
+    cleanupTestDir(testDir);
+  })) passed++; else failed++;
+
+  // --- validate-commands.js: whitespace-only file ---
+  console.log('\nvalidate-commands.js (whitespace edge cases):');
+
+  if (test('fails on whitespace-only command file', () => {
+    const testDir = createTestDir();
+    fs.writeFileSync(path.join(testDir, 'blank.md'), '   \n\t\n  ');
+
+    const result = runValidatorWithDir('validate-commands', 'COMMANDS_DIR', testDir);
+    assert.strictEqual(result.code, 1, 'Should reject whitespace-only command file');
+    assert.ok(result.stderr.includes('Empty'), 'Should report empty file');
+    cleanupTestDir(testDir);
+  })) passed++; else failed++;
+
+  if (test('accepts valid skill directory reference', () => {
+    const testDir = createTestDir();
+    const agentsDir = createTestDir();
+    const skillsDir = createTestDir();
+    // Create a matching skill directory
+    fs.mkdirSync(path.join(skillsDir, 'my-skill'));
+    fs.writeFileSync(path.join(testDir, 'cmd.md'),
+      '# Command\nSee skills/my-skill/ for details.');
+
+    const result = runValidatorWithDirs('validate-commands', {
+      COMMANDS_DIR: testDir, AGENTS_DIR: agentsDir, SKILLS_DIR: skillsDir
+    });
+    assert.strictEqual(result.code, 0, 'Should pass on valid skill reference');
+    assert.ok(!result.stdout.includes('warning'), 'Should have no warnings');
+    cleanupTestDir(testDir); cleanupTestDir(agentsDir); cleanupTestDir(skillsDir);
+  })) passed++; else failed++;
+
+  // --- validate-rules.js: mixed valid/invalid ---
+  console.log('\nvalidate-rules.js (mixed files):');
+
+  if (test('fails on mix of valid and empty rule files', () => {
+    const testDir = createTestDir();
+    fs.writeFileSync(path.join(testDir, 'good.md'), '# Good Rule\nContent here.');
+    fs.writeFileSync(path.join(testDir, 'bad.md'), '');
+
+    const result = runValidatorWithDir('validate-rules', 'RULES_DIR', testDir);
+    assert.strictEqual(result.code, 1, 'Should fail when any rule is empty');
+    assert.ok(result.stderr.includes('bad.md'), 'Should report the bad file');
+    cleanupTestDir(testDir);
+  })) passed++; else failed++;
+
+  // --- validate-skills.js: mixed valid/invalid ---
+  console.log('\nvalidate-skills.js (mixed dirs):');
+
+  if (test('fails on mix of valid and invalid skill directories', () => {
+    const testDir = createTestDir();
+    // Valid skill
+    const goodSkill = path.join(testDir, 'good-skill');
+    fs.mkdirSync(goodSkill);
+    fs.writeFileSync(path.join(goodSkill, 'SKILL.md'), '# Good Skill');
+    // Missing SKILL.md
+    const badSkill = path.join(testDir, 'bad-skill');
+    fs.mkdirSync(badSkill);
+    // Empty SKILL.md
+    const emptySkill = path.join(testDir, 'empty-skill');
+    fs.mkdirSync(emptySkill);
+    fs.writeFileSync(path.join(emptySkill, 'SKILL.md'), '');
+
+    const result = runValidatorWithDir('validate-skills', 'SKILLS_DIR', testDir);
+    assert.strictEqual(result.code, 1, 'Should fail when any skill is invalid');
+    assert.ok(result.stderr.includes('bad-skill'), 'Should report missing SKILL.md');
+    assert.ok(result.stderr.includes('empty-skill'), 'Should report empty SKILL.md');
+    cleanupTestDir(testDir);
+  })) passed++; else failed++;
+
   // Summary
   console.log(`\nResults: Passed: ${passed}, Failed: ${failed}`);
   process.exit(failed > 0 ? 1 : 0);
