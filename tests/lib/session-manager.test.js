@@ -956,6 +956,28 @@ src/main.ts
     assert.ok(result.modifiedTime, 'modifiedTime should be present');
   })) passed++; else failed++;
 
+  // ── Round 54: search filter scope and getSessionPath utility ──
+  console.log('\nRound 54: search filter scope and path utility:');
+
+  if (test('getAllSessions search filter matches only short ID, not title or content', () => {
+    // "Session" appears in file CONTENT (e.g. "# Session 1") but not in any shortId
+    const result = sessionManager.getAllSessions({ search: 'Session', limit: 100 });
+    assert.strictEqual(result.total, 0, 'Search should not match title/content, only shortId');
+    // Verify that searching by actual shortId substring still works
+    const result2 = sessionManager.getAllSessions({ search: 'abcd', limit: 100 });
+    assert.strictEqual(result2.total, 1, 'Search by shortId should still work');
+  })) passed++; else failed++;
+
+  if (test('getSessionPath returns absolute path for session filename', () => {
+    const filename = '2026-02-01-testpath-session.tmp';
+    const result = sessionManager.getSessionPath(filename);
+    assert.ok(path.isAbsolute(result), 'Should return an absolute path');
+    assert.ok(result.endsWith(filename), `Path should end with filename, got: ${result}`);
+    // Since HOME is overridden, sessions dir should be under tmpHome
+    assert.ok(result.includes('.claude'), 'Path should include .claude directory');
+    assert.ok(result.includes('sessions'), 'Path should include sessions directory');
+  })) passed++; else failed++;
+
   // Cleanup — restore both HOME and USERPROFILE (Windows)
   process.env.HOME = origHome;
   if (origUserProfile !== undefined) {

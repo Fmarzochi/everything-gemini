@@ -451,6 +451,25 @@ function runTests() {
     });
   })) passed++; else failed++;
 
+  // ── Round 54: analysisResults with zero values ──
+  console.log('\nanalysisResults zero values (Round 54):');
+
+  if (test('analysisResults handles zero values for all data fields', () => {
+    const output = new SkillCreateOutput('repo');
+    const logs = captureLog(() => output.analysisResults({
+      commits: 0, timeRange: '', contributors: 0, files: 0,
+    }));
+    const combined = logs.join('\n');
+    assert.ok(combined.includes('0'), 'Should display zero values');
+    assert.ok(logs.length > 0, 'Should produce output without crash');
+    // Box lines should still be 60 chars wide
+    const boxLines = combined.split('\n').filter(l => {
+      const s = stripAnsi(l).trim();
+      return s.startsWith('\u256D') || s.startsWith('\u2502') || s.startsWith('\u2570');
+    });
+    assert.ok(boxLines.length >= 3, 'Should render a complete box');
+  })) passed++; else failed++;
+
   // Summary
   console.log(`\nResults: Passed: ${passed}, Failed: ${failed}`);
   process.exit(failed > 0 ? 1 : 0);
