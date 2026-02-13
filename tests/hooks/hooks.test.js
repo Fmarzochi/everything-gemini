@@ -3117,6 +3117,42 @@ async function runTests() {
     }
   })) passed++; else failed++;
 
+  // ── Round 71: session-start.js default source shows getSelectionPrompt ──
+  console.log('\nRound 71: session-start.js (default source — selection prompt):');
+
+  if (await asyncTest('shows selection prompt when no package manager preference found (default source)', async () => {
+    const isoHome = path.join(os.tmpdir(), `ecc-r71-ss-default-${Date.now()}`);
+    const isoProject = path.join(isoHome, 'project');
+    fs.mkdirSync(path.join(isoHome, '.claude', 'sessions'), { recursive: true });
+    fs.mkdirSync(path.join(isoHome, '.claude', 'skills', 'learned'), { recursive: true });
+    fs.mkdirSync(isoProject, { recursive: true });
+    // No package.json, no lock files, no package-manager.json — forces default source
+
+    try {
+      const result = await new Promise((resolve, reject) => {
+        const env = { ...process.env, HOME: isoHome, USERPROFILE: isoHome };
+        delete env.CLAUDE_PACKAGE_MANAGER; // Remove any env-level PM override
+        const proc = spawn('node', [path.join(scriptsDir, 'session-start.js')], {
+          env,
+          cwd: isoProject, // CWD with no package.json or lock files
+          stdio: ['pipe', 'pipe', 'pipe']
+        });
+        let stdout = '';
+        let stderr = '';
+        proc.stdout.on('data', data => stdout += data);
+        proc.stderr.on('data', data => stderr += data);
+        proc.stdin.end();
+        proc.on('close', code => resolve({ code, stdout, stderr }));
+        proc.on('error', reject);
+      });
+      assert.strictEqual(result.code, 0, 'Should exit 0');
+      assert.ok(result.stderr.includes('No package manager preference'),
+        `Should show selection prompt when source is default. Got stderr: ${result.stderr.slice(0, 500)}`);
+    } finally {
+      fs.rmSync(isoHome, { recursive: true, force: true });
+    }
+  })) passed++; else failed++;
+
   // Summary
   console.log('\n=== Test Results ===');
   console.log(`Passed: ${passed}`);

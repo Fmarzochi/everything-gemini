@@ -1269,6 +1269,43 @@ function runTests() {
     }
   })) passed++; else failed++;
 
+  // ── Round 71: setPreferredPackageManager save failure wraps error ──
+  console.log('\nRound 71: setPreferredPackageManager (save failure):');
+
+  if (test('setPreferredPackageManager throws wrapped error when save fails', () => {
+    if (process.platform === 'win32' || process.getuid?.() === 0) {
+      console.log('    (skipped — chmod ineffective on Windows/root)');
+      return;
+    }
+    const isoHome = path.join(os.tmpdir(), `ecc-pm-r71-${Date.now()}`);
+    const claudeDir = path.join(isoHome, '.claude');
+    fs.mkdirSync(claudeDir, { recursive: true });
+
+    const savedHome = process.env.HOME;
+    const savedProfile = process.env.USERPROFILE;
+    try {
+      process.env.HOME = isoHome;
+      process.env.USERPROFILE = isoHome;
+      delete require.cache[require.resolve('../../scripts/lib/package-manager')];
+      delete require.cache[require.resolve('../../scripts/lib/utils')];
+      const freshPm = require('../../scripts/lib/package-manager');
+
+      // Make .claude directory read-only — can't create new files (package-manager.json)
+      fs.chmodSync(claudeDir, 0o555);
+
+      assert.throws(() => {
+        freshPm.setPreferredPackageManager('npm');
+      }, /Failed to save package manager preference/);
+    } finally {
+      try { fs.chmodSync(claudeDir, 0o755); } catch { /* best-effort */ }
+      process.env.HOME = savedHome;
+      process.env.USERPROFILE = savedProfile;
+      delete require.cache[require.resolve('../../scripts/lib/package-manager')];
+      delete require.cache[require.resolve('../../scripts/lib/utils')];
+      fs.rmSync(isoHome, { recursive: true, force: true });
+    }
+  })) passed++; else failed++;
+
   // Summary
   console.log('\n=== Test Results ===');
   console.log(`Passed: ${passed}`);

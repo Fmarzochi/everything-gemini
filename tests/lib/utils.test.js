@@ -1062,6 +1062,40 @@ function runTests() {
       'All-invalid patterns should return same result as no patterns (no filtering)');
   })) passed++; else failed++;
 
+  // ── Round 71: findFiles recursive scan skips unreadable subdirectory ──
+  console.log('\nRound 71: findFiles (unreadable subdirectory in recursive scan):');
+
+  if (test('findFiles recursive scan skips unreadable subdirectory silently', () => {
+    if (process.platform === 'win32' || process.getuid?.() === 0) {
+      console.log('    (skipped — chmod ineffective on Windows/root)');
+      return;
+    }
+    const tmpDir = path.join(utils.getTempDir(), `ecc-findfiles-r71-${Date.now()}`);
+    const readableSubdir = path.join(tmpDir, 'readable');
+    const unreadableSubdir = path.join(tmpDir, 'unreadable');
+    fs.mkdirSync(readableSubdir, { recursive: true });
+    fs.mkdirSync(unreadableSubdir, { recursive: true });
+
+    // Create files in both subdirectories
+    fs.writeFileSync(path.join(readableSubdir, 'found.txt'), 'data');
+    fs.writeFileSync(path.join(unreadableSubdir, 'hidden.txt'), 'data');
+
+    // Make the subdirectory unreadable — readdirSync will throw EACCES
+    fs.chmodSync(unreadableSubdir, 0o000);
+
+    try {
+      const results = utils.findFiles(tmpDir, '*.txt', { recursive: true });
+      // Should find the readable file but silently skip the unreadable dir
+      assert.ok(results.length >= 1, 'Should find at least the readable file');
+      const paths = results.map(r => r.path);
+      assert.ok(paths.some(p => p.includes('found.txt')), 'Should find readable/found.txt');
+      assert.ok(!paths.some(p => p.includes('hidden.txt')), 'Should not find unreadable/hidden.txt');
+    } finally {
+      fs.chmodSync(unreadableSubdir, 0o755);
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  })) passed++; else failed++;
+
   // Summary
   console.log('\n=== Test Results ===');
   console.log(`Passed: ${passed}`);
