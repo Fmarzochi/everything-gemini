@@ -856,6 +856,46 @@ function runTests() {
     assert.strictEqual(data.metadata.totalCount, 5, 'Metadata count should match actual aliases');
   })) passed++; else failed++;
 
+  // ── Round 56: Windows platform unlink-before-rename code path ──
+  console.log('\nRound 56: Windows platform atomic write path:');
+
+  if (test('Windows platform mock: unlinks existing file before rename', () => {
+    resetAliases();
+    // First create an alias so the file exists
+    const r1 = aliases.setAlias('win-initial', '2026-01-01-abc123-session.tmp');
+    assert.strictEqual(r1.success, true, 'Initial alias should succeed');
+    const aliasesPath = aliases.getAliasesPath();
+    assert.ok(fs.existsSync(aliasesPath), 'Aliases file should exist before win32 test');
+
+    // Mock process.platform to 'win32' to trigger the unlink-before-rename path
+    const origPlatform = Object.getOwnPropertyDescriptor(process, 'platform');
+    Object.defineProperty(process, 'platform', { value: 'win32', configurable: true });
+
+    try {
+      // This save triggers the Windows code path: unlink existing → rename temp
+      const r2 = aliases.setAlias('win-updated', '2026-02-01-def456-session.tmp');
+      assert.strictEqual(r2.success, true, 'setAlias should succeed under win32 mock');
+
+      // Verify data integrity after the Windows path
+      assert.ok(fs.existsSync(aliasesPath), 'Aliases file should exist after win32 save');
+      const data = aliases.loadAliases();
+      assert.ok(data.aliases['win-initial'], 'Original alias should still exist');
+      assert.ok(data.aliases['win-updated'], 'New alias should exist');
+      assert.strictEqual(data.aliases['win-updated'].sessionPath,
+        '2026-02-01-def456-session.tmp', 'Session path should match');
+
+      // No .tmp or .bak files left behind
+      assert.ok(!fs.existsSync(aliasesPath + '.tmp'), 'No temp file should remain');
+      assert.ok(!fs.existsSync(aliasesPath + '.bak'), 'No backup file should remain');
+    } finally {
+      // Restore original platform descriptor
+      if (origPlatform) {
+        Object.defineProperty(process, 'platform', origPlatform);
+      }
+      resetAliases();
+    }
+  })) passed++; else failed++;
+
   // Summary
   console.log(`\nResults: Passed: ${passed}, Failed: ${failed}`);
   process.exit(failed > 0 ? 1 : 0);

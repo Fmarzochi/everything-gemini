@@ -2811,6 +2811,51 @@ async function runTests() {
     }
   })) passed++; else failed++;
 
+  // ── Round 56: typecheck tsconfig walk-up, suggest-compact fallback path ──
+  console.log('\nRound 56: post-edit-typecheck.js (tsconfig in parent directory):');
+
+  if (await asyncTest('walks up directory tree to find tsconfig.json in grandparent', async () => {
+    const testDir = createTestDir();
+    // Place tsconfig at the TOP level, file is nested 2 levels deep
+    fs.writeFileSync(path.join(testDir, 'tsconfig.json'), JSON.stringify({
+      compilerOptions: { strict: false, noEmit: true }
+    }));
+    const deepDir = path.join(testDir, 'src', 'components');
+    fs.mkdirSync(deepDir, { recursive: true });
+    const testFile = path.join(deepDir, 'widget.ts');
+    fs.writeFileSync(testFile, 'export const value: number = 42;\n');
+
+    const stdinJson = JSON.stringify({ tool_input: { file_path: testFile } });
+    const result = await runScript(path.join(scriptsDir, 'post-edit-typecheck.js'), stdinJson);
+
+    assert.strictEqual(result.code, 0, 'Should exit 0 after walking up to find tsconfig');
+    // Core assertion: stdin must pass through regardless of whether tsc ran
+    const parsed = JSON.parse(result.stdout);
+    assert.strictEqual(parsed.tool_input.file_path, testFile,
+      'Should pass through original stdin data with file_path intact');
+    cleanupTestDir(testDir);
+  })) passed++; else failed++;
+
+  console.log('\nRound 56: suggest-compact.js (counter file as directory — fallback path):');
+
+  if (await asyncTest('exits 0 when counter file path is occupied by a directory', async () => {
+    const sessionId = `dirblock-${Date.now()}`;
+    const counterFile = path.join(os.tmpdir(), `claude-tool-count-${sessionId}`);
+    // Create a DIRECTORY at the counter file path — openSync('a+') will fail with EISDIR
+    fs.mkdirSync(counterFile);
+
+    try {
+      const result = await runScript(path.join(scriptsDir, 'suggest-compact.js'), '', {
+        CLAUDE_SESSION_ID: sessionId
+      });
+      assert.strictEqual(result.code, 0,
+        'Should exit 0 even when counter file path is a directory (graceful fallback)');
+    } finally {
+      // Cleanup: remove the blocking directory
+      try { fs.rmdirSync(counterFile); } catch { /* best-effort */ }
+    }
+  })) passed++; else failed++;
+
   // Summary
   console.log('\n=== Test Results ===');
   console.log(`Passed: ${passed}`);
