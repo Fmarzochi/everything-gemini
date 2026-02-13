@@ -47,8 +47,10 @@ function parseSessionFilename(filename) {
     filename,
     shortId,
     date: dateStr,
-    // Convert date string to Date object
-    datetime: new Date(dateStr)
+    // Use local-time constructor (consistent with validation on line 40)
+    // new Date(dateStr) interprets YYYY-MM-DD as UTC midnight which shows
+    // as the previous day in negative UTC offset timezones
+    datetime: new Date(year, month - 1, day)
   };
 }
 

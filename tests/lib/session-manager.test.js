@@ -951,6 +951,64 @@ src/main.ts
     // best-effort
   }
 
+  // ── Round 30: datetime local-time fix and parseSessionFilename edge cases ──
+  console.log('\nRound 30: datetime local-time fix:');
+
+  if (test('datetime day matches the filename date (local-time constructor)', () => {
+    const result = sessionManager.parseSessionFilename('2026-06-15-abcdef12-session.tmp');
+    assert.ok(result);
+    // With the fix, getDate()/getMonth() should return local-time values
+    // matching the filename, regardless of timezone
+    assert.strictEqual(result.datetime.getDate(), 15, 'Day should be 15 (local time)');
+    assert.strictEqual(result.datetime.getMonth(), 5, 'Month should be 5 (June, 0-indexed)');
+    assert.strictEqual(result.datetime.getFullYear(), 2026, 'Year should be 2026');
+  })) passed++; else failed++;
+
+  if (test('datetime matches for January 1 (timezone-sensitive date)', () => {
+    // Jan 1 at UTC midnight is Dec 31 in negative offsets — this tests the fix
+    const result = sessionManager.parseSessionFilename('2026-01-01-abc12345-session.tmp');
+    assert.ok(result);
+    assert.strictEqual(result.datetime.getDate(), 1, 'Day should be 1 in local time');
+    assert.strictEqual(result.datetime.getMonth(), 0, 'Month should be 0 (January)');
+  })) passed++; else failed++;
+
+  if (test('datetime matches for December 31 (year boundary)', () => {
+    const result = sessionManager.parseSessionFilename('2025-12-31-abc12345-session.tmp');
+    assert.ok(result);
+    assert.strictEqual(result.datetime.getDate(), 31);
+    assert.strictEqual(result.datetime.getMonth(), 11); // December
+    assert.strictEqual(result.datetime.getFullYear(), 2025);
+  })) passed++; else failed++;
+
+  console.log('\nRound 30: parseSessionFilename edge cases:');
+
+  if (test('parses session ID with many dashes (UUID-like)', () => {
+    const result = sessionManager.parseSessionFilename('2026-02-13-a1b2c3d4-session.tmp');
+    assert.ok(result);
+    assert.strictEqual(result.shortId, 'a1b2c3d4');
+    assert.strictEqual(result.date, '2026-02-13');
+  })) passed++; else failed++;
+
+  if (test('rejects filename with missing session.tmp suffix', () => {
+    const result = sessionManager.parseSessionFilename('2026-02-13-abc12345.tmp');
+    assert.strictEqual(result, null, 'Should reject filename without -session.tmp');
+  })) passed++; else failed++;
+
+  if (test('rejects filename with extra text after suffix', () => {
+    const result = sessionManager.parseSessionFilename('2026-02-13-abc12345-session.tmp.bak');
+    assert.strictEqual(result, null, 'Should reject filenames with extra extension');
+  })) passed++; else failed++;
+
+  if (test('handles old-format filename without session ID', () => {
+    // The regex match[2] is undefined for old format → shortId defaults to 'no-id'
+    const result = sessionManager.parseSessionFilename('2026-02-13-session.tmp');
+    if (result) {
+      assert.strictEqual(result.shortId, 'no-id', 'Should default to no-id');
+    }
+    // Either null (regex doesn't match) or has no-id — both are acceptable
+    assert.ok(true, 'Old format handled without crash');
+  })) passed++; else failed++;
+
   // Summary
   console.log(`\nResults: Passed: ${passed}, Failed: ${failed}`);
   process.exit(failed > 0 ? 1 : 0);

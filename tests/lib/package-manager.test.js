@@ -993,6 +993,37 @@ function runTests() {
     }
   })) passed++; else failed++;
 
+  // ── Round 30: getCommandPattern with special action patterns ──
+  console.log('\nRound 30: getCommandPattern edge cases:');
+
+  if (test('escapes pipe character in action name', () => {
+    const pattern = pm.getCommandPattern('lint|fix');
+    const regex = new RegExp(pattern);
+    assert.ok(regex.test('npm run lint|fix'), 'Should match literal pipe');
+    assert.ok(!regex.test('npm run lint'), 'Pipe should be literal, not regex OR');
+  })) passed++; else failed++;
+
+  if (test('escapes dollar sign in action name', () => {
+    const pattern = pm.getCommandPattern('deploy$prod');
+    const regex = new RegExp(pattern);
+    assert.ok(regex.test('npm run deploy$prod'), 'Should match literal dollar sign');
+  })) passed++; else failed++;
+
+  if (test('handles action with leading/trailing spaces gracefully', () => {
+    // Spaces aren't special in regex but good to test the full pattern
+    const pattern = pm.getCommandPattern(' dev ');
+    const regex = new RegExp(pattern);
+    assert.ok(regex.test('npm run  dev '), 'Should match action with spaces');
+  })) passed++; else failed++;
+
+  if (test('known action "dev" does NOT use escapeRegex path', () => {
+    // "dev" is a known action with hardcoded patterns, not the generic path
+    const pattern = pm.getCommandPattern('dev');
+    // Should match pnpm dev (without "run")
+    const regex = new RegExp(pattern);
+    assert.ok(regex.test('pnpm dev'), 'Known action pnpm dev should match');
+  })) passed++; else failed++;
+
   // Summary
   console.log('\n=== Test Results ===');
   console.log(`Passed: ${passed}`);

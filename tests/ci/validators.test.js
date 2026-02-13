@@ -1359,6 +1359,68 @@ function runTests() {
     cleanupTestDir(testDir);
   })) passed++; else failed++;
 
+  // ── Round 30: validate-commands skill warnings and workflow edge cases ──
+  console.log('\nRound 30: validate-commands (skill warnings):');
+
+  if (test('warns (not errors) when skill directory reference is not found', () => {
+    const testDir = createTestDir();
+    const agentsDir = createTestDir();
+    const skillsDir = createTestDir();
+    // Create a command that references a skill via path (skills/name/) format
+    // but the skill doesn't exist — should warn, not error
+    fs.writeFileSync(path.join(testDir, 'cmd-a.md'),
+      '# Command A\nSee skills/nonexistent-skill/ for details.');
+
+    const result = runValidatorWithDirs('validate-commands', {
+      COMMANDS_DIR: testDir, AGENTS_DIR: agentsDir, SKILLS_DIR: skillsDir
+    });
+    // Skill directory references produce warnings, not errors — exit 0
+    assert.strictEqual(result.code, 0, 'Skill path references should warn, not error');
+    cleanupTestDir(testDir); cleanupTestDir(agentsDir); cleanupTestDir(skillsDir);
+  })) passed++; else failed++;
+
+  if (test('passes when command has no slash references at all', () => {
+    const testDir = createTestDir();
+    const agentsDir = createTestDir();
+    const skillsDir = createTestDir();
+    fs.writeFileSync(path.join(testDir, 'cmd-simple.md'),
+      '# Simple Command\nThis command has no references to other commands.');
+
+    const result = runValidatorWithDirs('validate-commands', {
+      COMMANDS_DIR: testDir, AGENTS_DIR: agentsDir, SKILLS_DIR: skillsDir
+    });
+    assert.strictEqual(result.code, 0, 'Should pass with no references');
+    cleanupTestDir(testDir); cleanupTestDir(agentsDir); cleanupTestDir(skillsDir);
+  })) passed++; else failed++;
+
+  console.log('\nRound 30: validate-agents (model validation):');
+
+  if (test('rejects agent with unrecognized model value', () => {
+    const testDir = createTestDir();
+    fs.writeFileSync(path.join(testDir, 'bad-model.md'),
+      '---\nmodel: gpt-4\ntools: Read, Write\n---\n# Bad Model Agent');
+
+    const result = runValidatorWithDir('validate-agents', 'AGENTS_DIR', testDir);
+    assert.strictEqual(result.code, 1, 'Should reject unrecognized model');
+    assert.ok(result.stderr.includes('gpt-4'), 'Should mention the invalid model');
+    cleanupTestDir(testDir);
+  })) passed++; else failed++;
+
+  if (test('accepts all valid model values (haiku, sonnet, opus)', () => {
+    const testDir = createTestDir();
+    fs.writeFileSync(path.join(testDir, 'haiku.md'),
+      '---\nmodel: haiku\ntools: Read\n---\n# Haiku Agent');
+    fs.writeFileSync(path.join(testDir, 'sonnet.md'),
+      '---\nmodel: sonnet\ntools: Read, Write\n---\n# Sonnet Agent');
+    fs.writeFileSync(path.join(testDir, 'opus.md'),
+      '---\nmodel: opus\ntools: Read, Write, Bash\n---\n# Opus Agent');
+
+    const result = runValidatorWithDir('validate-agents', 'AGENTS_DIR', testDir);
+    assert.strictEqual(result.code, 0, 'All valid models should pass');
+    assert.ok(result.stdout.includes('3'), 'Should validate 3 agent files');
+    cleanupTestDir(testDir);
+  })) passed++; else failed++;
+
   // Summary
   console.log(`\nResults: Passed: ${passed}, Failed: ${failed}`);
   process.exit(failed > 0 ? 1 : 0);
