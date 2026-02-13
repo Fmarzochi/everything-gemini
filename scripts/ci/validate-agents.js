@@ -58,7 +58,7 @@ function validateAgents() {
     }
 
     for (const field of REQUIRED_FIELDS) {
-      if (!frontmatter[field]) {
+      if (!frontmatter[field] || (typeof frontmatter[field] === 'string' && !frontmatter[field].trim())) {
         console.error(`ERROR: ${file} - Missing required field: ${field}`);
         hasErrors = true;
       }

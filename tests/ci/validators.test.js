@@ -777,6 +777,154 @@ function runTests() {
     cleanupTestDir(testDir);
   })) passed++; else failed++;
 
+  // ==========================================
+  // Round 19: Whitespace and edge-case tests
+  // ==========================================
+
+  // --- validate-hooks.js whitespace/null edge cases ---
+  console.log('\nvalidate-hooks.js (whitespace edge cases):');
+
+  if (test('rejects whitespace-only command string', () => {
+    const testDir = createTestDir();
+    const hooksFile = path.join(testDir, 'hooks.json');
+    fs.writeFileSync(hooksFile, JSON.stringify({
+      hooks: {
+        PreToolUse: [{ matcher: 'test', hooks: [{ type: 'command', command: '   \t  ' }] }]
+      }
+    }));
+
+    const result = runValidatorWithDir('validate-hooks', 'HOOKS_FILE', hooksFile);
+    assert.strictEqual(result.code, 1, 'Should reject whitespace-only command');
+    assert.ok(result.stderr.includes('command'), 'Should report command field error');
+    cleanupTestDir(testDir);
+  })) passed++; else failed++;
+
+  if (test('rejects null command value', () => {
+    const testDir = createTestDir();
+    const hooksFile = path.join(testDir, 'hooks.json');
+    fs.writeFileSync(hooksFile, JSON.stringify({
+      hooks: {
+        PreToolUse: [{ matcher: 'test', hooks: [{ type: 'command', command: null }] }]
+      }
+    }));
+
+    const result = runValidatorWithDir('validate-hooks', 'HOOKS_FILE', hooksFile);
+    assert.strictEqual(result.code, 1, 'Should reject null command');
+    assert.ok(result.stderr.includes('command'), 'Should report command field error');
+    cleanupTestDir(testDir);
+  })) passed++; else failed++;
+
+  if (test('rejects numeric command value', () => {
+    const testDir = createTestDir();
+    const hooksFile = path.join(testDir, 'hooks.json');
+    fs.writeFileSync(hooksFile, JSON.stringify({
+      hooks: {
+        PreToolUse: [{ matcher: 'test', hooks: [{ type: 'command', command: 42 }] }]
+      }
+    }));
+
+    const result = runValidatorWithDir('validate-hooks', 'HOOKS_FILE', hooksFile);
+    assert.strictEqual(result.code, 1, 'Should reject numeric command');
+    assert.ok(result.stderr.includes('command'), 'Should report command field error');
+    cleanupTestDir(testDir);
+  })) passed++; else failed++;
+
+  // --- validate-agents.js whitespace edge cases ---
+  console.log('\nvalidate-agents.js (whitespace edge cases):');
+
+  if (test('rejects agent with whitespace-only model value', () => {
+    const testDir = createTestDir();
+    fs.writeFileSync(path.join(testDir, 'ws-model.md'), '---\nmodel:   \t  \ntools: Read, Write\n---\n# Agent');
+
+    const result = runValidatorWithDir('validate-agents', 'AGENTS_DIR', testDir);
+    assert.strictEqual(result.code, 1, 'Should reject whitespace-only model');
+    assert.ok(result.stderr.includes('model'), 'Should report model field error');
+    cleanupTestDir(testDir);
+  })) passed++; else failed++;
+
+  if (test('rejects agent with whitespace-only tools value', () => {
+    const testDir = createTestDir();
+    fs.writeFileSync(path.join(testDir, 'ws-tools.md'), '---\nmodel: sonnet\ntools:   \t  \n---\n# Agent');
+
+    const result = runValidatorWithDir('validate-agents', 'AGENTS_DIR', testDir);
+    assert.strictEqual(result.code, 1, 'Should reject whitespace-only tools');
+    assert.ok(result.stderr.includes('tools'), 'Should report tools field error');
+    cleanupTestDir(testDir);
+  })) passed++; else failed++;
+
+  if (test('accepts agent with extra unknown frontmatter fields', () => {
+    const testDir = createTestDir();
+    fs.writeFileSync(path.join(testDir, 'extra.md'), '---\nmodel: sonnet\ntools: Read, Write\ncustom_field: some value\nauthor: test\n---\n# Agent');
+
+    const result = runValidatorWithDir('validate-agents', 'AGENTS_DIR', testDir);
+    assert.strictEqual(result.code, 0, 'Should accept extra unknown fields');
+    cleanupTestDir(testDir);
+  })) passed++; else failed++;
+
+  if (test('rejects agent with invalid model value', () => {
+    const testDir = createTestDir();
+    fs.writeFileSync(path.join(testDir, 'bad-model.md'), '---\nmodel: gpt-4\ntools: Read\n---\n# Agent');
+
+    const result = runValidatorWithDir('validate-agents', 'AGENTS_DIR', testDir);
+    assert.strictEqual(result.code, 1, 'Should reject invalid model');
+    assert.ok(result.stderr.includes('Invalid model'), 'Should report invalid model');
+    assert.ok(result.stderr.includes('gpt-4'), 'Should show the invalid value');
+    cleanupTestDir(testDir);
+  })) passed++; else failed++;
+
+  // --- validate-commands.js additional edge cases ---
+  console.log('\nvalidate-commands.js (additional edge cases):');
+
+  if (test('reports all invalid agents in mixed agent references', () => {
+    const testDir = createTestDir();
+    const agentsDir = createTestDir();
+    const skillsDir = createTestDir();
+    fs.writeFileSync(path.join(agentsDir, 'real-agent.md'), '---\nmodel: sonnet\ntools: Read\n---\n# A');
+    fs.writeFileSync(path.join(testDir, 'cmd.md'),
+      '# Cmd\nSee agents/real-agent.md and agents/fake-one.md and agents/fake-two.md');
+
+    const result = runValidatorWithDirs('validate-commands', {
+      COMMANDS_DIR: testDir, AGENTS_DIR: agentsDir, SKILLS_DIR: skillsDir
+    });
+    assert.strictEqual(result.code, 1, 'Should fail on invalid agent refs');
+    assert.ok(result.stderr.includes('fake-one'), 'Should report first invalid agent');
+    assert.ok(result.stderr.includes('fake-two'), 'Should report second invalid agent');
+    assert.ok(!result.stderr.includes('real-agent'), 'Should NOT report valid agent');
+    cleanupTestDir(testDir); cleanupTestDir(agentsDir); cleanupTestDir(skillsDir);
+  })) passed++; else failed++;
+
+  if (test('validates workflow with hyphenated agent names', () => {
+    const testDir = createTestDir();
+    const agentsDir = createTestDir();
+    const skillsDir = createTestDir();
+    fs.writeFileSync(path.join(agentsDir, 'tdd-guide.md'), '---\nmodel: sonnet\ntools: Read\n---\n# T');
+    fs.writeFileSync(path.join(agentsDir, 'code-reviewer.md'), '---\nmodel: sonnet\ntools: Read\n---\n# C');
+    fs.writeFileSync(path.join(testDir, 'flow.md'), '# Workflow\n\ntdd-guide -> code-reviewer');
+
+    const result = runValidatorWithDirs('validate-commands', {
+      COMMANDS_DIR: testDir, AGENTS_DIR: agentsDir, SKILLS_DIR: skillsDir
+    });
+    assert.strictEqual(result.code, 0, 'Should pass on hyphenated agent names in workflow');
+    cleanupTestDir(testDir); cleanupTestDir(agentsDir); cleanupTestDir(skillsDir);
+  })) passed++; else failed++;
+
+  if (test('detects skill directory reference warning', () => {
+    const testDir = createTestDir();
+    const agentsDir = createTestDir();
+    const skillsDir = createTestDir();
+    // Reference a non-existent skill directory
+    fs.writeFileSync(path.join(testDir, 'cmd.md'),
+      '# Command\nSee skills/nonexistent-skill/ for details.');
+
+    const result = runValidatorWithDirs('validate-commands', {
+      COMMANDS_DIR: testDir, AGENTS_DIR: agentsDir, SKILLS_DIR: skillsDir
+    });
+    // Should pass (warnings don't cause exit 1) but stderr should have warning
+    assert.strictEqual(result.code, 0, 'Skill warnings should not cause failure');
+    assert.ok(result.stdout.includes('warning'), 'Should report warning count');
+    cleanupTestDir(testDir); cleanupTestDir(agentsDir); cleanupTestDir(skillsDir);
+  })) passed++; else failed++;
+
   // Summary
   console.log(`\nResults: Passed: ${passed}, Failed: ${failed}`);
   process.exit(failed > 0 ? 1 : 0);

@@ -34,7 +34,7 @@ function validateHookEntry(hook, label) {
     hasErrors = true;
   }
 
-  if (!hook.command || (typeof hook.command !== 'string' && !Array.isArray(hook.command))) {
+  if (!hook.command || (typeof hook.command !== 'string' && !Array.isArray(hook.command)) || (typeof hook.command === 'string' && !hook.command.trim())) {
     console.error(`ERROR: ${label} missing or invalid 'command' field`);
     hasErrors = true;
   } else if (typeof hook.command === 'string') {
