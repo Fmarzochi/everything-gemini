@@ -2433,6 +2433,47 @@ async function runTests() {
     cleanupTestDir(testDir);
   })) passed++; else failed++;
 
+  // Round 41: pre-compact.js (multiple session files)
+  console.log('\nRound 41: pre-compact.js (multiple session files):');
+
+  if (await asyncTest('annotates only the newest session file when multiple exist', async () => {
+    const isoHome = path.join(os.tmpdir(), `ecc-compact-multi-${Date.now()}`);
+    const sessionsDir = path.join(isoHome, '.claude', 'sessions');
+    fs.mkdirSync(sessionsDir, { recursive: true });
+
+    // Create two session files with different mtimes
+    const olderSession = path.join(sessionsDir, '2026-01-01-older-session.tmp');
+    const newerSession = path.join(sessionsDir, '2026-02-11-newer-session.tmp');
+    fs.writeFileSync(olderSession, '# Older Session\n');
+    // Small delay to ensure different mtime
+    const now = Date.now();
+    fs.utimesSync(olderSession, new Date(now - 60000), new Date(now - 60000));
+    fs.writeFileSync(newerSession, '# Newer Session\n');
+
+    try {
+      const result = await runScript(path.join(scriptsDir, 'pre-compact.js'), '', {
+        HOME: isoHome, USERPROFILE: isoHome
+      });
+      assert.strictEqual(result.code, 0);
+
+      const newerContent = fs.readFileSync(newerSession, 'utf8');
+      const olderContent = fs.readFileSync(olderSession, 'utf8');
+
+      // findFiles sorts by mtime newest first, so sessions[0] is the newest
+      assert.ok(
+        newerContent.includes('Compaction occurred'),
+        'Should annotate the newest session file'
+      );
+      assert.strictEqual(
+        olderContent,
+        '# Older Session\n',
+        'Should NOT annotate older session files'
+      );
+    } finally {
+      fs.rmSync(isoHome, { recursive: true, force: true });
+    }
+  })) passed++; else failed++;
+
   // Round 40: session-end.js (newline collapse in markdown list items)
   console.log('\nRound 40: session-end.js (newline collapse):');
 
