@@ -2713,6 +2713,104 @@ async function runTests() {
     assert.strictEqual(result.stdout, stdinJson, 'Should pass through stdin data unchanged');
   })) passed++; else failed++;
 
+  // ── Round 55: maxAge boundary, multi-session injection, stdin overflow ──
+  console.log('\nRound 55: session-start.js (maxAge 7-day boundary):');
+
+  if (await asyncTest('excludes session files older than 7 days', async () => {
+    const isoHome = path.join(os.tmpdir(), `ecc-start-7day-${Date.now()}`);
+    const sessionsDir = path.join(isoHome, '.claude', 'sessions');
+    fs.mkdirSync(sessionsDir, { recursive: true });
+    fs.mkdirSync(path.join(isoHome, '.claude', 'skills', 'learned'), { recursive: true });
+
+    // Create session file 6.9 days old (should be INCLUDED by maxAge:7)
+    const recentFile = path.join(sessionsDir, '2026-02-06-recent69-session.tmp');
+    fs.writeFileSync(recentFile, '# Recent Session\n\nRECENT CONTENT HERE');
+    const sixPointNineDaysAgo = new Date(Date.now() - 6.9 * 24 * 60 * 60 * 1000);
+    fs.utimesSync(recentFile, sixPointNineDaysAgo, sixPointNineDaysAgo);
+
+    // Create session file 8 days old (should be EXCLUDED by maxAge:7)
+    const oldFile = path.join(sessionsDir, '2026-02-05-old8day-session.tmp');
+    fs.writeFileSync(oldFile, '# Old Session\n\nOLD CONTENT SHOULD NOT APPEAR');
+    const eightDaysAgo = new Date(Date.now() - 8 * 24 * 60 * 60 * 1000);
+    fs.utimesSync(oldFile, eightDaysAgo, eightDaysAgo);
+
+    try {
+      const result = await runScript(path.join(scriptsDir, 'session-start.js'), '', {
+        HOME: isoHome, USERPROFILE: isoHome
+      });
+      assert.strictEqual(result.code, 0);
+      assert.ok(result.stderr.includes('1 recent session'),
+        `Should find 1 recent session (6.9-day included, 8-day excluded), stderr: ${result.stderr}`);
+      assert.ok(result.stdout.includes('RECENT CONTENT HERE'),
+        'Should inject the 6.9-day-old session content');
+      assert.ok(!result.stdout.includes('OLD CONTENT SHOULD NOT APPEAR'),
+        'Should NOT inject the 8-day-old session content');
+    } finally {
+      fs.rmSync(isoHome, { recursive: true, force: true });
+    }
+  })) passed++; else failed++;
+
+  console.log('\nRound 55: session-start.js (newest session selection):');
+
+  if (await asyncTest('injects newest session when multiple recent sessions exist', async () => {
+    const isoHome = path.join(os.tmpdir(), `ecc-start-multi-${Date.now()}`);
+    const sessionsDir = path.join(isoHome, '.claude', 'sessions');
+    fs.mkdirSync(sessionsDir, { recursive: true });
+    fs.mkdirSync(path.join(isoHome, '.claude', 'skills', 'learned'), { recursive: true });
+
+    const now = Date.now();
+
+    // Create older session (2 days ago)
+    const olderSession = path.join(sessionsDir, '2026-02-11-olderabc-session.tmp');
+    fs.writeFileSync(olderSession, '# Older Session\n\nOLDER_CONTEXT_MARKER');
+    fs.utimesSync(olderSession, new Date(now - 2 * 86400000), new Date(now - 2 * 86400000));
+
+    // Create newer session (1 day ago)
+    const newerSession = path.join(sessionsDir, '2026-02-12-newerdef-session.tmp');
+    fs.writeFileSync(newerSession, '# Newer Session\n\nNEWER_CONTEXT_MARKER');
+    fs.utimesSync(newerSession, new Date(now - 1 * 86400000), new Date(now - 1 * 86400000));
+
+    try {
+      const result = await runScript(path.join(scriptsDir, 'session-start.js'), '', {
+        HOME: isoHome, USERPROFILE: isoHome
+      });
+      assert.strictEqual(result.code, 0);
+      assert.ok(result.stderr.includes('2 recent session'),
+        `Should find 2 recent sessions, stderr: ${result.stderr}`);
+      // Should inject the NEWER session, not the older one
+      assert.ok(result.stdout.includes('NEWER_CONTEXT_MARKER'),
+        'Should inject the newest session content');
+    } finally {
+      fs.rmSync(isoHome, { recursive: true, force: true });
+    }
+  })) passed++; else failed++;
+
+  console.log('\nRound 55: session-end.js (stdin overflow):');
+
+  if (await asyncTest('handles stdin exceeding MAX_STDIN (1MB) gracefully', async () => {
+    const testDir = createTestDir();
+    const transcriptPath = path.join(testDir, 'transcript.jsonl');
+    // Create a minimal valid transcript so env var fallback works
+    fs.writeFileSync(transcriptPath, JSON.stringify({ type: 'user', content: 'Overflow test' }) + '\n');
+
+    // Create stdin > 1MB: truncated JSON will be invalid → falls back to env var
+    const oversizedPayload = '{"transcript_path":"' + 'x'.repeat(1048600) + '"}';
+
+    try {
+      const result = await runScript(path.join(scriptsDir, 'session-end.js'), oversizedPayload, {
+        CLAUDE_TRANSCRIPT_PATH: transcriptPath
+      });
+      assert.strictEqual(result.code, 0, 'Should exit 0 even with oversized stdin');
+      // Truncated JSON → JSON.parse throws → falls back to env var → creates session file
+      assert.ok(
+        result.stderr.includes('Created session file') || result.stderr.includes('Updated session file'),
+        `Should create/update session file via env var fallback, stderr: ${result.stderr}`
+      );
+    } finally {
+      cleanupTestDir(testDir);
+    }
+  })) passed++; else failed++;
+
   // Summary
   console.log('\n=== Test Results ===');
   console.log(`Passed: ${passed}`);
