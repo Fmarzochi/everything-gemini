@@ -1454,6 +1454,19 @@ function runTests() {
     }
   })) passed++; else failed++;
 
+  // ── Round 101: output() with circular reference object throws (no try/catch around JSON.stringify) ──
+  console.log('\nRound 101: output() (circular reference — JSON.stringify crash):');
+  if (test('output() throws TypeError on circular reference object (JSON.stringify has no try/catch)', () => {
+    const circular = { a: 1 };
+    circular.self = circular; // Creates circular reference
+
+    assert.throws(
+      () => utils.output(circular),
+      { name: 'TypeError' },
+      'JSON.stringify of circular object should throw TypeError (no try/catch in output())'
+    );
+  })) passed++; else failed++;
+
   // Summary
   console.log('\n=== Test Results ===');
   console.log(`Passed: ${passed}`);

@@ -1628,6 +1628,26 @@ src/main.ts
       'Item text truncated at embedded ### (lazy regex stops at first ### match)');
   })) passed++; else failed++;
 
+  // ── Round 101: getSessionStats with non-string input (number) throws TypeError ──
+  console.log('\nRound 101: getSessionStats (non-string input — type confusion crash):');
+  if (test('getSessionStats(123) throws TypeError (number reaches parseSessionMetadata → .match() fails)', () => {
+    // typeof 123 === 'number' → looksLikePath = false → content = 123
+    // parseSessionMetadata(123) → !123 is false → 123.match(...) → TypeError
+    assert.throws(
+      () => sessionManager.getSessionStats(123),
+      { name: 'TypeError' },
+      'Non-string input (number) should crash in parseSessionMetadata (.match not a function)'
+    );
+  })) passed++; else failed++;
+
+  // ── Round 101: appendSessionContent(null, 'content') returns false (error caught) ──
+  console.log('\nRound 101: appendSessionContent (null path — error handling):');
+  if (test('appendSessionContent(null, content) returns false (TypeError caught by try/catch)', () => {
+    const result = sessionManager.appendSessionContent(null, 'some content');
+    assert.strictEqual(result, false,
+      'null path should cause fs.appendFileSync to throw TypeError, caught by try/catch');
+  })) passed++; else failed++;
+
   // Summary
   console.log(`\nResults: Passed: ${passed}, Failed: ${failed}`);
   process.exit(failed > 0 ? 1 : 0);
