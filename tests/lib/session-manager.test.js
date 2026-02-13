@@ -1565,6 +1565,34 @@ src/main.ts
       'Null search should return sessions (confirming they exist but space filtered them)');
   })) passed++; else failed++;
 
+  // ── Round 98: getSessionById with null sessionId throws TypeError ──
+  console.log('\nRound 98: getSessionById (null sessionId — crashes at line 297):');
+
+  if (test('getSessionById(null) throws TypeError when session files exist', () => {
+    // session-manager.js line 297: `sessionId.length > 0` — calling .length on null
+    // throws TypeError because there's no early guard for null/undefined input.
+    // This only surfaces when valid .tmp files exist in the sessions directory.
+    assert.throws(
+      () => sessionManager.getSessionById(null),
+      { name: 'TypeError' },
+      'null.length should throw TypeError (no input guard at function entry)'
+    );
+  })) passed++; else failed++;
+
+  // ── Round 98: parseSessionFilename with null input throws TypeError ──
+  console.log('\nRound 98: parseSessionFilename (null input — crashes at line 30):');
+
+  if (test('parseSessionFilename(null) throws TypeError because null has no .match()', () => {
+    // session-manager.js line 30: `filename.match(SESSION_FILENAME_REGEX)`
+    // When filename is null, null.match() throws TypeError.
+    // Function lacks a type guard like `if (!filename || typeof filename !== 'string')`.
+    assert.throws(
+      () => sessionManager.parseSessionFilename(null),
+      { name: 'TypeError' },
+      'null.match() should throw TypeError (no type guard on filename parameter)'
+    );
+  })) passed++; else failed++;
+
   // Summary
   console.log(`\nResults: Passed: ${passed}, Failed: ${failed}`);
   process.exit(failed > 0 ? 1 : 0);

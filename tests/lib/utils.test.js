@@ -1350,6 +1350,29 @@ function runTests() {
     }
   })) passed++; else failed++;
 
+  // ── Round 98: findFiles with maxAge: -1 (negative boundary — excludes everything) ──
+  console.log('\nRound 98: findFiles (maxAge: -1 — negative boundary excludes all):');
+
+  if (test('findFiles with maxAge: -1 excludes all files (ageInDays always >= 0)', () => {
+    // utils.js line 176-178: `if (maxAge !== null) { ageInDays = ...; if (ageInDays <= maxAge) }`
+    // With maxAge: -1, the condition requires ageInDays <= -1. Since ageInDays =
+    // (Date.now() - mtimeMs) / 86400000 is always >= 0 for real files, nothing passes.
+    // This negative boundary deterministically excludes everything.
+    const tmpDir = fs.mkdtempSync(path.join(utils.getTempDir(), 'r98-maxage-neg-'));
+    try {
+      fs.writeFileSync(path.join(tmpDir, 'fresh.txt'), 'created just now');
+      const results = utils.findFiles(tmpDir, '*.txt', { maxAge: -1 });
+      assert.strictEqual(results.length, 0,
+        'maxAge: -1 should exclude all files (ageInDays is always >= 0)');
+      // Contrast: maxAge: null (default) should include the file
+      const noMaxAge = utils.findFiles(tmpDir, '*.txt');
+      assert.strictEqual(noMaxAge.length, 1,
+        'No maxAge (null default) should include the file (proving it exists)');
+    } finally {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  })) passed++; else failed++;
+
   // Summary
   console.log('\n=== Test Results ===');
   console.log(`Passed: ${passed}`);
