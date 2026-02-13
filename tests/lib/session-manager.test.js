@@ -1461,6 +1461,19 @@ src/main.ts
     assert.strictEqual(stats.totalItems, 0, 'Non-existent path should have 0 items');
   })) passed++; else failed++;
 
+  // ── Round 92: getSessionStats with UNC path treated as content ──
+  console.log('\nRound 92: getSessionStats (Windows UNC path):');
+
+  if (test('getSessionStats treats UNC path as content (not recognized as file path)', () => {
+    // session-manager.js line 163-166: The path heuristic checks for Unix paths
+    // (starts with /) and Windows drive-letter paths (/^[A-Za-z]:[/\\]/). UNC paths
+    // (\\server\share\file.tmp) don't match either pattern, so the function treats
+    // the string as pre-read content rather than a file path to read.
+    const stats = sessionManager.getSessionStats('\\\\server\\share\\session.tmp');
+    assert.strictEqual(stats.lineCount, 1,
+      'UNC path should be treated as single-line content (not a recognized path)');
+  })) passed++; else failed++;
+
   // Summary
   console.log(`\nResults: Passed: ${passed}, Failed: ${failed}`);
   process.exit(failed > 0 ? 1 : 0);

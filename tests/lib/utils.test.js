@@ -1231,6 +1231,23 @@ function runTests() {
     }
   })) passed++; else failed++;
 
+  // ── Round 92: countInFile with object pattern type ──
+  console.log('\nRound 92: countInFile (non-string non-RegExp pattern):');
+
+  if (test('countInFile returns 0 for object pattern (neither string nor RegExp)', () => {
+    // utils.js line 443-444: The else branch returns 0 when pattern is
+    // not instanceof RegExp and typeof !== 'string'. An object like {invalid: true}
+    // triggers this early return without throwing.
+    const testFile = path.join(utils.getTempDir(), `utils-test-obj-pattern-${Date.now()}.txt`);
+    try {
+      utils.writeFile(testFile, 'some test content to match against');
+      const count = utils.countInFile(testFile, { invalid: 'object' });
+      assert.strictEqual(count, 0, 'Object pattern should return 0');
+    } finally {
+      try { fs.unlinkSync(testFile); } catch { /* best-effort */ }
+    }
+  })) passed++; else failed++;
+
   // Summary
   console.log('\n=== Test Results ===');
   console.log(`Passed: ${passed}`);

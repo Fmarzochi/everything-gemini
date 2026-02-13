@@ -1396,6 +1396,22 @@ function runTests() {
     cleanupTestDir(testDir);
   })) passed++; else failed++;
 
+  // ── Round 92: detectFromPackageJson with empty string packageManager ──
+  console.log('\nRound 92: detectFromPackageJson (empty string packageManager):');
+
+  if (test('detectFromPackageJson returns null for empty string packageManager field', () => {
+    // package-manager.js line 114: if (pkg.packageManager) — empty string "" is falsy,
+    // so the if block is skipped entirely. Function returns null without attempting split.
+    // This is distinct from Round 91's whitespace test ("   " is truthy and enters the if).
+    const testDir = createTestDir();
+    fs.writeFileSync(
+      path.join(testDir, 'package.json'),
+      JSON.stringify({ name: 'test', packageManager: '' }));
+    const result = pm.detectFromPackageJson(testDir);
+    assert.strictEqual(result, null, 'Empty string packageManager should return null (falsy)');
+    cleanupTestDir(testDir);
+  })) passed++; else failed++;
+
   // Summary
   console.log('\n=== Test Results ===');
   console.log(`Passed: ${passed}`);
