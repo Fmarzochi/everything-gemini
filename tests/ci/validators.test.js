@@ -1530,6 +1530,63 @@ function runTests() {
     cleanupTestDir(testDir); cleanupTestDir(agentsDir); cleanupTestDir(skillsDir);
   })) passed++; else failed++;
 
+  // ── Round 42: case sensitivity, space-before-colon, missing dirs, empty matchers ──
+  console.log('\nRound 42: validate-agents (case sensitivity):');
+
+  if (test('rejects uppercase model value (case-sensitive check)', () => {
+    const testDir = createTestDir();
+    fs.writeFileSync(path.join(testDir, 'upper.md'), '---\nmodel: Haiku\ntools: Read\n---\n# Uppercase model');
+
+    const result = runValidatorWithDir('validate-agents', 'AGENTS_DIR', testDir);
+    assert.strictEqual(result.code, 1, 'Should reject capitalized model');
+    assert.ok(result.stderr.includes('Invalid model'), 'Should report invalid model');
+    assert.ok(result.stderr.includes('Haiku'), 'Should show the rejected value');
+    cleanupTestDir(testDir);
+  })) passed++; else failed++;
+
+  if (test('handles space before colon in frontmatter key', () => {
+    const testDir = createTestDir();
+    // "model : sonnet" — space before colon. extractFrontmatter uses indexOf(':') + trim()
+    fs.writeFileSync(path.join(testDir, 'space.md'), '---\nmodel : sonnet\ntools : Read, Write\n---\n# Agent with space-colon');
+
+    const result = runValidatorWithDir('validate-agents', 'AGENTS_DIR', testDir);
+    assert.strictEqual(result.code, 0, 'Should accept space before colon (trim handles it)');
+    cleanupTestDir(testDir);
+  })) passed++; else failed++;
+
+  console.log('\nRound 42: validate-commands (missing agents dir):');
+
+  if (test('flags agent path references when AGENTS_DIR does not exist', () => {
+    const testDir = createTestDir();
+    const skillsDir = createTestDir();
+    // AGENTS_DIR points to non-existent path → validAgents set stays empty
+    fs.writeFileSync(path.join(testDir, 'cmd.md'), '# Command\nSee agents/planner.md for details.');
+
+    const result = runValidatorWithDirs('validate-commands', {
+      COMMANDS_DIR: testDir, AGENTS_DIR: '/nonexistent/agents-dir', SKILLS_DIR: skillsDir
+    });
+    assert.strictEqual(result.code, 1, 'Should fail when agents dir missing but agent referenced');
+    assert.ok(result.stderr.includes('planner'), 'Should report the unresolvable agent reference');
+    cleanupTestDir(testDir); cleanupTestDir(skillsDir);
+  })) passed++; else failed++;
+
+  console.log('\nRound 42: validate-hooks (empty matchers array):');
+
+  if (test('accepts event type with empty matchers array', () => {
+    const testDir = createTestDir();
+    const hooksFile = path.join(testDir, 'hooks.json');
+    fs.writeFileSync(hooksFile, JSON.stringify({
+      hooks: {
+        PreToolUse: []
+      }
+    }));
+
+    const result = runValidatorWithDir('validate-hooks', 'HOOKS_FILE', hooksFile);
+    assert.strictEqual(result.code, 0, 'Should accept empty matchers array');
+    assert.ok(result.stdout.includes('Validated 0'), 'Should report 0 matchers');
+    cleanupTestDir(testDir);
+  })) passed++; else failed++;
+
   // Summary
   console.log(`\nResults: Passed: ${passed}, Failed: ${failed}`);
   process.exit(failed > 0 ? 1 : 0);
