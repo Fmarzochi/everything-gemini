@@ -1739,6 +1739,52 @@ file.ts
       'In-progress item should be Task C');
   })) passed++; else failed++;
 
+  // ── Round 106: getAllSessions with array/object limit — Number() coercion edge cases ──
+  console.log('\nRound 106: getAllSessions (array/object limit coercion — Number([5])→5, Number({})→NaN→50):');
+  if (test('getAllSessions coerces array/object limit via Number() with NaN fallback to 50', () => {
+    const isoHome = path.join(os.tmpdir(), `ecc-r106-limit-coerce-${Date.now()}`);
+    const isoSessionsDir = path.join(isoHome, '.claude', 'sessions');
+    fs.mkdirSync(isoSessionsDir, { recursive: true });
+    // Create 3 test sessions
+    for (let i = 0; i < 3; i++) {
+      const name = `2026-03-0${i + 1}-aaaa${i}${i}${i}${i}-session.tmp`;
+      const filePath = path.join(isoSessionsDir, name);
+      fs.writeFileSync(filePath, `# Session ${i}`);
+      const mtime = new Date(Date.now() - (3 - i) * 60000);
+      fs.utimesSync(filePath, mtime, mtime);
+    }
+    const origHome = process.env.HOME;
+    const origUserProfile = process.env.USERPROFILE;
+    process.env.HOME = isoHome;
+    process.env.USERPROFILE = isoHome;
+    try {
+      delete require.cache[require.resolve('../../scripts/lib/session-manager')];
+      delete require.cache[require.resolve('../../scripts/lib/utils')];
+      const freshManager = require('../../scripts/lib/session-manager');
+      // Object limit: Number({}) → NaN → fallback to 50
+      const objResult = freshManager.getAllSessions({ limit: {} });
+      assert.strictEqual(objResult.limit, 50,
+        'Object limit should coerce to NaN → fallback to default 50');
+      assert.strictEqual(objResult.total, 3, 'Should still find all 3 sessions');
+      // Single-element array: Number([2]) → 2
+      const arrResult = freshManager.getAllSessions({ limit: [2] });
+      assert.strictEqual(arrResult.limit, 2,
+        'Single-element array [2] coerces to Number 2 via Number([2])');
+      assert.strictEqual(arrResult.sessions.length, 2, 'Should return only 2 sessions');
+      assert.strictEqual(arrResult.hasMore, true, 'hasMore should be true with limit 2 of 3');
+      // Multi-element array: Number([1,2]) → NaN → fallback to 50
+      const multiArrResult = freshManager.getAllSessions({ limit: [1, 2] });
+      assert.strictEqual(multiArrResult.limit, 50,
+        'Multi-element array [1,2] coerces to NaN → fallback to 50');
+    } finally {
+      process.env.HOME = origHome;
+      process.env.USERPROFILE = origUserProfile;
+      delete require.cache[require.resolve('../../scripts/lib/session-manager')];
+      delete require.cache[require.resolve('../../scripts/lib/utils')];
+      fs.rmSync(isoHome, { recursive: true, force: true });
+    }
+  })) passed++; else failed++;
+
   // Summary
   console.log(`\nResults: Passed: ${passed}, Failed: ${failed}`);
   process.exit(failed > 0 ? 1 : 0);

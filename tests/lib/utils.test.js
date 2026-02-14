@@ -1548,6 +1548,50 @@ function runTests() {
     }
   })) passed++; else failed++;
 
+  // ── Round 106: countInFile with named capture groups — match(g) ignores group details ──
+  console.log('\nRound 106: countInFile (named capture groups — String.match(g) returns full matches only):');
+  if (test('countInFile with named capture groups counts matches not groups', () => {
+    const tmpDir = fs.mkdtempSync(path.join(utils.getTempDir(), 'r106-count-named-'));
+    const testFile = path.join(tmpDir, 'test.txt');
+    try {
+      fs.writeFileSync(testFile, 'foo bar baz\nfoo qux\nbar foo end');
+      // Named capture group — should still count 3 matches for "foo"
+      const count = utils.countInFile(testFile, /(?<word>foo)/);
+      assert.strictEqual(count, 3,
+        'Named capture group should not inflate count — match(g) returns full matches only');
+      // Compare with plain pattern
+      const plainCount = utils.countInFile(testFile, /foo/);
+      assert.strictEqual(plainCount, 3, 'Plain regex should also find 3 matches');
+      assert.strictEqual(count, plainCount,
+        'Named group pattern and plain pattern should return identical counts');
+    } finally {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  })) passed++; else failed++;
+
+  // ── Round 106: grepFile with multiline (m) flag — preserved, unlike g which is stripped ──
+  console.log('\nRound 106: grepFile (multiline m flag — preserved in regex, unlike g which is stripped):');
+  if (test('grepFile preserves multiline (m) flag and anchors work on split lines', () => {
+    const tmpDir = fs.mkdtempSync(path.join(utils.getTempDir(), 'r106-grep-multiline-'));
+    const testFile = path.join(tmpDir, 'test.txt');
+    try {
+      fs.writeFileSync(testFile, 'hello\nworld hello\nhello world');
+      // With m flag + anchors: ^hello$ should match only exact "hello" line
+      const mResults = utils.grepFile(testFile, /^hello$/m);
+      assert.strictEqual(mResults.length, 1,
+        'With m flag, ^hello$ should match only line 1 (exact "hello")');
+      assert.strictEqual(mResults[0].lineNumber, 1);
+      // Without m flag: same behavior since grepFile splits lines individually
+      const noMResults = utils.grepFile(testFile, /^hello$/);
+      assert.strictEqual(noMResults.length, 1,
+        'Without m flag, same result — grepFile splits lines so anchors are per-line already');
+      assert.strictEqual(mResults.length, noMResults.length,
+        'm flag is preserved but irrelevant — line splitting makes anchors per-line already');
+    } finally {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  })) passed++; else failed++;
+
   // Summary
   console.log('\n=== Test Results ===');
   console.log(`Passed: ${passed}`);
