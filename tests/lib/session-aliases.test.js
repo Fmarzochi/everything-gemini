@@ -1418,6 +1418,40 @@ function runTests() {
       'Error message should mention 128-char limit');
   })) passed++; else failed++;
 
+  // ── Round 112: resolveAlias rejects Unicode characters in alias name ──
+  console.log('\nRound 112: resolveAlias (Unicode rejection):');
+  if (test('resolveAlias returns null for alias names containing Unicode characters', () => {
+    resetAliases();
+    // First create a valid alias to ensure the store works
+    aliases.setAlias('valid-alias', '/path/to/session');
+    const validResult = aliases.resolveAlias('valid-alias');
+    assert.notStrictEqual(validResult, null, 'Valid ASCII alias should resolve');
+
+    // Unicode accented characters — rejected by /^[a-zA-Z0-9_-]+$/
+    const accentedResult = aliases.resolveAlias('café-session');
+    assert.strictEqual(accentedResult, null,
+      'Accented character "é" should be rejected by [a-zA-Z0-9_-]');
+
+    const umlautResult = aliases.resolveAlias('über-test');
+    assert.strictEqual(umlautResult, null,
+      'Umlaut "ü" should be rejected by [a-zA-Z0-9_-]');
+
+    // CJK characters
+    const cjkResult = aliases.resolveAlias('会議-notes');
+    assert.strictEqual(cjkResult, null,
+      'CJK characters should be rejected');
+
+    // Emoji
+    const emojiResult = aliases.resolveAlias('rocket-🚀');
+    assert.strictEqual(emojiResult, null,
+      'Emoji should be rejected by the ASCII-only regex');
+
+    // Cyrillic characters that look like Latin (homoglyphs)
+    const cyrillicResult = aliases.resolveAlias('tеst'); // 'е' is Cyrillic U+0435
+    assert.strictEqual(cyrillicResult, null,
+      'Cyrillic homoglyph "е" (U+0435) should be rejected even though it looks like "e"');
+  })) passed++; else failed++;
+
   // Summary
   console.log(`\nResults: Passed: ${passed}, Failed: ${failed}`);
   process.exit(failed > 0 ? 1 : 0);

@@ -1930,6 +1930,66 @@ file.ts
       'Clean context should have second line');
   })) passed++; else failed++;
 
+  // ── Round 112: getSessionStats with newline-containing absolute path — treated as content ──
+  console.log('\nRound 112: getSessionStats (newline-in-path heuristic):');
+  if (test('getSessionStats treats absolute .tmp path containing newline as content, not a file path', () => {
+    // The looksLikePath heuristic at line 163-166 checks:
+    //   !sessionPathOrContent.includes('\n')
+    // A string with embedded newline fails this check and is treated as content
+    const pathWithNewline = '/tmp/sessions/2026-01-15\n-abcd1234-session.tmp';
+
+    // This should NOT throw (it's treated as content, not a path that doesn't exist)
+    const stats = sessionManager.getSessionStats(pathWithNewline);
+    assert.ok(stats, 'Should return stats object (treating input as content)');
+    // The "content" has 2 lines (split by the embedded \n)
+    assert.strictEqual(stats.lineCount, 2,
+      'Should count 2 lines in the "content" (split at \\n)');
+    // No markdown headings = no completed/in-progress items
+    assert.strictEqual(stats.totalItems, 0,
+      'Should find 0 items in non-markdown content');
+
+    // Contrast: a real absolute path without newlines IS treated as a path
+    const realPath = '/tmp/nonexistent-session.tmp';
+    const realStats = sessionManager.getSessionStats(realPath);
+    // getSessionContent returns '' for non-existent files, so lineCount = 1 (empty string split)
+    assert.ok(realStats, 'Should return stats even for nonexistent path');
+    assert.strictEqual(realStats.lineCount, 0,
+      'Non-existent file returns empty content with 0 lines');
+  })) passed++; else failed++;
+
+  // ── Round 112: appendSessionContent with read-only file — returns false ──
+  console.log('\nRound 112: appendSessionContent (read-only file):');
+  if (test('appendSessionContent returns false when file is read-only (EACCES)', () => {
+    if (process.platform === 'win32') {
+      // chmod doesn't work reliably on Windows — skip
+      assert.ok(true, 'Skipped on Windows');
+      return;
+    }
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'r112-readonly-'));
+    const readOnlyFile = path.join(tmpDir, '2026-01-15-session.tmp');
+    try {
+      fs.writeFileSync(readOnlyFile, '# Session\n\nInitial content\n');
+      // Make file read-only
+      fs.chmodSync(readOnlyFile, 0o444);
+      // Verify it exists and is readable
+      const content = fs.readFileSync(readOnlyFile, 'utf8');
+      assert.ok(content.includes('Initial content'), 'File should be readable');
+
+      // appendSessionContent should catch EACCES and return false
+      const result = sessionManager.appendSessionContent(readOnlyFile, '\nAppended data');
+      assert.strictEqual(result, false,
+        'Should return false when file is read-only (fs.appendFileSync throws EACCES)');
+
+      // Verify original content unchanged
+      const afterContent = fs.readFileSync(readOnlyFile, 'utf8');
+      assert.ok(!afterContent.includes('Appended data'),
+        'Original content should be unchanged');
+    } finally {
+      try { fs.chmodSync(readOnlyFile, 0o644); } catch {}
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  })) passed++; else failed++;
+
   // Summary
   console.log(`\nResults: Passed: ${passed}, Failed: ${failed}`);
   process.exit(failed > 0 ? 1 : 0);
