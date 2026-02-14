@@ -1752,6 +1752,76 @@ function runTests() {
       'limit > total should return all aliases');
   })) passed++; else failed++;
 
+  // ── Round 125: loadAliases with __proto__ key in JSON — no prototype pollution ──
+  console.log('\nRound 125: loadAliases (__proto__ key in JSON — safe, no prototype pollution):');
+  if (test('loadAliases with __proto__ alias key does not pollute Object prototype', () => {
+    // JSON.parse('{"__proto__":...}') creates a normal property named "__proto__",
+    // it does NOT modify Object.prototype. This is safe but worth documenting.
+    // The alias would be accessible via data.aliases['__proto__'] and iterable
+    // via Object.entries, but it won't affect other objects.
+    resetAliases();
+
+    // Write raw JSON string with __proto__ as an alias name.
+    // IMPORTANT: Cannot use JSON.stringify(obj) because {'__proto__':...} in JS
+    // sets the prototype rather than creating an own property, so stringify drops it.
+    // Must write the JSON string directly to simulate a maliciously crafted file.
+    const aliasesPath = aliases.getAliasesPath();
+    const now = new Date().toISOString();
+    const rawJson = `{
+  "version": "1.0.0",
+  "aliases": {
+    "__proto__": {
+      "sessionPath": "/evil/path",
+      "createdAt": "${now}",
+      "title": "Prototype Pollution Attempt"
+    },
+    "normal": {
+      "sessionPath": "/normal/path",
+      "createdAt": "${now}",
+      "title": "Normal Alias"
+    }
+  },
+  "metadata": { "totalCount": 2, "lastUpdated": "${now}" }
+}`;
+    fs.writeFileSync(aliasesPath, rawJson);
+
+    // Load aliases — should NOT pollute prototype
+    const data = aliases.loadAliases();
+
+    // Verify __proto__ did NOT pollute Object.prototype
+    const freshObj = {};
+    assert.strictEqual(freshObj.sessionPath, undefined,
+      'Object.prototype should NOT have sessionPath (no pollution)');
+    assert.strictEqual(freshObj.title, undefined,
+      'Object.prototype should NOT have title (no pollution)');
+
+    // The __proto__ key IS accessible as a normal property
+    assert.ok(data.aliases['__proto__'],
+      '__proto__ key exists as normal property in parsed aliases');
+    assert.strictEqual(data.aliases['__proto__'].sessionPath, '/evil/path',
+      '__proto__ alias data is accessible normally');
+
+    // Normal alias also works
+    assert.ok(data.aliases['normal'],
+      'Normal alias coexists with __proto__ key');
+
+    // resolveAlias with '__proto__' — rejected by regex (underscores ok but __ prefix works)
+    // Actually ^[a-zA-Z0-9_-]+$ would ACCEPT '__proto__' since _ is allowed
+    const resolved = aliases.resolveAlias('__proto__');
+    // If the regex accepts it, it should find the alias
+    if (resolved) {
+      assert.strictEqual(resolved.sessionPath, '/evil/path',
+        'resolveAlias can access __proto__ alias (regex allows underscores)');
+    }
+
+    // Object.keys should enumerate __proto__ from JSON.parse
+    const keys = Object.keys(data.aliases);
+    assert.ok(keys.includes('__proto__'),
+      'Object.keys includes __proto__ from JSON.parse (normal property)');
+    assert.ok(keys.includes('normal'),
+      'Object.keys includes normal alias');
+  })) passed++; else failed++;
+
   // Summary
   console.log(`\nResults: Passed: ${passed}, Failed: ${failed}`);
   process.exit(failed > 0 ? 1 : 0);

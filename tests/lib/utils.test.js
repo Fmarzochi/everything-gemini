@@ -2232,6 +2232,82 @@ function runTests() {
     }
   })) passed++; else failed++;
 
+  // ── Round 125: readFile with binary content — returns garbled UTF-8, not null ──
+  console.log('\nRound 125: readFile (binary/non-UTF8 content — garbled, not null):');
+  if (test('readFile with binary content returns garbled string (not null) because UTF-8 decode does not throw', () => {
+    // utils.js line 285: fs.readFileSync(filePath, 'utf8') — binary data gets UTF-8 decoded.
+    // Invalid byte sequences become U+FFFD replacement characters. The function does
+    // NOT return null for binary files (only returns null on ENOENT/permission errors).
+    // This means grepFile/countInFile would operate on corrupted content silently.
+    const tmpDir = fs.mkdtempSync(path.join(utils.getTempDir(), 'r125-binary-'));
+    const testFile = path.join(tmpDir, 'binary.dat');
+    try {
+      // Write raw binary data (invalid UTF-8 sequences)
+      const binaryData = Buffer.from([0x00, 0x80, 0xFF, 0xFE, 0x48, 0x65, 0x6C, 0x6C, 0x6F]);
+      fs.writeFileSync(testFile, binaryData);
+
+      const content = utils.readFile(testFile);
+      assert.ok(content !== null,
+        'readFile should NOT return null for binary files');
+      assert.ok(typeof content === 'string',
+        'readFile always returns a string (or null for missing files)');
+      // The string contains "Hello" (bytes 0x48-0x6F) somewhere in the garbled output
+      assert.ok(content.includes('Hello'),
+        'ASCII subset of binary data should survive UTF-8 decode');
+      // Content length may differ from byte length due to multi-byte replacement chars
+      assert.ok(content.length > 0, 'Non-empty content from binary file');
+
+      // grepFile on binary file — still works but on garbled content
+      const matches = utils.grepFile(testFile, 'Hello');
+      assert.strictEqual(matches.length, 1,
+        'grepFile finds "Hello" even in binary file (ASCII bytes survive)');
+
+      // Non-existent file — returns null (contrast with binary)
+      const missing = utils.readFile(path.join(tmpDir, 'no-such-file.txt'));
+      assert.strictEqual(missing, null,
+        'Missing file returns null (not garbled content)');
+    } finally {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  })) passed++; else failed++;
+
+  // ── Round 125: output() with undefined, NaN, Infinity — non-object primitives logged directly ──
+  console.log('\nRound 125: output() (undefined/NaN/Infinity — typeof checks and JSON.stringify):');
+  if (test('output() handles undefined, NaN, Infinity as non-objects — logs directly', () => {
+    // utils.js line 273: `if (typeof data === 'object')` — undefined/NaN/Infinity are NOT objects.
+    // typeof undefined → "undefined", typeof NaN → "number", typeof Infinity → "number"
+    // All three bypass JSON.stringify and go to console.log(data) directly.
+    const origLog = console.log;
+    const logged = [];
+    console.log = (...args) => logged.push(args);
+    try {
+      // undefined — typeof "undefined", logged directly
+      utils.output(undefined);
+      assert.strictEqual(logged[0][0], undefined,
+        'output(undefined) logs undefined (not "undefined" string)');
+
+      // NaN — typeof "number", logged directly
+      utils.output(NaN);
+      assert.ok(Number.isNaN(logged[1][0]),
+        'output(NaN) logs NaN directly (typeof "number", not "object")');
+
+      // Infinity — typeof "number", logged directly
+      utils.output(Infinity);
+      assert.strictEqual(logged[2][0], Infinity,
+        'output(Infinity) logs Infinity directly');
+
+      // Object containing NaN — JSON.stringify converts NaN to null
+      utils.output({ value: NaN, count: Infinity });
+      const parsed = JSON.parse(logged[3][0]);
+      assert.strictEqual(parsed.value, null,
+        'JSON.stringify converts NaN to null inside objects');
+      assert.strictEqual(parsed.count, null,
+        'JSON.stringify converts Infinity to null inside objects');
+    } finally {
+      console.log = origLog;
+    }
+  })) passed++; else failed++;
+
   // Summary
   console.log('\n=== Test Results ===');
   console.log(`Passed: ${passed}`);
