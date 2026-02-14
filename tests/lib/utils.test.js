@@ -1702,6 +1702,32 @@ function runTests() {
     }
   })) passed++; else failed++;
 
+  // ── Round 113: replaceInFile with zero-width regex — inserts between every character ──
+  console.log('\nRound 113: replaceInFile (zero-width regex /(?:)/g — matches every position):');
+  if (test('replaceInFile with zero-width regex /(?:)/g inserts replacement at every position', () => {
+    const tmpDir = fs.mkdtempSync(path.join(utils.getTempDir(), 'r113-zero-width-'));
+    const testFile = path.join(tmpDir, 'test.txt');
+    try {
+      fs.writeFileSync(testFile, 'abc');
+      // /(?:)/g matches at every position boundary: before 'a', between 'a'-'b', etc.
+      // "abc".replace(/(?:)/g, 'X') → "XaXbXcX" (7 chars from 3)
+      const result = utils.replaceInFile(testFile, /(?:)/g, 'X');
+      assert.strictEqual(result, true, 'Should succeed (no error)');
+      const content = utils.readFile(testFile);
+      assert.strictEqual(content, 'XaXbXcX',
+        'Zero-width regex inserts at every position boundary');
+
+      // Also test with /^/gm (start of each line)
+      fs.writeFileSync(testFile, 'line1\nline2\nline3');
+      utils.replaceInFile(testFile, /^/gm, '> ');
+      const prefixed = utils.readFile(testFile);
+      assert.strictEqual(prefixed, '> line1\n> line2\n> line3',
+        '/^/gm inserts at start of each line');
+    } finally {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  })) passed++; else failed++;
+
   // Summary
   console.log('\n=== Test Results ===');
   console.log(`Passed: ${passed}`);

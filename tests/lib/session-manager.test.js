@@ -1990,6 +1990,71 @@ file.ts
     }
   })) passed++; else failed++;
 
+  // ── Round 113: parseSessionFilename century leap year validation (1900, 2100 not leap; 2000 is) ──
+  console.log('\nRound 113: parseSessionFilename (century leap year — 100/400 rules):');
+  if (test('parseSessionFilename rejects Feb 29 in century non-leap years (1900, 2100) but accepts 2000', () => {
+    // Gregorian rule: divisible by 100 → NOT leap, UNLESS also divisible by 400
+    // 1900: divisible by 100 but NOT by 400 → NOT leap → Feb 29 invalid
+    const result1900 = sessionManager.parseSessionFilename('1900-02-29-abcd1234-session.tmp');
+    assert.strictEqual(result1900, null,
+      '1900 is NOT a leap year (div by 100 but not 400) — Feb 29 should be rejected');
+
+    // 2100: same rule — NOT leap
+    const result2100 = sessionManager.parseSessionFilename('2100-02-29-test1234-session.tmp');
+    assert.strictEqual(result2100, null,
+      '2100 is NOT a leap year — Feb 29 should be rejected');
+
+    // 2000: divisible by 400 → IS leap → Feb 29 valid
+    const result2000 = sessionManager.parseSessionFilename('2000-02-29-leap2000-session.tmp');
+    assert.notStrictEqual(result2000, null,
+      '2000 IS a leap year (div by 400) — Feb 29 should be accepted');
+    assert.strictEqual(result2000.date, '2000-02-29');
+
+    // 2400: also divisible by 400 → IS leap
+    const result2400 = sessionManager.parseSessionFilename('2400-02-29-test2400-session.tmp');
+    assert.notStrictEqual(result2400, null,
+      '2400 IS a leap year (div by 400) — Feb 29 should be accepted');
+
+    // Verify Feb 28 always works in non-leap century years
+    const result1900Feb28 = sessionManager.parseSessionFilename('1900-02-28-abcd1234-session.tmp');
+    assert.notStrictEqual(result1900Feb28, null,
+      'Feb 28 should always be valid even in non-leap years');
+  })) passed++; else failed++;
+
+  // ── Round 113: parseSessionMetadata title with markdown formatting — raw markdown preserved ──
+  console.log('\nRound 113: parseSessionMetadata (title with markdown formatting — raw markdown preserved):');
+  if (test('parseSessionMetadata captures raw markdown formatting in title without stripping', () => {
+    // The regex /^#\s+(.+)$/m captures everything after "# ", including markdown
+    const boldContent = '# **Important Session**\n\nSome content';
+    const boldMeta = sessionManager.parseSessionMetadata(boldContent);
+    assert.strictEqual(boldMeta.title, '**Important Session**',
+      'Bold markdown ** should be preserved in title (not stripped)');
+
+    // Inline code in title
+    const codeContent = '# `fix-bug` Session\n\nContent here';
+    const codeMeta = sessionManager.parseSessionMetadata(codeContent);
+    assert.strictEqual(codeMeta.title, '`fix-bug` Session',
+      'Inline code backticks should be preserved in title');
+
+    // Italic in title
+    const italicContent = '# _Urgent_ Review\n\n**Date:** 2026-01-01';
+    const italicMeta = sessionManager.parseSessionMetadata(italicContent);
+    assert.strictEqual(italicMeta.title, '_Urgent_ Review',
+      'Italic underscores should be preserved in title');
+
+    // Mixed markdown in title
+    const mixedContent = '# **Bold** and `code` and _italic_\n\nBody text';
+    const mixedMeta = sessionManager.parseSessionMetadata(mixedContent);
+    assert.strictEqual(mixedMeta.title, '**Bold** and `code` and _italic_',
+      'Mixed markdown should all be preserved as raw text');
+
+    // Title with trailing whitespace (trim should remove it)
+    const trailingContent = '# Title with spaces   \n\nBody';
+    const trailingMeta = sessionManager.parseSessionMetadata(trailingContent);
+    assert.strictEqual(trailingMeta.title, 'Title with spaces',
+      'Trailing whitespace should be trimmed');
+  })) passed++; else failed++;
+
   // Summary
   console.log(`\nResults: Passed: ${passed}, Failed: ${failed}`);
   process.exit(failed > 0 ? 1 : 0);
