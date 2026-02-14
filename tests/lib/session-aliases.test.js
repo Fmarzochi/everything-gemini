@@ -1395,6 +1395,29 @@ function runTests() {
       'Whitespace title persists in JSON as-is');
   })) passed++; else failed++;
 
+  // ── Round 111: setAlias with exactly 128-character alias — off-by-one boundary ──
+  console.log('\nRound 111: setAlias (128-char alias — exact boundary of > 128 check):');
+  if (test('setAlias accepts alias of exactly 128 characters (128 is NOT > 128)', () => {
+    // session-aliases.js line 199: if (alias.length > 128)
+    // 128 is NOT > 128, so exactly 128 chars is ACCEPTED.
+    // Existing test only checks 129 (rejected).
+    resetAliases();
+    const alias128 = 'a'.repeat(128);
+    const result = aliases.setAlias(alias128, '/path/to/session');
+    assert.strictEqual(result.success, true,
+      '128-char alias should be accepted (128 is NOT > 128)');
+    assert.strictEqual(result.isNew, true);
+    // Verify it can be resolved
+    const resolved = aliases.resolveAlias(alias128);
+    assert.notStrictEqual(resolved, null, '128-char alias should be resolvable');
+    assert.strictEqual(resolved.sessionPath, '/path/to/session');
+    // Confirm 129 is rejected (boundary)
+    const result129 = aliases.setAlias('b'.repeat(129), '/path');
+    assert.strictEqual(result129.success, false, '129-char alias should be rejected');
+    assert.ok(result129.error.includes('128'),
+      'Error message should mention 128-char limit');
+  })) passed++; else failed++;
+
   // Summary
   console.log(`\nResults: Passed: ${passed}, Failed: ${failed}`);
   process.exit(failed > 0 ? 1 : 0);

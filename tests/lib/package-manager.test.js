@@ -1536,6 +1536,33 @@ function runTests() {
     }
   })) passed++; else failed++;
 
+  // ── Round 111: getExecCommand with newline in args — SAFE_ARGS_REGEX \s includes \n ──
+  console.log('\nRound 111: getExecCommand (newline in args — SAFE_ARGS_REGEX \\s matches \\n):');
+  if (test('getExecCommand accepts newline in args because SAFE_ARGS_REGEX \\s includes \\n', () => {
+    // SAFE_ARGS_REGEX = /^[@a-zA-Z0-9\s_.\/:=,'"*+-]+$/
+    // \s matches [\t\n\v\f\r ] — includes newline!
+    // This means "file.js\nmalicious" passes the regex.
+    const originalEnv = process.env.CLAUDE_PACKAGE_MANAGER;
+    try {
+      process.env.CLAUDE_PACKAGE_MANAGER = 'npm';
+      // Newline in args should pass SAFE_ARGS_REGEX because \s matches \n
+      const cmd = pm.getExecCommand('prettier', 'file.js\necho injected');
+      assert.strictEqual(cmd, 'npx prettier file.js\necho injected',
+        'Newline passes SAFE_ARGS_REGEX (\\s includes \\n) — potential command injection vector');
+      // Tab also passes
+      const cmd2 = pm.getExecCommand('eslint', 'file.js\t--fix');
+      assert.strictEqual(cmd2, 'npx eslint file.js\t--fix',
+        'Tab also passes SAFE_ARGS_REGEX via \\s');
+      // Carriage return also passes
+      const cmd3 = pm.getExecCommand('tsc', 'src\r--strict');
+      assert.strictEqual(cmd3, 'npx tsc src\r--strict',
+        'Carriage return passes via \\s');
+    } finally {
+      if (originalEnv !== undefined) process.env.CLAUDE_PACKAGE_MANAGER = originalEnv;
+      else delete process.env.CLAUDE_PACKAGE_MANAGER;
+    }
+  })) passed++; else failed++;
+
   // Summary
   console.log('\n=== Test Results ===');
   console.log(`Passed: ${passed}`);

@@ -1891,6 +1891,45 @@ file.ts
     assert.strictEqual(lowerResult.shortId, 'abcd1234');
   })) passed++; else failed++;
 
+  // ── Round 111: parseSessionMetadata context with nested triple backticks — lazy regex truncation ──
+  console.log('\nRound 111: parseSessionMetadata (nested ``` in context — lazy \\S*? stops at first ```):");');
+  if (test('parseSessionMetadata context capture truncated by nested triple backticks', () => {
+    // The regex: /### Context to Load\s*\n```\n([\s\S]*?)```/
+    // The lazy [\s\S]*? matches as few chars as possible, so it stops at the
+    // FIRST ``` it encounters — even if that's inside the code block content.
+    const content = [
+      '# Session',
+      '',
+      '### Context to Load',
+      '```',
+      'const x = 1;',
+      '```nested code block```',  // Inner ``` causes premature match end
+      'const y = 2;',
+      '```'
+    ].join('\n');
+    const meta = sessionManager.parseSessionMetadata(content);
+    // Lazy regex stops at the inner ```, so context only captures "const x = 1;\n"
+    assert.ok(meta.context.includes('const x = 1'),
+      'Context should contain text before the inner backticks');
+    assert.ok(!meta.context.includes('const y = 2'),
+      'Context should NOT contain text after inner ``` (lazy regex stops early)');
+    // Without nested backticks, full content is captured
+    const cleanContent = [
+      '# Session',
+      '',
+      '### Context to Load',
+      '```',
+      'const x = 1;',
+      'const y = 2;',
+      '```'
+    ].join('\n');
+    const cleanMeta = sessionManager.parseSessionMetadata(cleanContent);
+    assert.ok(cleanMeta.context.includes('const x = 1'),
+      'Clean context should have first line');
+    assert.ok(cleanMeta.context.includes('const y = 2'),
+      'Clean context should have second line');
+  })) passed++; else failed++;
+
   // Summary
   console.log(`\nResults: Passed: ${passed}, Failed: ${failed}`);
   process.exit(failed > 0 ? 1 : 0);
