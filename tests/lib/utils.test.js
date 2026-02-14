@@ -1974,6 +1974,49 @@ function runTests() {
     }
   })) passed++; else failed++;
 
+  // ── Round 119: appendFile with non-string content — TypeError propagates (no try/catch) ──
+  console.log('\nRound 119: appendFile (non-string content — TypeError propagates like writeFile):');
+  if (test('appendFile with null/number content throws TypeError (no try/catch wrapper)', () => {
+    const tmpDir = fs.mkdtempSync(path.join(utils.getTempDir(), 'r119-appendfile-type-'));
+    const testFile = path.join(tmpDir, 'test.txt');
+    try {
+      // Create file with initial content
+      fs.writeFileSync(testFile, 'initial');
+
+      // null content → TypeError from fs.appendFileSync
+      assert.throws(
+        () => utils.appendFile(testFile, null),
+        (err) => err instanceof TypeError,
+        'appendFile(path, null) should throw TypeError'
+      );
+
+      // undefined content → TypeError
+      assert.throws(
+        () => utils.appendFile(testFile, undefined),
+        (err) => err instanceof TypeError,
+        'appendFile(path, undefined) should throw TypeError'
+      );
+
+      // number content → TypeError
+      assert.throws(
+        () => utils.appendFile(testFile, 42),
+        (err) => err instanceof TypeError,
+        'appendFile(path, 42) should throw TypeError'
+      );
+
+      // Verify original content is unchanged after failed appends
+      assert.strictEqual(utils.readFile(testFile), 'initial',
+        'File content should be unchanged after failed appends');
+
+      // Contrast: string append works
+      utils.appendFile(testFile, ' appended');
+      assert.strictEqual(utils.readFile(testFile), 'initial appended',
+        'String append should work correctly');
+    } finally {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  })) passed++; else failed++;
+
   // Summary
   console.log('\n=== Test Results ===');
   console.log(`Passed: ${passed}`);

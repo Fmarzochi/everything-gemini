@@ -2186,6 +2186,66 @@ file.ts
     assert.strictEqual(hexLower.shortId, 'a1b2c3d4');
   })) passed++; else failed++;
 
+  // ── Round 119: parseSessionMetadata "Context to Load" code block extraction ──
+  console.log('\nRound 119: parseSessionMetadata ("Context to Load" — code block extraction edge cases):');
+  if (test('parseSessionMetadata extracts Context to Load from code block, handles missing/nested blocks', () => {
+    // Valid context extraction
+    const validContent = [
+      '# Session\n\n',
+      '### Context to Load\n',
+      '```\n',
+      'file1.js\n',
+      'file2.ts\n',
+      '```\n'
+    ].join('');
+    const validMeta = sessionManager.parseSessionMetadata(validContent);
+    assert.strictEqual(validMeta.context, 'file1.js\nfile2.ts',
+      'Should extract content between ``` markers and trim');
+
+    // Missing closing backticks — regex doesn't match, context stays empty
+    const noClose = [
+      '# Session\n\n',
+      '### Context to Load\n',
+      '```\n',
+      'file1.js\n',
+      'file2.ts\n'
+    ].join('');
+    const noCloseMeta = sessionManager.parseSessionMetadata(noClose);
+    assert.strictEqual(noCloseMeta.context, '',
+      'Missing closing ``` should result in empty context (regex no match)');
+
+    // No code block after header — just plain text
+    const noBlock = [
+      '# Session\n\n',
+      '### Context to Load\n',
+      'file1.js\n',
+      'file2.ts\n'
+    ].join('');
+    const noBlockMeta = sessionManager.parseSessionMetadata(noBlock);
+    assert.strictEqual(noBlockMeta.context, '',
+      'Plain text without ``` should not be captured as context');
+
+    // Nested code block — lazy [\s\S]*? stops at first ```
+    const nested = [
+      '# Session\n\n',
+      '### Context to Load\n',
+      '```\n',
+      'first block\n',
+      '```\n',
+      'second block\n',
+      '```\n'
+    ].join('');
+    const nestedMeta = sessionManager.parseSessionMetadata(nested);
+    assert.strictEqual(nestedMeta.context, 'first block',
+      'Lazy quantifier should stop at first closing ``` (not greedy)');
+
+    // Empty code block
+    const emptyBlock = '# Session\n\n### Context to Load\n```\n```\n';
+    const emptyMeta = sessionManager.parseSessionMetadata(emptyBlock);
+    assert.strictEqual(emptyMeta.context, '',
+      'Empty code block should result in empty context (trim of empty)');
+  })) passed++; else failed++;
+
   // Summary
   console.log(`\nResults: Passed: ${passed}, Failed: ${failed}`);
   process.exit(failed > 0 ? 1 : 0);

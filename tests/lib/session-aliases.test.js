@@ -1617,6 +1617,36 @@ function runTests() {
       'Non-reserved name should succeed');
   })) passed++; else failed++;
 
+  // ── Round 119: renameAlias with reserved newAlias name — parallel reserved check ──
+  console.log('\nRound 119: renameAlias (reserved newAlias name — parallel check to setAlias):');
+  if (test('renameAlias rejects reserved names for newAlias (same reserved list as setAlias)', () => {
+    resetAliases();
+    aliases.setAlias('my-alias', '/path/to/session');
+
+    // Rename to reserved name 'list' — should fail
+    const listResult = aliases.renameAlias('my-alias', 'list');
+    assert.strictEqual(listResult.success, false, '"list" should be rejected');
+    assert.ok(listResult.error.includes('reserved'),
+      'Error should mention "reserved"');
+
+    // Rename to reserved name 'help' (uppercase) — should fail
+    const helpResult = aliases.renameAlias('my-alias', 'Help');
+    assert.strictEqual(helpResult.success, false, '"Help" should be rejected');
+
+    // Rename to reserved name 'delete' — should fail
+    const deleteResult = aliases.renameAlias('my-alias', 'DELETE');
+    assert.strictEqual(deleteResult.success, false, '"DELETE" should be rejected');
+
+    // Verify alias is unchanged
+    const resolved = aliases.resolveAlias('my-alias');
+    assert.ok(resolved, 'Original alias should still exist after failed renames');
+    assert.strictEqual(resolved.sessionPath, '/path/to/session');
+
+    // Valid rename works
+    const validResult = aliases.renameAlias('my-alias', 'new-valid-name');
+    assert.strictEqual(validResult.success, true, 'Non-reserved name should succeed');
+  })) passed++; else failed++;
+
   // Summary
   console.log(`\nResults: Passed: ${passed}, Failed: ${failed}`);
   process.exit(failed > 0 ? 1 : 0);
