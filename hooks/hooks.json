@@ -17,7 +17,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node -e \"let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>{try{const i=JSON.parse(d);const cmd=i.tool_input?.command||'';if(process.platform!=='win32'&&!process.env.TMUX&&/(npm (install|test)|pnpm (install|test)|yarn (install|test)?|bun (install|test)|cargo build|make\\b|docker\\b|pytest|vitest|playwright)/.test(cmd)){console.error('[Hook] Consider running in tmux for session persistence');console.error('[Hook] tmux new -s dev  |  tmux attach -t dev')}}catch{}console.log(d)})\""
+            "command": "node -e \"let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>{try{const i=JSON.parse(d);const cmd=i.tool_input?.command||'';if(process.platform!=='win32'&&!process.env.TMUX&&/(npm (install|test)|pnpm (install|test)|yarn (install|test)?|bun (install|test)|cargo build|make\\b|docker\\b|pytest|vitest|playwright)/.test(cmd)){console.error('[Hook] Consider running in tmux for session persistence');console.error('[Hook] tmux new -s dev | tmux attach -t dev')}}catch{}console.log(d)})\""
           }
         ],
         "description": "Reminder to use tmux for long-running commands"
@@ -37,10 +37,10 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node -e \"const fs=require('fs');let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>{try{const i=JSON.parse(d);const p=i.tool_input?.file_path||'';if(/\\.(md|txt)$/.test(p)&&!/(README|CLAUDE|AGENTS|CONTRIBUTING)\\.md$/.test(p)&&!/\\.claude\\/plans\\//.test(p)){console.error('[Hook] BLOCKED: Unnecessary documentation file creation');console.error('[Hook] File: '+p);console.error('[Hook] Use README.md for documentation instead');process.exit(2)}}catch{}console.log(d)})\""
+            "command": "node -e \"let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>{{try{const i=JSON.parse(d);const p=i.tool_input?.file_path||'';if(/\\\\.(md|txt)$/.test(p)&&!/(README|CLAUDE|AGENTS|CONTRIBUTING|CHANGELOG|LICENSE|SKILL)\\\\.md$/i.test(p)&&!/\\\\.claude\\\\/plans\\\\//.test(p)&&!/(^|\\\\/)(docs|skills)\\\\//.test(p)){console.error('[Hook] WARNING: Non-standard documentation file detected');console.error('[Hook] File: '+p);console.error('[Hook] Consider consolidating into README.md or docs/ directory')}}catch{}console.log(d)}})\""
           }
         ],
-        "description": "Block creation of random .md files - keeps docs consolidated"
+        "description": "Warn about random .md files - keeps docs consolidated without blocking"
       },
       {
         "matcher": "Edit|Write",
