@@ -777,7 +777,7 @@ npm install ecc-universal
 - **詳細ガイド（高度）:** [Everything Claude Code 詳細ガイド](https://x.com/affaanmustafa/status/2014040193557471352)
 - **フォロー:** [@affaanmustafa](https://x.com/affaanmustafa)
 - **zenith.chat:** [zenith.chat](https://zenith.chat)
-- **スキル ディレクトリ:** [awesome-agent-skills](https://github.com/JackyST0/awesome-agent-skills)
+- **スキル ディレクトリ:** awesome-agent-skills（コミュニティ管理のエージェントスキル ディレクトリ）
 
 ---
 
