@@ -88,8 +88,11 @@ cp -r everything-claude-code/rules/* ~/.claude/rules/
 ### 第三步：開始使用
 
 ```bash
-# 嘗試一個指令
-/plan "新增使用者認證"
+# 嘗試一個指令（外掛安裝使用命名空間形式）
+/everything-claude-code:plan "新增使用者認證"
+
+# 手動安裝（選項2）使用簡短形式：
+# /plan "新增使用者認證"
 
 # 查看可用指令
 /plugin list everything-claude-code@everything-claude-code

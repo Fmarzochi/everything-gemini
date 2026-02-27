@@ -145,8 +145,11 @@ For manual install instructions see the README in the `rules/` folder.
 ### Step 3: Start Using
 
 ```bash
-# Try a command
-/plan "Add user authentication"
+# Try a command (plugin install uses namespaced form)
+/everything-claude-code:plan "Add user authentication"
+
+# Manual install (Option 2) uses the shorter form:
+# /plan "Add user authentication"
 
 # Check available commands
 /plugin list everything-claude-code@everything-claude-code
@@ -624,8 +627,8 @@ Not sure where to start? Use this quick reference:
 
 | I want to... | Use this command | Agent used |
 |--------------|-----------------|------------|
-| Plan a new feature | `/plan "Add auth"` | planner |
-| Design system architecture | `/plan` + architect agent | architect |
+| Plan a new feature | `/everything-claude-code:plan "Add auth"` | planner |
+| Design system architecture | `/everything-claude-code:plan` + architect agent | architect |
 | Write code with tests first | `/tdd` | tdd-guide |
 | Review code I just wrote | `/code-review` | code-reviewer |
 | Fix a failing build | `/build-fix` | build-error-resolver |
@@ -641,7 +644,8 @@ Not sure where to start? Use this quick reference:
 
 **Starting a new feature:**
 ```
-/plan "Add user authentication with OAuth"   → planner creates implementation blueprint
+/everything-claude-code:plan "Add user authentication with OAuth"
+                                              → planner creates implementation blueprint
 /tdd                                          → tdd-guide enforces write-tests-first
 /code-review                                  → code-reviewer checks your work
 ```

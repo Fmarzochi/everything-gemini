@@ -88,8 +88,11 @@ cp -r everything-claude-code/rules/* ~/.claude/rules/
 ### 第三步：开始使用
 
 ```bash
-# 尝试一个命令
-/plan "添加用户认证"
+# 尝试一个命令（插件安装使用命名空间形式）
+/everything-claude-code:plan "添加用户认证"
+
+# 手动安装（选项2）使用简短形式：
+# /plan "添加用户认证"
 
 # 查看可用命令
 /plugin list everything-claude-code@everything-claude-code

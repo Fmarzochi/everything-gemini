@@ -149,4 +149,3 @@ claude /schedule-reply "Reply to Sarah about the board meeting"
 - Gmail CLI (e.g., [gog](https://github.com/pterm/gog))
 - Node.js 18+ (for calendar-suggest.js)
 - Optional: Slack MCP server, Matrix bridge (LINE), Chrome + Playwright (Messenger)
-

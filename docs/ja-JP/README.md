@@ -133,8 +133,11 @@ cp -r everything-claude-code/rules/golang/* ~/.claude/rules/
 ### ステップ3：使用開始
 
 ```bash
-# コマンドを試す
-/plan "ユーザー認証を追加"
+# コマンドを試す（プラグインはネームスペース形式）
+/everything-claude-code:plan "ユーザー認証を追加"
+
+# 手動インストール（オプション2）は短縮形式：
+# /plan "ユーザー認証を追加"
 
 # 利用可能なコマンドを確認
 /plugin list everything-claude-code@everything-claude-code
