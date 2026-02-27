@@ -1,6 +1,6 @@
 {
   "name": "everything-claude-code",
-  "version": "1.4.1",
+  "version": "1.6.0",
   "description": "Complete collection of battle-tested Claude Code configs from an Anthropic hackathon winner - agents, skills, hooks, and rules evolved over 10+ months of intensive daily use",
   "author": {
     "name": "Affaan Mustafa",
@@ -26,6 +26,7 @@
   "agents": [
     "./agents/architect.md",
     "./agents/build-error-resolver.md",
+    "./agents/chief-of-staff.md",
     "./agents/code-reviewer.md",
     "./agents/database-reviewer.md",
     "./agents/doc-updater.md",
