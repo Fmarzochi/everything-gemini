@@ -27,9 +27,11 @@
 
 ---
 
-**The complete collection of Claude Code configs from an Anthropic hackathon winner.**
+**The performance optimization system for AI agent harnesses. From an Anthropic hackathon winner.**
 
-Production-ready agents, skills, hooks, commands, rules, and MCP configurations evolved over 10+ months of intensive daily use building real products.
+Not just configs. A complete system: skills, instincts, memory optimization, continuous learning, security scanning, and research-first development. Production-ready agents, hooks, commands, rules, and MCP configurations evolved over 10+ months of intensive daily use building real products.
+
+Works across **Claude Code**, **Codex**, **Cowork**, and other AI agent harnesses.
 
 ---
 
@@ -439,6 +441,10 @@ npx ecc-agentshield init
 Use `/security-scan` in Claude Code to run it, or add to CI with the [GitHub Action](https://github.com/affaan-m/agentshield).
 
 [GitHub](https://github.com/affaan-m/agentshield) | [npm](https://www.npmjs.com/package/ecc-agentshield)
+
+### 🔬 Plankton — Code Quality Integration
+
+[Plankton](https://github.com/alexfazio/plankton) is a recommended companion for code quality enforcement. It provides automated code review, linting orchestration, and quality gates that pair well with the ECC skill and hook system. Use it alongside AgentShield for security + quality coverage.
 
 ### 🧠 Continuous Learning v2
 
