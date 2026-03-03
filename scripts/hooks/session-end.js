@@ -167,14 +167,15 @@ async function main() {
       log(`[SessionEnd] Failed to update timestamp in ${sessionFile}`);
     }
 
-    // If we have a new summary and the file still has the blank template, replace it
+    // If we have a new summary, update the session file content
     if (summary) {
       const existing = readFile(sessionFile);
-      if (existing && existing.includes('[Session context goes here]')) {
-        // Use a flexible regex that tolerates CRLF, extra whitespace, and minor template variations
+      if (existing) {
+        // Use a flexible regex that matches both "## Session Summary" and "## Current State"
+        // Match to end-of-string to avoid duplicate ### Stats sections
         const updatedContent = existing.replace(
-          /## Current State\s*\n\s*\[Session context goes here\][\s\S]*?### Context to Load\s*\n```\s*\n\[relevant files\]\s*\n```/,
-          buildSummarySection(summary)
+          /## (?:Session Summary|Current State)[\s\S]*?$/ ,
+          buildSummarySection(summary).trim() + '\n'
         );
         writeFile(sessionFile, updatedContent);
       }
