@@ -165,10 +165,7 @@ function getPackageJsonDeps(projectDir) {
     const pkgPath = path.join(projectDir, 'package.json');
     if (!fs.existsSync(pkgPath)) return [];
     const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
-    return [
-      ...Object.keys(pkg.dependencies || {}),
-      ...Object.keys(pkg.devDependencies || {})
-    ];
+    return [...Object.keys(pkg.dependencies || {}), ...Object.keys(pkg.devDependencies || {})];
   } catch {
     return [];
   }
@@ -190,12 +187,17 @@ function getPythonDeps(projectDir) {
       content.split('\n').forEach(line => {
         const trimmed = line.trim();
         if (trimmed && !trimmed.startsWith('#') && !trimmed.startsWith('-')) {
-          const name = trimmed.split(/[>=<!\[;]/)[0].trim().toLowerCase();
+          const name = trimmed
+            .split(/[>=<![;]/)[0]
+            .trim()
+            .toLowerCase();
           if (name) deps.push(name);
         }
       });
     }
-  } catch { /* ignore */ }
+  } catch {
+    /* ignore */
+  }
 
   // pyproject.toml — simple extraction of dependency names
   try {
@@ -206,12 +208,18 @@ function getPythonDeps(projectDir) {
       if (depMatches) {
         const block = depMatches[1];
         block.match(/"([^"]+)"/g)?.forEach(m => {
-          const name = m.replace(/"/g, '').split(/[>=<!\[;]/)[0].trim().toLowerCase();
+          const name = m
+            .replace(/"/g, '')
+            .split(/[>=<![;]/)[0]
+            .trim()
+            .toLowerCase();
           if (name) deps.push(name);
         });
       }
     }
-  } catch { /* ignore */ }
+  } catch {
+    /* ignore */
+  }
 
   return deps;
 }
@@ -282,10 +290,7 @@ function getComposerDeps(projectDir) {
     const composerPath = path.join(projectDir, 'composer.json');
     if (!fs.existsSync(composerPath)) return [];
     const composer = JSON.parse(fs.readFileSync(composerPath, 'utf8'));
-    return [
-      ...Object.keys(composer.require || {}),
-      ...Object.keys(composer['require-dev'] || {})
-    ];
+    return [...Object.keys(composer.require || {}), ...Object.keys(composer['require-dev'] || {})];
   } catch {
     return [];
   }
@@ -355,17 +360,27 @@ function detectProjectType(projectDir) {
     if (rule.packageKeys.length > 0) {
       let depList = [];
       switch (rule.language) {
-        case 'python': depList = pyDeps; break;
+        case 'python':
+          depList = pyDeps;
+          break;
         case 'typescript':
-        case 'javascript': depList = npmDeps; break;
-        case 'golang': depList = goDeps; break;
-        case 'rust': depList = rustDeps; break;
-        case 'php': depList = composerDeps; break;
-        case 'elixir': depList = elixirDeps; break;
+        case 'javascript':
+          depList = npmDeps;
+          break;
+        case 'golang':
+          depList = goDeps;
+          break;
+        case 'rust':
+          depList = rustDeps;
+          break;
+        case 'php':
+          depList = composerDeps;
+          break;
+        case 'elixir':
+          depList = elixirDeps;
+          break;
       }
-      hasDep = rule.packageKeys.some(key =>
-        depList.some(dep => dep.toLowerCase().includes(key.toLowerCase()))
-      );
+      hasDep = rule.packageKeys.some(key => depList.some(dep => dep.toLowerCase().includes(key.toLowerCase())));
     }
 
     if (hasMarker || hasDep) {
