@@ -20,6 +20,7 @@ const {
 } = require('../lib/utils');
 const { getPackageManager, getSelectionPrompt } = require('../lib/package-manager');
 const { listAliases } = require('../lib/session-aliases');
+const { detectProjectType } = require('../lib/project-detect');
 
 async function main() {
   const sessionsDir = getSessionsDir();
@@ -69,6 +70,22 @@ async function main() {
   if (pm.source === 'default') {
     log('[SessionStart] No package manager preference found.');
     log(getSelectionPrompt());
+  }
+
+  // Detect project type and frameworks (#293)
+  const projectInfo = detectProjectType();
+  if (projectInfo.languages.length > 0 || projectInfo.frameworks.length > 0) {
+    const parts = [];
+    if (projectInfo.languages.length > 0) {
+      parts.push(`languages: ${projectInfo.languages.join(', ')}`);
+    }
+    if (projectInfo.frameworks.length > 0) {
+      parts.push(`frameworks: ${projectInfo.frameworks.join(', ')}`);
+    }
+    log(`[SessionStart] Project detected — ${parts.join('; ')}`);
+    output(`Project type: ${JSON.stringify(projectInfo)}`);
+  } else {
+    log('[SessionStart] No specific project type detected');
   }
 
   process.exit(0);
