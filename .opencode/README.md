@@ -67,7 +67,7 @@ opencode
 | go-build-resolver | Go build errors |
 | database-reviewer | Database optimization |
 
-### Commands (24)
+### Commands (31)
 
 | Command | Description |
 |---------|-------------|
@@ -97,6 +97,11 @@ opencode
 | `/evolve` | Cluster instincts |
 | `/promote` | Promote project instincts |
 | `/projects` | List known projects |
+| `/harness-audit` | Audit harness reliability and eval readiness |
+| `/loop-start` | Start controlled agentic loops |
+| `/loop-status` | Check loop state and checkpoints |
+| `/quality-gate` | Run quality gates on file/repo scope |
+| `/model-route` | Route tasks by model and budget |
 
 ### Plugin Hooks
 
@@ -129,6 +134,18 @@ OpenCode's plugin system maps to Claude Code hooks:
 | SessionEnd | `session.deleted` |
 
 OpenCode has 20+ additional events not available in Claude Code.
+
+### Hook Runtime Controls
+
+OpenCode plugin hooks honor the same runtime controls used by Claude Code/Cursor:
+
+```bash
+export ECC_HOOK_PROFILE=standard
+export ECC_DISABLED_HOOKS="pre:bash:tmux-reminder,post:edit:typecheck"
+```
+
+- `ECC_HOOK_PROFILE`: `minimal`, `standard` (default), `strict`
+- `ECC_DISABLED_HOOKS`: comma-separated hook IDs to disable
 
 ## Skills
 

@@ -1,10 +1,10 @@
 ---
-description: Start the NanoClaw agent REPL — a persistent, session-aware AI assistant powered by the claude CLI.
+description: Start NanoClaw v2 — ECC's persistent, zero-dependency REPL with model routing, skill hot-load, branching, compaction, export, and metrics.
 ---
 
 # Claw Command
 
-Start an interactive AI agent session that persists conversation history to disk and optionally loads ECC skill context.
+Start an interactive AI agent session with persistent markdown history and operational controls.
 
 ## Usage
 
@@ -23,57 +23,29 @@ npm run claw
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `CLAW_SESSION` | `default` | Session name (alphanumeric + hyphens) |
-| `CLAW_SKILLS` | *(empty)* | Comma-separated skill names to load as system context |
+| `CLAW_SKILLS` | *(empty)* | Comma-separated skills loaded at startup |
+| `CLAW_MODEL` | `sonnet` | Default model for the session |
 
 ## REPL Commands
 
-Inside the REPL, type these commands directly at the prompt:
-
-```
-/clear      Clear current session history
-/history    Print full conversation history
-/sessions   List all saved sessions
-/help       Show available commands
-exit        Quit the REPL
-```
-
-## How It Works
-
-1. Reads `CLAW_SESSION` env var to select a named session (default: `default`)
-2. Loads conversation history from `~/.claude/claw/{session}.md`
-3. Optionally loads ECC skill context from `CLAW_SKILLS` env var
-4. Enters a blocking prompt loop — each user message is sent to `claude -p` with full history
-5. Responses are appended to the session file for persistence across restarts
-
-## Session Storage
-
-Sessions are stored as Markdown files in `~/.claude/claw/`:
-
-```
-~/.claude/claw/default.md
-~/.claude/claw/my-project.md
+```text
+/help                          Show help
+/clear                         Clear current session history
+/history                       Print full conversation history
+/sessions                      List saved sessions
+/model [name]                  Show/set model
+/load <skill-name>             Hot-load a skill into context
+/branch <session-name>         Branch current session
+/search <query>                Search query across sessions
+/compact                       Compact old turns, keep recent context
+/export <md|json|txt> [path]   Export session
+/metrics                       Show session metrics
+exit                           Quit
 ```
 
-Each turn is formatted as:
+## Notes
 
-```markdown
-### [2025-01-15T10:30:00.000Z] User
-What does this function do?
----
-### [2025-01-15T10:30:05.000Z] Assistant
-This function calculates...
----
-```
-
-## Examples
-
-```bash
-# Start default session
-node scripts/claw.js
-
-# Named session
-CLAW_SESSION=my-project node scripts/claw.js
-
-# With skill context
-CLAW_SKILLS=tdd-workflow,security-review node scripts/claw.js
-```
+- NanoClaw remains zero-dependency.
+- Sessions are stored at `~/.claude/claw/<session>.md`.
+- Compaction keeps the most recent turns and writes a compaction header.
+- Export supports markdown, JSON turns, and plain text.

@@ -32,6 +32,7 @@ User request → Claude picks a tool → PreToolUse hook runs → Tool executes 
 |------|---------|-------------|
 | **PR logger** | `Bash` | Logs PR URL and review command after `gh pr create` |
 | **Build analysis** | `Bash` | Background analysis after build commands (async, non-blocking) |
+| **Quality gate** | `Edit\|Write\|MultiEdit` | Runs fast quality checks after edits |
 | **Prettier format** | `Edit` | Auto-formats JS/TS files with Prettier after edits |
 | **TypeScript check** | `Edit` | Runs `tsc --noEmit` after editing `.ts`/`.tsx` files |
 | **console.log warning** | `Edit` | Warns about `console.log` statements in edited files |
@@ -43,8 +44,10 @@ User request → Claude picks a tool → PreToolUse hook runs → Tool executes 
 | **Session start** | `SessionStart` | Loads previous context and detects package manager |
 | **Pre-compact** | `PreCompact` | Saves state before context compaction |
 | **Console.log audit** | `Stop` | Checks all modified files for `console.log` after each response |
-| **Session end** | `SessionEnd` | Persists session state for next session |
-| **Pattern extraction** | `SessionEnd` | Evaluates session for extractable patterns (continuous learning) |
+| **Session summary** | `Stop` | Persists session state when transcript path is available |
+| **Pattern extraction** | `Stop` | Evaluates session for extractable patterns (continuous learning) |
+| **Cost tracker** | `Stop` | Emits lightweight run-cost telemetry markers |
+| **Session end marker** | `SessionEnd` | Lifecycle marker and cleanup log |
 
 ## Customizing Hooks
 
@@ -65,6 +68,23 @@ Remove or comment out the hook entry in `hooks.json`. If installed as a plugin, 
   }
 }
 ```
+
+### Runtime Hook Controls (Recommended)
+
+Use environment variables to control hook behavior without editing `hooks.json`:
+
+```bash
+# minimal | standard | strict (default: standard)
+export ECC_HOOK_PROFILE=standard
+
+# Disable specific hook IDs (comma-separated)
+export ECC_DISABLED_HOOKS="pre:bash:tmux-reminder,post:edit:typecheck"
+```
+
+Profiles:
+- `minimal` — keep essential lifecycle and safety hooks only.
+- `standard` — default; balanced quality + safety checks.
+- `strict` — enables additional reminders and stricter guardrails.
 
 ### Writing Your Own Hook
 
@@ -189,7 +209,7 @@ Async hooks run in the background. They cannot block tool execution.
 
 ## Cross-Platform Notes
 
-All hooks in this plugin use Node.js (`node -e` or `node script.js`) for maximum compatibility across Windows, macOS, and Linux. Avoid bash-specific syntax in hooks.
+Hook logic is implemented in Node.js scripts for cross-platform behavior on Windows, macOS, and Linux. A small number of shell wrappers are retained for continuous-learning observer hooks; those wrappers are profile-gated and have Windows-safe fallback behavior.
 
 ## Related
 

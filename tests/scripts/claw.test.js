@@ -21,7 +21,12 @@ const {
   buildPrompt,
   askClaude,
   isValidSessionName,
-  handleClear
+  handleClear,
+  getSessionMetrics,
+  searchSessions,
+  branchSession,
+  exportSession,
+  compactSession
 } = require(path.join(__dirname, '..', '..', 'scripts', 'claw.js'));
 
 // Test helper — matches ECC's custom test pattern
@@ -227,6 +232,88 @@ function runTests() {
     assert.strictEqual(isValidSessionName('-starts-dash'), false);
     assert.strictEqual(isValidSessionName(null), false);
     assert.strictEqual(isValidSessionName(undefined), false);
+  })) passed++; else failed++;
+
+  console.log('\nNanoClaw v2:');
+
+  if (test('getSessionMetrics returns non-zero token estimate for populated history', () => {
+    const tmpDir = makeTmpDir();
+    const filePath = path.join(tmpDir, 'metrics.md');
+    try {
+      appendTurn(filePath, 'User', 'Implement auth');
+      appendTurn(filePath, 'Assistant', 'Working on it');
+      const metrics = getSessionMetrics(filePath);
+      assert.strictEqual(metrics.turns, 2);
+      assert.ok(metrics.tokenEstimate > 0);
+    } finally {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  })) passed++; else failed++;
+
+  if (test('searchSessions finds query in saved session', () => {
+    const tmpDir = makeTmpDir();
+    try {
+      const clawDir = path.join(tmpDir, '.claude', 'claw');
+      const sessionPath = path.join(clawDir, 'alpha.md');
+      fs.mkdirSync(clawDir, { recursive: true });
+      appendTurn(sessionPath, 'User', 'Need oauth migration');
+      const results = searchSessions('oauth', clawDir);
+      assert.strictEqual(results.length, 1);
+      assert.strictEqual(results[0].session, 'alpha');
+    } finally {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  })) passed++; else failed++;
+
+  if (test('branchSession copies history into new branch session', () => {
+    const tmpDir = makeTmpDir();
+    try {
+      const clawDir = path.join(tmpDir, '.claude', 'claw');
+      const source = path.join(clawDir, 'base.md');
+      fs.mkdirSync(clawDir, { recursive: true });
+      appendTurn(source, 'User', 'base content');
+      const result = branchSession(source, 'feature-branch', clawDir);
+      assert.strictEqual(result.ok, true);
+      const branched = fs.readFileSync(result.path, 'utf8');
+      assert.ok(branched.includes('base content'));
+    } finally {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  })) passed++; else failed++;
+
+  if (test('exportSession writes JSON export', () => {
+    const tmpDir = makeTmpDir();
+    const filePath = path.join(tmpDir, 'export.md');
+    const outPath = path.join(tmpDir, 'export.json');
+    try {
+      appendTurn(filePath, 'User', 'hello');
+      appendTurn(filePath, 'Assistant', 'world');
+      const result = exportSession(filePath, 'json', outPath);
+      assert.strictEqual(result.ok, true);
+      const exported = JSON.parse(fs.readFileSync(outPath, 'utf8'));
+      assert.strictEqual(Array.isArray(exported.turns), true);
+      assert.strictEqual(exported.turns.length, 2);
+    } finally {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  })) passed++; else failed++;
+
+  if (test('compactSession reduces long histories', () => {
+    const tmpDir = makeTmpDir();
+    const filePath = path.join(tmpDir, 'compact.md');
+    try {
+      for (let i = 0; i < 30; i++) {
+        appendTurn(filePath, i % 2 ? 'Assistant' : 'User', `turn-${i}`);
+      }
+      const changed = compactSession(filePath, 10);
+      assert.strictEqual(changed, true);
+      const content = fs.readFileSync(filePath, 'utf8');
+      assert.ok(content.includes('NanoClaw Compaction'));
+      assert.ok(!content.includes('turn-0'));
+      assert.ok(content.includes('turn-29'));
+    } finally {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
   })) passed++; else failed++;
 
   // ── Summary ───────────────────────────────────────────────────────────

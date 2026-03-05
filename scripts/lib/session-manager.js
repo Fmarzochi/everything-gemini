@@ -16,10 +16,12 @@ const {
   log
 } = require('./utils');
 
-// Session filename pattern: YYYY-MM-DD-[short-id]-session.tmp
-// The short-id is optional (old format) and can be 8+ alphanumeric characters
-// Matches: "2026-02-01-session.tmp" or "2026-02-01-a1b2c3d4-session.tmp"
-const SESSION_FILENAME_REGEX = /^(\d{4}-\d{2}-\d{2})(?:-([a-z0-9]{8,}))?-session\.tmp$/;
+// Session filename pattern: YYYY-MM-DD-[session-id]-session.tmp
+// The session-id is optional (old format) and can include lowercase
+// alphanumeric characters and hyphens, with a minimum length of 8.
+// Matches: "2026-02-01-session.tmp", "2026-02-01-a1b2c3d4-session.tmp",
+// and "2026-02-01-frontend-worktree-1-session.tmp"
+const SESSION_FILENAME_REGEX = /^(\d{4}-\d{2}-\d{2})(?:-([a-z0-9-]{8,}))?-session\.tmp$/;
 
 /**
  * Parse session filename to extract metadata

@@ -1,9 +1,10 @@
 #!/usr/bin/env node
-const { readStdin, runExistingHook, transformToClaude } = require('./adapter');
+const { readStdin, runExistingHook, transformToClaude, hookEnabled } = require('./adapter');
 readStdin().then(raw => {
-  const input = JSON.parse(raw);
+  const input = JSON.parse(raw || '{}');
   const claudeInput = transformToClaude(input);
-  runExistingHook('session-end.js', claudeInput);
-  runExistingHook('evaluate-session.js', claudeInput);
+  if (hookEnabled('session:end:marker', ['minimal', 'standard', 'strict'])) {
+    runExistingHook('session-end-marker.js', claudeInput);
+  }
   process.stdout.write(raw);
 }).catch(() => process.exit(0));

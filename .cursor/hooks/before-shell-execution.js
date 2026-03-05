@@ -1,27 +1,72 @@
 #!/usr/bin/env node
-const { readStdin } = require('./adapter');
-readStdin().then(raw => {
-  try {
-    const input = JSON.parse(raw);
-    const cmd = input.command || '';
+const { readStdin, hookEnabled } = require('./adapter');
 
-    // 1. Block dev server outside tmux
-    if (process.platform !== 'win32' && /(npm run dev\b|pnpm( run)? dev\b|yarn dev\b|bun run dev\b)/.test(cmd)) {
-      console.error('[ECC] BLOCKED: Dev server must run in tmux for log access');
-      console.error('[ECC] Use: tmux new-session -d -s dev "npm run dev"');
-      process.exit(2);
+function splitShellSegments(command) {
+  const segments = [];
+  let current = '';
+  let quote = null;
+
+  for (let i = 0; i < command.length; i++) {
+    const ch = command[i];
+    if (quote) {
+      if (ch === quote) quote = null;
+      current += ch;
+      continue;
     }
 
-    // 2. Tmux reminder for long-running commands
-    if (process.platform !== 'win32' && !process.env.TMUX &&
-        /(npm (install|test)|pnpm (install|test)|yarn (install|test)?|bun (install|test)|cargo build|make\b|docker\b|pytest|vitest|playwright)/.test(cmd)) {
+    if (ch === '"' || ch === "'") {
+      quote = ch;
+      current += ch;
+      continue;
+    }
+
+    const next = command[i + 1] || '';
+    if (ch === ';' || (ch === '&' && next === '&') || (ch === '|' && next === '|') || (ch === '&' && next !== '&')) {
+      if (current.trim()) segments.push(current.trim());
+      current = '';
+      if ((ch === '&' && next === '&') || (ch === '|' && next === '|')) i++;
+      continue;
+    }
+
+    current += ch;
+  }
+
+  if (current.trim()) segments.push(current.trim());
+  return segments;
+}
+
+readStdin().then(raw => {
+  try {
+    const input = JSON.parse(raw || '{}');
+    const cmd = String(input.command || input.args?.command || '');
+
+    if (hookEnabled('pre:bash:dev-server-block', ['standard', 'strict']) && process.platform !== 'win32') {
+      const segments = splitShellSegments(cmd);
+      const tmuxLauncher = /^\s*tmux\s+(new|new-session|new-window|split-window)\b/;
+      const devPattern = /\b(npm\s+run\s+dev|pnpm(?:\s+run)?\s+dev|yarn\s+dev|bun\s+run\s+dev)\b/;
+      const hasBlockedDev = segments.some(segment => devPattern.test(segment) && !tmuxLauncher.test(segment));
+      if (hasBlockedDev) {
+        console.error('[ECC] BLOCKED: Dev server must run in tmux for log access');
+        console.error('[ECC] Use: tmux new-session -d -s dev "npm run dev"');
+        process.exit(2);
+      }
+    }
+
+    if (
+      hookEnabled('pre:bash:tmux-reminder', ['strict']) &&
+      process.platform !== 'win32' &&
+      !process.env.TMUX &&
+      /(npm (install|test)|pnpm (install|test)|yarn (install|test)?|bun (install|test)|cargo build|make\b|docker\b|pytest|vitest|playwright)/.test(cmd)
+    ) {
       console.error('[ECC] Consider running in tmux for session persistence');
     }
 
-    // 3. Git push review reminder
-    if (/git push/.test(cmd)) {
+    if (hookEnabled('pre:bash:git-push-reminder', ['strict']) && /\bgit\s+push\b/.test(cmd)) {
       console.error('[ECC] Review changes before push: git diff origin/main...HEAD');
     }
-  } catch {}
+  } catch {
+    // noop
+  }
+
   process.stdout.write(raw);
 }).catch(() => process.exit(0));

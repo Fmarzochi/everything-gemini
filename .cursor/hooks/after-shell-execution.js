@@ -1,13 +1,13 @@
 #!/usr/bin/env node
-const { readStdin } = require('./adapter');
+const { readStdin, hookEnabled } = require('./adapter');
+
 readStdin().then(raw => {
   try {
-    const input = JSON.parse(raw);
-    const cmd = input.command || '';
-    const output = input.output || input.result || '';
+    const input = JSON.parse(raw || '{}');
+    const cmd = String(input.command || input.args?.command || '');
+    const output = String(input.output || input.result || '');
 
-    // PR creation logging
-    if (/gh pr create/.test(cmd)) {
+    if (hookEnabled('post:bash:pr-created', ['standard', 'strict']) && /\bgh\s+pr\s+create\b/.test(cmd)) {
       const m = output.match(/https:\/\/github\.com\/[^/]+\/[^/]+\/pull\/\d+/);
       if (m) {
         console.error('[ECC] PR created: ' + m[0]);
@@ -17,10 +17,12 @@ readStdin().then(raw => {
       }
     }
 
-    // Build completion notice
-    if (/(npm run build|pnpm build|yarn build)/.test(cmd)) {
+    if (hookEnabled('post:bash:build-complete', ['standard', 'strict']) && /(npm run build|pnpm build|yarn build)/.test(cmd)) {
       console.error('[ECC] Build completed');
     }
-  } catch {}
+  } catch {
+    // noop
+  }
+
   process.stdout.write(raw);
 }).catch(() => process.exit(0));

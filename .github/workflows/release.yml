@@ -37,23 +37,31 @@ jobs:
             exit 1
           fi
 
-      - name: Generate changelog
-        id: changelog
+      - name: Generate release highlights
+        id: highlights
+        env:
+          TAG_NAME: ${{ github.ref_name }}
         run: |
-          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
-          if [ -z "$PREV_TAG" ]; then
-            COMMITS=$(git log --pretty=format:"- %s" HEAD)
-          else
-            COMMITS=$(git log --pretty=format:"- %s" ${PREV_TAG}..HEAD)
-          fi
-          echo "commits<<EOF" >> $GITHUB_OUTPUT
-          echo "$COMMITS" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+          TAG_VERSION="${TAG_NAME#v}"
+          cat > release_body.md <<EOF
+          ## ECC ${TAG_VERSION}
+
+          ### What This Release Focuses On
+          - Harness reliability and hook stability across Claude Code, Cursor, OpenCode, and Codex
+          - Stronger eval-driven workflows and quality gates
+          - Better operator UX for autonomous loop execution
+
+          ### Notable Changes
+          - Session persistence and hook lifecycle fixes
+          - Expanded skills and command coverage for harness performance work
+          - Improved release-note generation and changelog hygiene
+
+          ### Notes
+          - For migration tips and compatibility notes, see README and CHANGELOG.
+          EOF
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          body: |
-            ## Changes
-            ${{ steps.changelog.outputs.commits }}
-          generate_release_notes: false
+          body_path: release_body.md
+          generate_release_notes: true

@@ -23,6 +23,7 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 SKILL_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+OBSERVER_LOOP_SCRIPT="${SCRIPT_DIR}/observer-loop.sh"
 
 # Source shared project detection helper
 # This sets: PROJECT_ID, PROJECT_NAME, PROJECT_ROOT, PROJECT_DIR
@@ -73,6 +74,13 @@ OBSERVER_INTERVAL_SECONDS=$((OBSERVER_INTERVAL_MINUTES * 60))
 
 echo "Project: ${PROJECT_NAME} (${PROJECT_ID})"
 echo "Storage: ${PROJECT_DIR}"
+
+# Windows/Git-Bash detection (Issue #295)
+UNAME_LOWER="$(uname -s 2>/dev/null | tr '[:upper:]' '[:lower:]')"
+IS_WINDOWS=false
+case "$UNAME_LOWER" in
+  *mingw*|*msys*|*cygwin*) IS_WINDOWS=true ;;
+esac
 
 case "${1:-start}" in
   stop)
@@ -135,8 +143,13 @@ case "${1:-start}" in
 
     echo "Starting observer agent for ${PROJECT_NAME}..."
 
+    if [ ! -x "$OBSERVER_LOOP_SCRIPT" ]; then
+      echo "Observer loop script not found or not executable: $OBSERVER_LOOP_SCRIPT"
+      exit 1
+    fi
+
     # The observer loop — fully detached with nohup, IO redirected to log.
-    # Variables passed safely via env to avoid shell injection from special chars in paths.
+    # Variables are passed via env; observer-loop.sh handles analysis/retry flow.
     nohup env \
       CONFIG_DIR="$CONFIG_DIR" \
       PID_FILE="$PID_FILE" \
@@ -148,116 +161,8 @@ case "${1:-start}" in
       PROJECT_ID="$PROJECT_ID" \
       MIN_OBSERVATIONS="$MIN_OBSERVATIONS" \
       OBSERVER_INTERVAL_SECONDS="$OBSERVER_INTERVAL_SECONDS" \
-      /bin/bash -c '
-      set +e
-      unset CLAUDECODE
-
-      SLEEP_PID=""
-      USR1_FIRED=0
-
-      cleanup() {
-        [ -n "$SLEEP_PID" ] && kill "$SLEEP_PID" 2>/dev/null
-        # Only remove PID file if it still belongs to this process
-        if [ -f "$PID_FILE" ] && [ "$(cat "$PID_FILE" 2>/dev/null)" = "$$" ]; then
-          rm -f "$PID_FILE"
-        fi
-        exit 0
-      }
-      trap cleanup TERM INT
-
-      analyze_observations() {
-        if [ ! -f "$OBSERVATIONS_FILE" ]; then
-          return
-        fi
-        obs_count=$(wc -l < "$OBSERVATIONS_FILE" 2>/dev/null || echo 0)
-        if [ "$obs_count" -lt "$MIN_OBSERVATIONS" ]; then
-          return
-        fi
-
-        echo "[$(date)] Analyzing $obs_count observations for project ${PROJECT_NAME}..." >> "$LOG_FILE"
-
-        # Use Claude Code with Haiku to analyze observations
-        # The prompt specifies project-scoped instinct creation
-        if command -v claude &> /dev/null; then
-          exit_code=0
-          claude --model haiku --max-turns 3 --print \
-            "Read $OBSERVATIONS_FILE and identify patterns for the project '${PROJECT_NAME}' (user corrections, error resolutions, repeated workflows, tool preferences).
-If you find 3+ occurrences of the same pattern, create an instinct file in $INSTINCTS_DIR/<id>.md.
-
-CRITICAL: Every instinct file MUST use this exact format:
-
----
-id: kebab-case-name
-trigger: \"when <specific condition>\"
-confidence: <0.3-0.85 based on frequency: 3-5 times=0.5, 6-10=0.7, 11+=0.85>
-domain: <one of: code-style, testing, git, debugging, workflow, file-patterns>
-source: session-observation
-scope: project
-project_id: ${PROJECT_ID}
-project_name: ${PROJECT_NAME}
----
-
-# Title
-
-## Action
-<what to do, one clear sentence>
-
-## Evidence
-- Observed N times in session <id>
-- Pattern: <description>
-- Last observed: <date>
-
-Rules:
-- Be conservative, only clear patterns with 3+ observations
-- Use narrow, specific triggers
-- Never include actual code snippets, only describe patterns
-- If a similar instinct already exists in $INSTINCTS_DIR/, update it instead of creating a duplicate
-- The YAML frontmatter (between --- markers) with id field is MANDATORY
-- If a pattern seems universal (not project-specific), set scope to 'global' instead of 'project'
-- Examples of global patterns: 'always validate user input', 'prefer explicit error handling'
-- Examples of project patterns: 'use React functional components', 'follow Django REST framework conventions'" \
-            >> "$LOG_FILE" 2>&1 || exit_code=$?
-          if [ "$exit_code" -ne 0 ]; then
-            echo "[$(date)] Claude analysis failed (exit $exit_code)" >> "$LOG_FILE"
-          fi
-        else
-          echo "[$(date)] claude CLI not found, skipping analysis" >> "$LOG_FILE"
-        fi
-
-        if [ -f "$OBSERVATIONS_FILE" ]; then
-          archive_dir="${PROJECT_DIR}/observations.archive"
-          mkdir -p "$archive_dir"
-          mv "$OBSERVATIONS_FILE" "$archive_dir/processed-$(date +%Y%m%d-%H%M%S)-$$.jsonl" 2>/dev/null || true
-        fi
-      }
-
-      on_usr1() {
-        # Kill pending sleep to avoid leak, then analyze
-        [ -n "$SLEEP_PID" ] && kill "$SLEEP_PID" 2>/dev/null
-        SLEEP_PID=""
-        USR1_FIRED=1
-        analyze_observations
-      }
-      trap on_usr1 USR1
-
-      echo "$$" > "$PID_FILE"
-      echo "[$(date)] Observer started for ${PROJECT_NAME} (PID: $$)" >> "$LOG_FILE"
-
-      while true; do
-        # Interruptible sleep — allows USR1 trap to fire immediately
-        sleep "$OBSERVER_INTERVAL_SECONDS" &
-        SLEEP_PID=$!
-        wait $SLEEP_PID 2>/dev/null
-        SLEEP_PID=""
-
-        # Skip scheduled analysis if USR1 already ran it
-        if [ "$USR1_FIRED" -eq 1 ]; then
-          USR1_FIRED=0
-        else
-          analyze_observations
-        fi
-      done
-    ' >> "$LOG_FILE" 2>&1 &
+      CLV2_IS_WINDOWS="$IS_WINDOWS" \
+      "$OBSERVER_LOOP_SCRIPT" >> "$LOG_FILE" 2>&1 &
 
     # Wait for PID file
     sleep 2

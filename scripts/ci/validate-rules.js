@@ -8,14 +8,47 @@ const path = require('path');
 
 const RULES_DIR = path.join(__dirname, '../../rules');
 
+/**
+ * Recursively collect markdown rule files.
+ * Uses explicit traversal for portability across Node versions.
+ * @param {string} dir - Directory to scan
+ * @returns {string[]} Relative file paths from RULES_DIR
+ */
+function collectRuleFiles(dir) {
+  const files = [];
+
+  let entries;
+  try {
+    entries = fs.readdirSync(dir, { withFileTypes: true });
+  } catch {
+    return files;
+  }
+
+  for (const entry of entries) {
+    const absolute = path.join(dir, entry.name);
+
+    if (entry.isDirectory()) {
+      files.push(...collectRuleFiles(absolute));
+      continue;
+    }
+
+    if (entry.name.endsWith('.md')) {
+      files.push(path.relative(RULES_DIR, absolute));
+    }
+
+    // Non-markdown files are ignored.
+  }
+
+  return files;
+}
+
 function validateRules() {
   if (!fs.existsSync(RULES_DIR)) {
     console.log('No rules directory found, skipping validation');
     process.exit(0);
   }
 
-  const files = fs.readdirSync(RULES_DIR, { recursive: true })
-    .filter(f => f.endsWith('.md'));
+  const files = collectRuleFiles(RULES_DIR);
   let hasErrors = false;
   let validatedCount = 0;
 

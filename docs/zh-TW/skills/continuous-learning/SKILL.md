@@ -107,4 +107,4 @@ Homunculus v2 採用更複雜的方法：
 4. **領域標記** - code-style、testing、git、debugging 等
 5. **演化路徑** - 將相關本能聚類為技能/指令
 
-參見：`/Users/affoon/Documents/tasks/12-continuous-learning-v2.md` 完整規格。
+參見：`docs/continuous-learning-v2-spec.md` 完整規格。

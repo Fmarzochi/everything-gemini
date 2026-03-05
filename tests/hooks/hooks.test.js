@@ -1183,7 +1183,7 @@ async function runTests() {
     assert.ok(hooks.hooks.PreCompact, 'Should have PreCompact hooks');
   })) passed++; else failed++;
 
-  if (test('all hook commands use node or are skill shell scripts', () => {
+  if (test('all hook commands use node or approved shell wrappers', () => {
     const hooksPath = path.join(__dirname, '..', '..', 'hooks', 'hooks.json');
     const hooks = JSON.parse(fs.readFileSync(hooksPath, 'utf8'));
 
@@ -1196,9 +1196,11 @@ async function runTests() {
               /^(bash|sh)\s/.test(hook.command) ||
               hook.command.startsWith('${CLAUDE_PLUGIN_ROOT}/skills/')
             );
+            const isHookShellWrapper = /^(bash|sh)\s+["']?\$\{CLAUDE_PLUGIN_ROOT\}\/scripts\/hooks\/run-with-flags-shell\.sh/.test(hook.command);
+            const isSessionStartFallback = hook.command.startsWith('bash -lc') && hook.command.includes('run-with-flags.js');
             assert.ok(
-              isNode || isSkillScript,
-              `Hook command should start with 'node' or be a skill shell script: ${hook.command.substring(0, 80)}...`
+              isNode || isSkillScript || isHookShellWrapper || isSessionStartFallback,
+              `Hook command should use node or approved shell wrapper: ${hook.command.substring(0, 100)}...`
             );
           }
         }
@@ -1210,7 +1212,7 @@ async function runTests() {
     }
   })) passed++; else failed++;
 
-  if (test('script references use CLAUDE_PLUGIN_ROOT variable', () => {
+  if (test('script references use CLAUDE_PLUGIN_ROOT variable (except SessionStart fallback)', () => {
     const hooksPath = path.join(__dirname, '..', '..', 'hooks', 'hooks.json');
     const hooks = JSON.parse(fs.readFileSync(hooksPath, 'utf8'));
 
@@ -1219,7 +1221,8 @@ async function runTests() {
         for (const hook of entry.hooks) {
           if (hook.type === 'command' && hook.command.includes('scripts/hooks/')) {
             // Check for the literal string "${CLAUDE_PLUGIN_ROOT}" in the command
-            const hasPluginRoot = hook.command.includes('${CLAUDE_PLUGIN_ROOT}');
+            const isSessionStartFallback = hook.command.startsWith('bash -lc') && hook.command.includes('run-with-flags.js');
+            const hasPluginRoot = hook.command.includes('${CLAUDE_PLUGIN_ROOT}') || isSessionStartFallback;
             assert.ok(
               hasPluginRoot,
               `Script paths should use CLAUDE_PLUGIN_ROOT: ${hook.command.substring(0, 80)}...`

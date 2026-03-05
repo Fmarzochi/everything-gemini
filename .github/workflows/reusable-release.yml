@@ -34,26 +34,23 @@ jobs:
             exit 1
           fi
 
-      - name: Generate changelog
-        id: changelog
+      - name: Generate release highlights
+        env:
+          TAG_NAME: ${{ inputs.tag }}
         run: |
-          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
-          if [ -z "$PREV_TAG" ]; then
-            COMMITS=$(git log --pretty=format:"- %s" HEAD)
-          else
-            COMMITS=$(git log --pretty=format:"- %s" ${PREV_TAG}..HEAD)
-          fi
-          # Use unique delimiter to prevent truncation if commit messages contain EOF
-          DELIMITER="COMMITS_END_$(date +%s)"
-          echo "commits<<${DELIMITER}" >> $GITHUB_OUTPUT
-          echo "$COMMITS" >> $GITHUB_OUTPUT
-          echo "${DELIMITER}" >> $GITHUB_OUTPUT
+          TAG_VERSION="${TAG_NAME#v}"
+          cat > release_body.md <<EOF
+          ## ECC ${TAG_VERSION}
+
+          ### What This Release Focuses On
+          - Harness reliability and cross-platform compatibility
+          - Eval-driven quality improvements
+          - Better workflow and operator ergonomics
+          EOF
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ inputs.tag }}
-          body: |
-            ## Changes
-            ${{ steps.changelog.outputs.commits }}
+          body_path: release_body.md
           generate_release_notes: ${{ inputs.generate-notes }}

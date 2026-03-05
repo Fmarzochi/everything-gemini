@@ -107,4 +107,4 @@ Homunculus v2はより洗練されたアプローチを採用:
 4. **ドメインタグ付け** - コードスタイル、テスト、git、デバッグなど
 5. **進化パス** - 関連する本能をスキル/コマンドにクラスタ化
 
-詳細: `/Users/affoon/Documents/tasks/12-continuous-learning-v2.md`を参照。
+詳細: `docs/continuous-learning-v2-spec.md`を参照。

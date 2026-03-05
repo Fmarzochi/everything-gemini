@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 /**
- * Stop Hook (Session End) - Persist learnings when session ends
+ * Stop Hook (Session End) - Persist learnings during active sessions
  *
  * Cross-platform (Windows, macOS, Linux)
  *
- * Runs when Claude session ends. Extracts a meaningful summary from
- * the session transcript (via stdin JSON transcript_path) and saves it
- * to a session file for cross-session continuity.
+ * Runs on Stop events (after each response). Extracts a meaningful summary
+ * from the session transcript (via stdin JSON transcript_path) and updates a
+ * session file for cross-session continuity.
  */
 
 const path = require('path');
@@ -22,6 +22,9 @@ const {
   replaceInFile,
   log
 } = require('../lib/utils');
+
+const SUMMARY_START_MARKER = '<!-- ECC:SUMMARY:START -->';
+const SUMMARY_END_MARKER = '<!-- ECC:SUMMARY:END -->';
 
 /**
  * Extract a meaningful summary from the session transcript.
@@ -167,16 +170,28 @@ async function main() {
       log(`[SessionEnd] Failed to update timestamp in ${sessionFile}`);
     }
 
-    // If we have a new summary, update the session file content
+    // If we have a new summary, update only the generated summary block.
+    // This keeps repeated Stop invocations idempotent and preserves
+    // user-authored sections in the same session file.
     if (summary) {
       const existing = readFile(sessionFile);
       if (existing) {
-        // Use a flexible regex that matches both "## Session Summary" and "## Current State"
-        // Match to end-of-string to avoid duplicate ### Stats sections
-        const updatedContent = existing.replace(
-          /## (?:Session Summary|Current State)[\s\S]*?$/ ,
-          buildSummarySection(summary).trim() + '\n'
-        );
+        const summaryBlock = buildSummaryBlock(summary);
+        let updatedContent = existing;
+
+        if (existing.includes(SUMMARY_START_MARKER) && existing.includes(SUMMARY_END_MARKER)) {
+          updatedContent = existing.replace(
+            new RegExp(`${escapeRegExp(SUMMARY_START_MARKER)}[\\s\\S]*?${escapeRegExp(SUMMARY_END_MARKER)}`),
+            summaryBlock
+          );
+        } else {
+          // Migration path for files created before summary markers existed.
+          updatedContent = existing.replace(
+            /## (?:Session Summary|Current State)[\s\S]*?$/,
+            `${summaryBlock}\n\n### Notes for Next Session\n-\n\n### Context to Load\n\`\`\`\n[relevant files]\n\`\`\`\n`
+          );
+        }
+
         writeFile(sessionFile, updatedContent);
       }
     }
@@ -185,7 +200,7 @@ async function main() {
   } else {
     // Create new session file
     const summarySection = summary
-      ? buildSummarySection(summary)
+      ? `${buildSummaryBlock(summary)}\n\n### Notes for Next Session\n-\n\n### Context to Load\n\`\`\`\n[relevant files]\n\`\`\``
       : `## Current State\n\n[Session context goes here]\n\n### Completed\n- [ ]\n\n### In Progress\n- [ ]\n\n### Notes for Next Session\n-\n\n### Context to Load\n\`\`\`\n[relevant files]\n\`\`\``;
 
     const template = `# Session: ${today}
@@ -234,3 +249,10 @@ function buildSummarySection(summary) {
   return section;
 }
 
+function buildSummaryBlock(summary) {
+  return `${SUMMARY_START_MARKER}\n${buildSummarySection(summary).trim()}\n${SUMMARY_END_MARKER}`;
+}
+
+function escapeRegExp(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}

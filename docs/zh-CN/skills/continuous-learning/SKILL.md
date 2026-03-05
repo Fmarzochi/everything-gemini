@@ -117,4 +117,4 @@ Homunculus v2 采用了更复杂的方法：
 4. **领域标记** - 代码风格、测试、git、调试等
 5. **演进路径** - 将相关本能聚类为技能/命令
 
-完整规格请参见：`/Users/affoon/Documents/tasks/12-continuous-learning-v2.md`
+完整规格请参见：`docs/continuous-learning-v2-spec.md`

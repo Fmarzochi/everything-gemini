@@ -194,3 +194,46 @@ Plankton's `.claude/hooks/config.json` controls all behavior:
 - Plankton (credit: @alxfazio)
 - Plankton REFERENCE.md — Full architecture documentation (credit: @alxfazio)
 - Plankton SETUP.md — Detailed installation guide (credit: @alxfazio)
+
+## ECC v1.8 Additions
+
+### Copyable Hook Profile
+
+Set strict quality behavior:
+
+```bash
+export ECC_HOOK_PROFILE=strict
+export ECC_QUALITY_GATE_FIX=true
+export ECC_QUALITY_GATE_STRICT=true
+```
+
+### Language Gate Table
+
+- TypeScript/JavaScript: Biome preferred, Prettier fallback
+- Python: Ruff format/check
+- Go: gofmt
+
+### Config Tamper Guard
+
+During quality enforcement, flag changes to config files in same iteration:
+
+- `biome.json`, `.eslintrc*`, `prettier.config*`, `tsconfig.json`, `pyproject.toml`
+
+If config is changed to suppress violations, require explicit review before merge.
+
+### CI Integration Pattern
+
+Use the same commands in CI as local hooks:
+
+1. run formatter checks
+2. run lint/type checks
+3. fail fast on strict mode
+4. publish remediation summary
+
+### Health Metrics
+
+Track:
+- edits flagged by gates
+- average remediation time
+- repeat violations by category
+- merge blocks due to gate failures

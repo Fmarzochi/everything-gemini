@@ -21,12 +21,48 @@ export const ECCHooksPlugin = async ({
   directory,
   worktree,
 }: PluginInput) => {
+  type HookProfile = "minimal" | "standard" | "strict"
+
   // Track files edited in current session for console.log audit
   const editedFiles = new Set<string>()
 
   // Helper to call the SDK's log API with correct signature
   const log = (level: "debug" | "info" | "warn" | "error", message: string) =>
     client.app.log({ body: { service: "ecc", level, message } })
+
+  const normalizeProfile = (value: string | undefined): HookProfile => {
+    if (value === "minimal" || value === "strict") return value
+    return "standard"
+  }
+
+  const currentProfile = normalizeProfile(process.env.ECC_HOOK_PROFILE)
+  const disabledHooks = new Set(
+    (process.env.ECC_DISABLED_HOOKS || "")
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean)
+  )
+
+  const profileOrder: Record<HookProfile, number> = {
+    minimal: 0,
+    standard: 1,
+    strict: 2,
+  }
+
+  const profileAllowed = (required: HookProfile | HookProfile[]): boolean => {
+    if (Array.isArray(required)) {
+      return required.some((entry) => profileOrder[currentProfile] >= profileOrder[entry])
+    }
+    return profileOrder[currentProfile] >= profileOrder[required]
+  }
+
+  const hookEnabled = (
+    hookId: string,
+    requiredProfile: HookProfile | HookProfile[] = "standard"
+  ): boolean => {
+    if (disabledHooks.has(hookId)) return false
+    return profileAllowed(requiredProfile)
+  }
 
   return {
     /**
@@ -41,7 +77,7 @@ export const ECCHooksPlugin = async ({
       editedFiles.add(event.path)
 
       // Auto-format JS/TS files
-      if (event.path.match(/\.(ts|tsx|js|jsx)$/)) {
+      if (hookEnabled("post:edit:format", ["standard", "strict"]) && event.path.match(/\.(ts|tsx|js|jsx)$/)) {
         try {
           await $`prettier --write ${event.path} 2>/dev/null`
           log("info", `[ECC] Formatted: ${event.path}`)
@@ -51,7 +87,7 @@ export const ECCHooksPlugin = async ({
       }
 
       // Console.log warning check
-      if (event.path.match(/\.(ts|tsx|js|jsx)$/)) {
+      if (hookEnabled("post:edit:console-warn", ["standard", "strict"]) && event.path.match(/\.(ts|tsx|js|jsx)$/)) {
         try {
           const result = await $`grep -n "console\\.log" ${event.path} 2>/dev/null`.text()
           if (result.trim()) {
@@ -80,6 +116,7 @@ export const ECCHooksPlugin = async ({
     ) => {
       // Check if a TypeScript file was edited
       if (
+        hookEnabled("post:edit:typecheck", ["standard", "strict"]) &&
         input.tool === "edit" &&
         input.args?.filePath?.match(/\.tsx?$/)
       ) {
@@ -98,7 +135,11 @@ export const ECCHooksPlugin = async ({
       }
 
       // PR creation logging
-      if (input.tool === "bash" && input.args?.toString().includes("gh pr create")) {
+      if (
+        hookEnabled("post:bash:pr-created", ["standard", "strict"]) &&
+        input.tool === "bash" &&
+        input.args?.toString().includes("gh pr create")
+      ) {
         log("info", "[ECC] PR created - check GitHub Actions status")
       }
     },
@@ -115,6 +156,7 @@ export const ECCHooksPlugin = async ({
     ) => {
       // Git push review reminder
       if (
+        hookEnabled("pre:bash:git-push-reminder", "strict") &&
         input.tool === "bash" &&
         input.args?.toString().includes("git push")
       ) {
@@ -126,6 +168,7 @@ export const ECCHooksPlugin = async ({
 
       // Block creation of unnecessary documentation files
       if (
+        hookEnabled("pre:write:doc-file-warning", ["standard", "strict"]) &&
         input.tool === "write" &&
         input.args?.filePath &&
         typeof input.args.filePath === "string"
@@ -146,7 +189,7 @@ export const ECCHooksPlugin = async ({
       }
 
       // Long-running command reminder
-      if (input.tool === "bash") {
+      if (hookEnabled("pre:bash:tmux-reminder", "strict") && input.tool === "bash") {
         const cmd = String(input.args?.command || input.args || "")
         if (
           cmd.match(/^(npm|pnpm|yarn|bun)\s+(install|build|test|run)/) ||
@@ -169,7 +212,9 @@ export const ECCHooksPlugin = async ({
      * Action: Loads context and displays welcome message
      */
     "session.created": async () => {
-      log("info", "[ECC] Session started - Everything Claude Code hooks active")
+      if (!hookEnabled("session:start", ["minimal", "standard", "strict"])) return
+
+      log("info", `[ECC] Session started - profile=${currentProfile}`)
 
       // Check for project-specific context files
       try {
@@ -190,6 +235,7 @@ export const ECCHooksPlugin = async ({
      * Action: Runs console.log audit on all edited files
      */
     "session.idle": async () => {
+      if (!hookEnabled("stop:check-console-log", ["minimal", "standard", "strict"])) return
       if (editedFiles.size === 0) return
 
       log("info", "[ECC] Session idle - running console.log audit")
@@ -244,6 +290,7 @@ export const ECCHooksPlugin = async ({
      * Action: Final cleanup and state saving
      */
     "session.deleted": async () => {
+      if (!hookEnabled("session:end-marker", ["minimal", "standard", "strict"])) return
       log("info", "[ECC] Session ended - cleaning up")
       editedFiles.clear()
     },
@@ -285,8 +332,10 @@ export const ECCHooksPlugin = async ({
      */
     "shell.env": async () => {
       const env: Record<string, string> = {
-        ECC_VERSION: "1.6.0",
+        ECC_VERSION: "1.8.0",
         ECC_PLUGIN: "true",
+        ECC_HOOK_PROFILE: currentProfile,
+        ECC_DISABLED_HOOKS: process.env.ECC_DISABLED_HOOKS || "",
         PROJECT_ROOT: worktree || directory,
       }
 
@@ -343,7 +392,7 @@ export const ECCHooksPlugin = async ({
       const contextBlock = [
         "# ECC Context (preserve across compaction)",
         "",
-        "## Active Plugin: Everything Claude Code v1.6.0",
+        "## Active Plugin: Everything Claude Code v1.8.0",
         "- Hooks: file.edited, tool.execute.before/after, session.created/idle/deleted, shell.env, compacting, permission.ask",
         "- Tools: run-tests, check-coverage, security-audit, format-code, lint-check, git-summary",
         "- Agents: 13 specialized (planner, architect, tdd-guide, code-reviewer, security-reviewer, build-error-resolver, e2e-runner, refactor-cleaner, doc-updater, go-reviewer, go-build-resolver, database-reviewer, python-reviewer)",

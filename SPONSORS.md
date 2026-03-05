@@ -29,6 +29,17 @@ Your sponsorship helps:
 - **Better support** — Sponsors get priority responses
 - **Shape the roadmap** — Pro+ sponsors vote on features
 
+## Sponsor Readiness Signals
+
+Use these proof points in sponsor conversations:
+
+- Live npm install/download metrics for `ecc-universal` and `ecc-agentshield`
+- GitHub App distribution via Marketplace installs
+- Public adoption signals: stars, forks, contributors, release cadence
+- Cross-harness support: Claude Code, Cursor, OpenCode, Codex app/CLI
+
+See [`docs/business/metrics-and-sponsorship.md`](docs/business/metrics-and-sponsorship.md) for a copy/paste metrics pull workflow.
+
 ## Sponsor Tiers
 
 | Tier | Price | Benefits |
@@ -37,6 +48,7 @@ Your sponsorship helps:
 | Builder | $10/mo | Premium tools access |
 | Pro | $25/mo | Priority support, office hours |
 | Team | $100/mo | 5 seats, team configs |
+| Harness Partner | $200/mo | Monthly roadmap sync, prioritized maintainer feedback, release-note mention |
 | Business | $500/mo | 25 seats, consulting credit |
 | Enterprise | $2K/mo | Unlimited seats, custom tools |
 

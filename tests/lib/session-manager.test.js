@@ -583,9 +583,10 @@ src/main.ts
     assert.strictEqual(result, null, 'Uppercase letters should be rejected');
   })) passed++; else failed++;
 
-  if (test('rejects filenames with extra segments', () => {
+  if (test('accepts hyphenated short IDs (extra segments)', () => {
     const result = sessionManager.parseSessionFilename('2026-02-01-abc12345-extra-session.tmp');
-    assert.strictEqual(result, null, 'Extra segments should be rejected');
+    assert.ok(result, 'Hyphenated short IDs should be accepted');
+    assert.strictEqual(result.shortId, 'abc12345-extra');
   })) passed++; else failed++;
 
   if (test('rejects impossible month (13)', () => {

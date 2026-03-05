@@ -1,56 +1,54 @@
 /**
  * ECC Custom Tool: Git Summary
  *
- * Provides a comprehensive git status including branch info, status,
- * recent log, and diff against base branch.
+ * Returns branch/status/log/diff details for the active repository.
  */
 
-import { tool } from "@opencode-ai/plugin"
-import { z } from "zod"
+import { tool } from "@opencode-ai/plugin/tool"
+import { execSync } from "child_process"
 
 export default tool({
-  name: "git-summary",
-  description: "Get comprehensive git summary: branch, status, recent log, and diff against base branch.",
-  parameters: z.object({
-    depth: z.number().optional().describe("Number of recent commits to show (default: 5)"),
-    includeDiff: z.boolean().optional().describe("Include diff against base branch (default: true)"),
-    baseBranch: z.string().optional().describe("Base branch for comparison (default: main)"),
-  }),
-  execute: async ({ depth = 5, includeDiff = true, baseBranch = "main" }, { $ }) => {
-    const results: Record<string, string> = {}
+  description:
+    "Generate git summary with branch, status, recent commits, and optional diff stats.",
+  args: {
+    depth: tool.schema
+      .number()
+      .optional()
+      .describe("Number of recent commits to include (default: 5)"),
+    includeDiff: tool.schema
+      .boolean()
+      .optional()
+      .describe("Include diff stats against base branch (default: true)"),
+    baseBranch: tool.schema
+      .string()
+      .optional()
+      .describe("Base branch for diff comparison (default: main)"),
+  },
+  async execute(args, context) {
+    const cwd = context.worktree || context.directory
+    const depth = args.depth ?? 5
+    const includeDiff = args.includeDiff ?? true
+    const baseBranch = args.baseBranch ?? "main"
 
-    try {
-      results.branch = (await $`git branch --show-current`.text()).trim()
-    } catch {
-      results.branch = "unknown"
-    }
-
-    try {
-      results.status = (await $`git status --short`.text()).trim()
-    } catch {
-      results.status = "unable to get status"
-    }
-
-    try {
-      results.log = (await $`git log --oneline -${depth}`.text()).trim()
-    } catch {
-      results.log = "unable to get log"
+    const result: Record<string, string> = {
+      branch: run("git branch --show-current", cwd) || "unknown",
+      status: run("git status --short", cwd) || "clean",
+      log: run(`git log --oneline -${depth}`, cwd) || "no commits found",
     }
 
     if (includeDiff) {
-      try {
-        results.stagedDiff = (await $`git diff --cached --stat`.text()).trim()
-      } catch {
-        results.stagedDiff = ""
-      }
-
-      try {
-        results.branchDiff = (await $`git diff ${baseBranch}...HEAD --stat`.text()).trim()
-      } catch {
-        results.branchDiff = `unable to diff against ${baseBranch}`
-      }
+      result.stagedDiff = run("git diff --cached --stat", cwd) || ""
+      result.branchDiff = run(`git diff ${baseBranch}...HEAD --stat`, cwd) || `unable to diff against ${baseBranch}`
     }
 
-    return results
+    return JSON.stringify(result)
   },
 })
+
+function run(command: string, cwd: string): string {
+  try {
+    return execSync(command, { cwd, encoding: "utf-8", stdio: ["ignore", "pipe", "pipe"] }).trim()
+  } catch {
+    return ""
+  }
+}
