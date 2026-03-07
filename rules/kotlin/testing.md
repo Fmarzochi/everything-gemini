@@ -21,7 +21,7 @@ paths:
 fun `loading state emitted then data`() = runTest {
     val repo = FakeItemRepository()
     repo.addItem(testItem)
-    val viewModel = ItemListViewModel(GetItemUseCase(repo))
+    val viewModel = ItemListViewModel(GetItemsUseCase(repo))
 
     viewModel.state.test {
         assertEquals(ItemListState(), awaitItem())     // initial state

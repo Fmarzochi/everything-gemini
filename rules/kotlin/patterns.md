@@ -15,14 +15,14 @@ Prefer constructor injection. Use Koin (KMP) or Hilt (Android-only):
 // Koin — declare modules
 val dataModule = module {
     single<ItemRepository> { ItemRepositoryImpl(get(), get()) }
-    factory { GetItemUseCase(get()) }
+    factory { GetItemsUseCase(get()) }
     viewModelOf(::ItemListViewModel)
 }
 
 // Hilt — annotations
 @HiltViewModel
 class ItemListViewModel @Inject constructor(
-    private val getItem: GetItemUseCase
+    private val getItems: GetItemsUseCase
 ) : ViewModel()
 ```
 
@@ -36,7 +36,7 @@ data class ScreenState(
     val isLoading: Boolean = false
 )
 
-class ScreenViewModel(private val useCase: GetItemUseCase) : ViewModel() {
+class ScreenViewModel(private val useCase: GetItemsUseCase) : ViewModel() {
     private val _state = MutableStateFlow(ScreenState())
     val state = _state.asStateFlow()
 
@@ -58,6 +58,7 @@ class ScreenViewModel(private val useCase: GetItemUseCase) : ViewModel() {
 ```kotlin
 interface ItemRepository {
     suspend fun getById(id: String): Result<Item>
+    suspend fun getAll(): Result<List<Item>>
     fun observeAll(): Flow<List<Item>>
 }
 ```
@@ -70,6 +71,12 @@ Single responsibility, `operator fun invoke`:
 class GetItemUseCase(private val repository: ItemRepository) {
     suspend operator fun invoke(id: String): Result<Item> {
         return repository.getById(id)
+    }
+}
+
+class GetItemsUseCase(private val repository: ItemRepository) {
+    suspend operator fun invoke(): Result<List<Item>> {
+        return repository.getAll()
     }
 }
 ```

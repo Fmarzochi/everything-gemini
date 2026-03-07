@@ -218,7 +218,7 @@ viewModelScope.launch {
 @Test
 fun `search updates item list`() = runTest {
     val fakeRepository = FakeItemRepository(items = testItems)
-    val viewModel = ItemListViewModel(GetItemUseCase(fakeRepository))
+    val viewModel = ItemListViewModel(GetItemsUseCase(fakeRepository))
 
     viewModel.state.test {
         assertEquals(ItemListState(), awaitItem())  // initial
