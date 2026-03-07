@@ -2,40 +2,7 @@
 'use strict';
 
 const MAX_STDIN = 1024 * 1024;
-
-function splitShellSegments(command) {
-  const segments = [];
-  let current = '';
-  let quote = null;
-
-  for (let i = 0; i < command.length; i++) {
-    const ch = command[i];
-    if (quote) {
-      if (ch === quote) quote = null;
-      current += ch;
-      continue;
-    }
-
-    if (ch === '"' || ch === "'") {
-      quote = ch;
-      current += ch;
-      continue;
-    }
-
-    const next = command[i + 1] || '';
-    if (ch === ';' || (ch === '&' && next === '&') || (ch === '|' && next === '|') || (ch === '&' && next !== '&')) {
-      if (current.trim()) segments.push(current.trim());
-      current = '';
-      if ((ch === '&' && next === '&') || (ch === '|' && next === '|')) i++;
-      continue;
-    }
-
-    current += ch;
-  }
-
-  if (current.trim()) segments.push(current.trim());
-  return segments;
-}
+const { splitShellSegments } = require('../lib/shell-split');
 
 let raw = '';
 process.stdin.setEncoding('utf8');
