@@ -38,24 +38,6 @@ Works across **Claude Code**, **Codex**, **Cowork**, and other AI agent harnesse
 
 ---
 
-## Traction & Distribution
-
-Use these live signals when presenting ECC to sponsors, platforms, or ecosystem partners:
-
-- **Main package installs:** [`ecc-universal` on npm](https://www.npmjs.com/package/ecc-universal)
-- **Security companion installs:** [`ecc-agentshield` on npm](https://www.npmjs.com/package/ecc-agentshield)
-- **GitHub App distribution:** [ECC Tools marketplace listing](https://github.com/marketplace/ecc-tools)
-- **Automated monthly metrics issue:** powered by `.github/workflows/monthly-metrics.yml`
-- **Repo adoption signal:** stars/forks/contributors badges at the top of this README
-
-Download counts for Claude Code plugin installs are not currently exposed as a public API. For partner reporting, combine npm metrics with GitHub App installs and repository traffic/fork growth.
-
-For a sponsor-call metrics checklist and command snippets, see [`docs/business/metrics-and-sponsorship.md`](docs/business/metrics-and-sponsorship.md).
-
-[**Sponsor ECC**](https://github.com/sponsors/affaan-m) | [Sponsor Tiers](SPONSORS.md) | [Sponsorship Program](SPONSORING.md)
-
----
-
 ## The Guides
 
 This repo is the raw code only. The guides explain everything.
