@@ -74,7 +74,7 @@ Scanning:
 
 ### Phase 2 — Quality Evaluation
 
-Launch a Task tool subagent (**Explore agent, model: opus**) with the full inventory and checklist.
+Launch an Agent tool subagent (**general-purpose agent**) with the full inventory and checklist.
 The subagent reads each skill, applies the checklist, and returns per-skill JSON:
 
 `{ "verdict": "Keep"|"Improve"|"Update"|"Retire"|"Merge into [X]", "reason": "..." }`
