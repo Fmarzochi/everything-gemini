@@ -12,17 +12,8 @@
       "properties": {
         "type": {
           "type": "string",
-          "enum": [
-            "PreToolUse",
-            "PostToolUse",
-            "PreCompact",
-            "SessionStart",
-            "SessionEnd",
-            "Stop",
-            "Notification",
-            "SubagentStop"
-          ],
-          "description": "Hook event type that triggers this hook"
+          "enum": ["command", "notification"],
+          "description": "Hook action type (command or notification)"
         },
         "command": {
           "oneOf": [

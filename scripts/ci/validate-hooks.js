@@ -1,13 +1,15 @@
 #!/usr/bin/env node
 /**
- * Validate hooks.json schema
+ * Validate hooks.json schema and hook entry rules.
  */
 
 const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
+const Ajv = require('ajv');
 
 const HOOKS_FILE = path.join(__dirname, '../../hooks/hooks.json');
+const HOOKS_SCHEMA_PATH = path.join(__dirname, '../../schemas/hooks.schema.json');
 const VALID_EVENTS = ['PreToolUse', 'PostToolUse', 'PreCompact', 'SessionStart', 'SessionEnd', 'Stop', 'Notification', 'SubagentStop'];
 
 /**
@@ -65,6 +67,20 @@ function validateHooks() {
   } catch (e) {
     console.error(`ERROR: Invalid JSON in hooks.json: ${e.message}`);
     process.exit(1);
+  }
+
+  // Validate against JSON schema
+  if (fs.existsSync(HOOKS_SCHEMA_PATH)) {
+    const schema = JSON.parse(fs.readFileSync(HOOKS_SCHEMA_PATH, 'utf-8'));
+    const ajv = new Ajv({ allErrors: true });
+    const validate = ajv.compile(schema);
+    const valid = validate(data);
+    if (!valid) {
+      for (const err of validate.errors) {
+        console.error(`ERROR: hooks.json schema: ${err.instancePath || '/'} ${err.message}`);
+      }
+      process.exit(1);
+    }
   }
 
   // Support both object format { hooks: {...} } and array format
