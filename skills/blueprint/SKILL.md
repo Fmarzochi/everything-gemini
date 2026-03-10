@@ -83,8 +83,9 @@ To update later, review the [changelog](https://github.com/antbotlab/blueprint/b
 
 ```bash
 cd ~/.claude/skills/blueprint
+git fetch origin
 git log --oneline HEAD..origin/main  # review new commits
-git pull
+git checkout <new-commit-sha>        # pin to a specific reviewed commit
 ```
 
 ## Requirements
