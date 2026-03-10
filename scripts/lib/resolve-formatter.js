@@ -86,7 +86,7 @@ function detectFormatter(projectRoot) {
     const pkgPath = path.join(projectRoot, 'package.json');
     if (fs.existsSync(pkgPath)) {
       const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
-      if (pkg.prettier != null) {
+      if ('prettier' in pkg) {
         formatterCache.set(projectRoot, 'prettier');
         return 'prettier';
       }

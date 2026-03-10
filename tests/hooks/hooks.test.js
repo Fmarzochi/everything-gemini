@@ -1966,8 +1966,10 @@ async function runTests() {
       const formatSource = fs.readFileSync(path.join(scriptsDir, 'post-edit-format.js'), 'utf8');
       // Strip comments to avoid matching "shell: true" in comment text
       const codeOnly = formatSource.replace(/\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '');
-      assert.ok(!codeOnly.includes('shell:'), 'post-edit-format.js should not pass shell option in code');
-      // npx.cmd handling moved to shared resolve-formatter.js — verify it uses the shared module
+      assert.ok(!/execFileSync\([^)]*shell\s*:/.test(codeOnly), 'post-edit-format.js should not pass shell option to execFileSync');
+      assert.ok(codeOnly.includes("process.platform === 'win32' && resolved.bin.endsWith('.cmd')"), 'Windows shell execution must stay gated to .cmd shims');
+      assert.ok(codeOnly.includes('UNSAFE_PATH_CHARS'), 'Must guard against shell metacharacters before using shell: true');
+      // npx.cmd handling in shared resolve-formatter.js
       const resolverSource = fs.readFileSync(path.join(scriptsDir, '..', 'lib', 'resolve-formatter.js'), 'utf8');
       assert.ok(resolverSource.includes('npx.cmd'), 'resolve-formatter.js should use npx.cmd for Windows cross-platform safety');
       assert.ok(formatSource.includes('resolveFormatterBin'), 'post-edit-format.js should use shared resolveFormatterBin');

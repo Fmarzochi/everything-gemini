@@ -17,8 +17,11 @@
  * Fails silently if no formatter is found or installed.
  */
 
-const { execFileSync } = require('child_process');
+const { execFileSync, spawnSync } = require('child_process');
 const path = require('path');
+
+// Shell metacharacters that cmd.exe interprets as command separators/operators
+const UNSAFE_PATH_CHARS = /[&|<>^%!]/;
 
 const { findProjectRoot, detectFormatter, resolveFormatterBin } = require('../lib/resolve-formatter');
 
@@ -50,11 +53,29 @@ function run(rawInput) {
         // Prettier: `--write` = format only
         const args = formatter === 'biome' ? [...resolved.prefix, 'check', '--write', resolvedFilePath] : [...resolved.prefix, '--write', resolvedFilePath];
 
-        execFileSync(resolved.bin, args, {
-          cwd: projectRoot,
-          stdio: ['pipe', 'pipe', 'pipe'],
-          timeout: 15000
-        });
+        if (process.platform === 'win32' && resolved.bin.endsWith('.cmd')) {
+          // Windows: .cmd files require shell to execute. Guard against
+          // command injection by rejecting paths with shell metacharacters.
+          if (UNSAFE_PATH_CHARS.test(resolvedFilePath)) {
+            throw new Error('File path contains unsafe shell characters');
+          }
+          const result = spawnSync(resolved.bin, args, {
+            cwd: projectRoot,
+            shell: true,
+            stdio: 'pipe',
+            timeout: 15000
+          });
+          if (result.error) throw result.error;
+          if (typeof result.status === 'number' && result.status !== 0) {
+            throw new Error(result.stderr?.toString() || `Formatter exited with status ${result.status}`);
+          }
+        } else {
+          execFileSync(resolved.bin, args, {
+            cwd: projectRoot,
+            stdio: ['pipe', 'pipe', 'pipe'],
+            timeout: 15000
+          });
+        }
       } catch {
         // Formatter not installed, file missing, or failed — non-blocking
       }

@@ -90,7 +90,7 @@ async function main() {
   if (hookModule && typeof hookModule.run === 'function') {
     try {
       const output = hookModule.run(raw);
-      if (output != null) process.stdout.write(output);
+      if (output !== null && output !== undefined) process.stdout.write(output);
     } catch (runErr) {
       process.stderr.write(`[Hook] run() error for ${hookId}: ${runErr.message}\n`);
       process.stdout.write(raw);
