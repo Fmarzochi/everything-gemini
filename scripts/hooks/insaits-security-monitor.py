@@ -88,6 +88,7 @@ AUDIT_FILE: str = ".insaits_audit_session.jsonl"
 MIN_CONTENT_LENGTH: int = 10
 MAX_SCAN_LENGTH: int = 4000
 DEFAULT_MODEL: str = "claude-opus"
+BLOCKING_SEVERITIES: frozenset = frozenset({"CRITICAL"})
 
 
 def extract_content(data: Dict[str, Any]) -> Tuple[str, str]:
@@ -216,7 +217,7 @@ def main() -> None:
             sender_id="claude-code",
             llm_id=os.environ.get("INSAITS_MODEL", DEFAULT_MODEL),
         )
-    except Exception as exc:
+    except Exception as exc:  # Broad catch intentional: unknown SDK internals
         fail_mode: str = os.environ.get("INSAITS_FAIL_MODE", "open").lower()
         if fail_mode == "closed":
             sys.stdout.write(
@@ -247,7 +248,8 @@ def main() -> None:
 
     # Determine maximum severity
     has_critical: bool = any(
-        get_anomaly_attr(a, "severity").upper() in ("CRITICAL",) for a in anomalies
+        get_anomaly_attr(a, "severity").upper() in BLOCKING_SEVERITIES
+        for a in anomalies
     )
 
     feedback: str = format_feedback(anomalies)
