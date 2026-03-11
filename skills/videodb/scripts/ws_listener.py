@@ -79,7 +79,7 @@ _first_connection = True
 
 def log(msg: str):
     """Log with timestamp."""
-    LOGGER.info(msg)
+    LOGGER.info("%s", msg)
 
 
 def append_event(event: dict):

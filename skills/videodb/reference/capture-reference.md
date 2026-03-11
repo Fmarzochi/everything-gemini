@@ -391,6 +391,8 @@ For RTStream methods (indexing, transcription, alerts, batch config), see [rtstr
   │   exported     │ ──> Access video_id, stream_url, player_url
   └───────────────┘
 
+          │
+          v
   ┌───────────────┐     WebSocket: capture_session.failed
   │    failed      │ ──> Inspect error payload and retry setup
   └───────────────┘
