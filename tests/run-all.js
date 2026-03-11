@@ -31,7 +31,7 @@ function discoverTestFiles(dir, baseDir = dir, acc = []) {
 const testFiles = discoverTestFiles(testsDir);
 
 const BOX_W = 58; // inner width between ║ delimiters
-const boxLine = (s) => `║${s.padEnd(BOX_W)}║`;
+const boxLine = s => `║${s.padEnd(BOX_W)}║`;
 
 console.log('╔' + '═'.repeat(BOX_W) + '╗');
 console.log(boxLine('           Everything Claude Code - Test Suite'));
