@@ -30,6 +30,7 @@ import sys
 import json
 import signal
 import asyncio
+import logging
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -43,10 +44,17 @@ MAX_RETRIES = 10
 INITIAL_BACKOFF = 1  # seconds
 MAX_BACKOFF = 60     # seconds
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="[%(asctime)s] %(message)s",
+    datefmt="%H:%M:%S",
+)
+LOGGER = logging.getLogger(__name__)
+
 # Parse arguments
-def parse_args():
+def parse_args() -> tuple[bool, Path]:
     clear = False
-    output_dir = None
+    output_dir: str | None = None
     
     args = sys.argv[1:]
     for arg in args:
@@ -71,15 +79,15 @@ _first_connection = True
 
 def log(msg: str):
     """Log with timestamp."""
-    ts = datetime.now().strftime("%H:%M:%S")
-    print(f"[{ts}] {msg}", flush=True)
+    LOGGER.info(msg)
 
 
 def append_event(event: dict):
     """Append event to JSONL file with timestamps."""
-    event["ts"] = datetime.now(timezone.utc).isoformat()
-    event["unix_ts"] = datetime.now(timezone.utc).timestamp()
-    with open(EVENTS_FILE, "a") as f:
+    now = datetime.now(timezone.utc)
+    event["ts"] = now.isoformat()
+    event["unix_ts"] = now.timestamp()
+    with EVENTS_FILE.open("a", encoding="utf-8") as f:
         f.write(json.dumps(event) + "\n")
 
 
@@ -93,8 +101,8 @@ def cleanup_pid():
     """Remove PID file on exit."""
     try:
         PID_FILE.unlink(missing_ok=True)
-    except Exception:
-        pass
+    except OSError as exc:
+        LOGGER.debug("Failed to remove PID file %s: %s", PID_FILE, exc)
 
 
 async def listen_with_retry():

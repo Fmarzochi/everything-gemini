@@ -168,8 +168,8 @@ kill $(cat /tmp/videodb_ws_pid)
 Each line is a JSON object with added timestamps:
 
 ```json
-{"ts": "2026-03-02T10:15:30.123Z", "unix_ts": 1709374530.12, "channel": "visual_index", "data": {"text": "..."}}
-{"ts": "2026-03-02T10:15:31.456Z", "unix_ts": 1709374531.45, "event": "capture_session.active", "capture_session_id": "cap-xxx"}
+{"ts": "2026-03-02T10:15:30.123Z", "unix_ts": 1772446530.123, "channel": "visual_index", "data": {"text": "..."}}
+{"ts": "2026-03-02T10:15:31.456Z", "unix_ts": 1772446531.456, "event": "capture_session.active", "capture_session_id": "cap-xxx"}
 ```
 
 ### Reading Events
@@ -365,10 +365,17 @@ For RTStream methods (indexing, transcription, alerts, batch config), see [rtstr
   └───────┬───────┘
           │  client.start_capture_session()
           v
+  ┌───────────────┐     WebSocket: capture_session.starting
+  │   starting     │ ──> Capture channels connect
+  └───────┬───────┘
+          │
+          v
   ┌───────────────┐     WebSocket: capture_session.active
   │    active      │ ──> Start AI pipelines
-  └───────┬───────┘
-          │  client.stop_capture()
+  └───────┬──────────────┐
+          │              │
+          │              └──────────────┐
+          │  client.stop_capture()      │ unrecoverable capture error
           v
   ┌───────────────┐     WebSocket: capture_session.stopping
   │   stopping     │ ──> Finalize streams
@@ -382,5 +389,9 @@ For RTStream methods (indexing, transcription, alerts, batch config), see [rtstr
           v
   ┌───────────────┐     WebSocket: capture_session.exported
   │   exported     │ ──> Access video_id, stream_url, player_url
+  └───────────────┘
+
+  ┌───────────────┐     WebSocket: capture_session.failed
+  │    failed      │ ──> Inspect error payload and retry setup
   └───────────────┘
 ```

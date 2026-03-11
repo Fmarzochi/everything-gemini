@@ -328,7 +328,18 @@ Use `ws_listener.py` to capture WebSocket events during recording sessions. Desk
 
 ```python
 import json
-events = [json.loads(l) for l in open("/tmp/videodb_events.jsonl")]
+from pathlib import Path
+
+events_file = Path("/tmp/videodb_events.jsonl")
+events = []
+
+if events_file.exists():
+    with events_file.open(encoding="utf-8") as handle:
+        for line in handle:
+            try:
+                events.append(json.loads(line))
+            except json.JSONDecodeError:
+                continue
 
 # Get all transcripts
 transcripts = [e["data"]["text"] for e in events if e.get("channel") == "transcript"]
@@ -361,8 +372,9 @@ For complete capture workflow, see [reference/capture.md](reference/capture.md).
 | Need to combine/trim clips | `VideoAsset` on a `Timeline` |
 | Need to generate voiceover, music, or SFX | `coll.generate_voice()`, `generate_music()`, `generate_sound_effect()` |
 
-## Repository
+## Provenance
 
-https://github.com/video-db/skills
+Reference material for this skill is vendored locally under `skills/videodb/reference/`.
+Use the local copies above instead of following external repository links at runtime.
 
-**Maintained By:** [VideoDB](https://github.com/video-db)
+**Maintained By:** [VideoDB](https://www.videodb.io/)

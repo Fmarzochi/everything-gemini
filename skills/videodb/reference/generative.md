@@ -59,7 +59,7 @@ video.play()
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `prompt` | `str` | required | Text description of the video to generate |
-| `duration` | `float` | `5` | Duration in seconds (must be integer value, 5-8) |
+| `duration` | `int` | `5` | Duration in seconds (must be integer value, 5-8) |
 | `callback_url` | `str\|None` | `None` | URL to receive async callback |
 
 Returns a `Video` object. Generated videos are automatically added to the collection and can be used in timelines, searches, and compilations like any uploaded video.

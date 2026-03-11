@@ -313,7 +313,7 @@ stream_url = timeline.generate_stream()
 print(f"Highlight reel: {stream_url}")
 ```
 
-### Picture-in-Picture with Background Music
+### Logo Overlay with Background Music
 
 ```python
 import videodb
@@ -365,6 +365,7 @@ clips = [
 ]
 
 timeline = Timeline(conn)
+timeline_offset = 0.0
 
 for clip in clips:
     # Add a label as an overlay on each clip
@@ -376,7 +377,8 @@ for clip in clips:
     timeline.add_inline(
         VideoAsset(asset_id=clip["video_id"], start=clip["start"], end=clip["end"])
     )
-    timeline.add_overlay(0, label)
+    timeline.add_overlay(timeline_offset, label)
+    timeline_offset += clip["end"] - clip["start"]
 
 stream_url = timeline.generate_stream()
 print(f"Montage: {stream_url}")

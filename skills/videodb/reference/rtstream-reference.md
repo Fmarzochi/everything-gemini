@@ -519,6 +519,7 @@ For WebSocket event structures and ws_listener usage, see [capture-reference.md]
 ```python
 import time
 import videodb
+from videodb.exceptions import InvalidRequestError
 
 conn = videodb.connect()
 coll = conn.get_collection()
@@ -527,6 +528,7 @@ coll = conn.get_collection()
 rtstream = coll.connect_rtstream(
     url="rtmp://your-stream-server/live/stream-key",
     name="Weekly Standup",
+    store=True,
 )
 rtstream.start()
 
@@ -535,6 +537,10 @@ start_ts = time.time()
 time.sleep(1800)  # 30 minutes
 end_ts = time.time()
 rtstream.stop()
+
+# Generate an immediate playback URL for the captured window
+stream_url = rtstream.generate_stream(start=start_ts, end=end_ts)
+print(f"Recorded stream: {stream_url}")
 
 # 3. Export to a permanent video
 export_result = rtstream.export(name="Weekly Standup Recording")
@@ -545,7 +551,13 @@ video = coll.get_video(export_result.video_id)
 video.index_spoken_words(force=True)
 
 # 5. Search for action items
-results = video.search("action items and next steps")
-stream_url = results.compile()
-print(f"Action items clip: {stream_url}")
+try:
+    results = video.search("action items and next steps")
+    stream_url = results.compile()
+    print(f"Action items clip: {stream_url}")
+except InvalidRequestError as exc:
+    if "No results found" in str(exc):
+        print("No action items were detected in the recording.")
+    else:
+        raise
 ```
