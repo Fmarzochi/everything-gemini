@@ -9,6 +9,8 @@ Common issues and solutions for Everything Claude Code (ECC) plugin.
 - [Hook & Workflow Errors](#hook--workflow-errors)
 - [Installation & Setup](#installation--setup)
 - [Performance Issues](#performance-issues)
+- [Common Error Messages](#common-error-messages)
+- [Getting Help](#getting-help)
 
 ---
 
@@ -32,7 +34,7 @@ Common issues and solutions for Everything Claude Code (ECC) plugin.
 head -n 100 large-file.log > sample.log
 
 # 3. Use streaming for large outputs
-cat large-file.txt | head -50
+head -n 50 large-file.txt
 
 # 4. Split tasks into smaller chunks
 # Instead of: "Analyze all 50 files"
@@ -51,13 +53,28 @@ cat large-file.txt | head -50
 **Solutions:**
 ```bash
 # Check if observations are being recorded
-ls ~/.claude/homunculus/*/observations.jsonl
+ls ~/.claude/homunculus/projects/*/observations.jsonl
 
-# View recent observations
-tail -20 ~/.claude/homunculus/$(basename $PWD)/observations.jsonl
+# Find the current project's hash id
+python3 - <<'PY'
+import json, os
+registry_path = os.path.expanduser("~/.claude/homunculus/projects.json")
+with open(registry_path) as f:
+    registry = json.load(f)
+for project_id, meta in registry.items():
+    if meta.get("root") == os.getcwd():
+        print(project_id)
+        break
+else:
+    raise SystemExit("Project hash not found in ~/.claude/homunculus/projects.json")
+PY
 
-# Reset observations if corrupted
-rm ~/.claude/homunculus/$(basename $PWD)/observations.jsonl
+# View recent observations for that project
+tail -20 ~/.claude/homunculus/projects/<project-hash>/observations.jsonl
+
+# Back up a corrupted observations file before recreating it
+mv ~/.claude/homunculus/projects/<project-hash>/observations.jsonl \
+  ~/.claude/homunculus/projects/<project-hash>/observations.jsonl.bak.$(date +%Y%m%d-%H%M%S)
 
 # Verify hooks are enabled
 grep -r "observe" ~/.claude/settings.json
@@ -153,7 +170,7 @@ echo $PATH
 **Solutions:**
 ```bash
 # Check hooks are registered
-cat ~/.claude/settings.json | grep -A 10 '"hooks"'
+grep -A 10 '"hooks"' ~/.claude/settings.json
 
 # Verify hook files exist and are executable
 ls -la ~/.claude/plugins/cache/*/hooks/
@@ -231,8 +248,12 @@ tmux attach -t dev
 
 **Solutions:**
 ```bash
-# Clear plugin cache
-rm -rf ~/.claude/plugins/cache/*
+# Inspect the plugin cache before changing it
+ls -la ~/.claude/plugins/cache/
+
+# Back up the plugin cache instead of deleting it in place
+mv ~/.claude/plugins/cache ~/.claude/plugins/cache.backup.$(date +%Y%m%d-%H%M%S)
+mkdir -p ~/.claude/plugins/cache
 
 # Reinstall from marketplace
 # Claude Code → Extensions → Everything Claude Code → Uninstall
@@ -268,7 +289,9 @@ echo '{"packageManager": "pnpm"}' > .claude/package-manager.json
 # Or use package.json field
 npm pkg set packageManager="pnpm@8.15.0"
 
-# Remove conflicting lock files
+# Warning: removing lock files can change installed dependency versions.
+# Commit or back up the lock file first, then run a fresh install and re-run CI.
+# Only do this when intentionally switching package managers.
 rm package-lock.json  # If using pnpm/yarn/bun
 ```
 
@@ -287,14 +310,22 @@ rm package-lock.json  # If using pnpm/yarn/bun
 
 **Solutions:**
 ```bash
-# Archive old observations
-find ~/.claude/homunculus -name "observations.jsonl" -size +10M -delete
+# Archive large observations instead of deleting them
+archive_dir="$HOME/.claude/homunculus/archive/$(date +%Y%m%d)"
+mkdir -p "$archive_dir"
+find ~/.claude/homunculus/projects -name "observations.jsonl" -size +10M -exec sh -c '
+  for file do
+    base=$(basename "$(dirname "$file")")
+    gzip -c "$file" > "'"$archive_dir"'/${base}-observations.jsonl.gz"
+    : > "$file"
+  done
+' sh {} +
 
 # Disable unused hooks temporarily
 # Edit ~/.claude/settings.json
 
-# Use local caching
-# Enable Redis for semantic search caching
+# Keep active observation files small
+# Large archives should live under ~/.claude/homunculus/archive/
 ```
 
 ### High CPU Usage
@@ -332,7 +363,7 @@ du -sh ~/.claude/homunculus/*/
 find ~/.claude/plugins -name "*.sh" -exec chmod +x {} \;
 
 # Fix observation directory permissions
-chmod -R 755 ~/.claude/homunculus
+chmod -R u+rwX,go+rX ~/.claude/homunculus
 ```
 
 ### "MODULE_NOT_FOUND"
