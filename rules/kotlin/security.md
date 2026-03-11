@@ -5,7 +5,7 @@ paths:
 ---
 # Kotlin Security
 
-> This file extends [common/security.md](../common/security.md) with Kotlin and Android/KMP specific content.
+> This file extends [common/security.md](../common/security.md) with Kotlin and Android/KMP-specific content.
 
 ## Secrets Management
 

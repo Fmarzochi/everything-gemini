@@ -28,6 +28,16 @@ Check for:
 - `CLAUDE.md` for project-specific conventions
 - Whether this is Android-only, KMP, or Compose Multiplatform
 
+### Step 2b: Security Review
+
+Apply the Kotlin/Android security guidance before continuing:
+- exported Android components, deep links, and intent filters
+- insecure crypto, WebView, and network configuration usage
+- keystore, token, and credential handling
+- platform-specific storage and permission risks
+
+If you find a CRITICAL security issue, stop the review and hand off to `security-reviewer` before doing any further analysis.
+
 ### Step 3: Read and Review
 
 Read changed files fully. Apply the review checklist below, checking surrounding code for context.
@@ -96,6 +106,15 @@ Button(onClick = onClick)
 - **Missing ProGuard rules** — Serialized classes without `@Keep` or ProGuard rules
 - **Hardcoded strings** — User-facing strings not in `strings.xml` or Compose resources
 - **Missing lifecycle handling** — Collecting Flows in Activities without `repeatOnLifecycle`
+
+### Security (CRITICAL)
+
+- **Exported component exposure** — Activities, services, or receivers exported without proper guards
+- **Insecure crypto/storage** — Homegrown crypto, plaintext secrets, or weak keystore usage
+- **Unsafe WebView/network config** — JavaScript bridges, cleartext traffic, permissive trust settings
+- **Sensitive logging** — Tokens, credentials, PII, or secrets emitted to logs
+
+If any CRITICAL security issue is present, stop and escalate to `security-reviewer`.
 
 ### Gradle & Build (LOW)
 

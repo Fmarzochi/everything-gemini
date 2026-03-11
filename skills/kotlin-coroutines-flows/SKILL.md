@@ -217,7 +217,7 @@ viewModelScope.launch {
 ```kotlin
 @Test
 fun `search updates item list`() = runTest {
-    val fakeRepository = FakeItemRepository(items = testItems)
+    val fakeRepository = FakeItemRepository().apply { emit(testItems) }
     val viewModel = ItemListViewModel(GetItemsUseCase(fakeRepository))
 
     viewModel.state.test {
