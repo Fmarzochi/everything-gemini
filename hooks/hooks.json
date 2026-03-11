@@ -65,7 +65,7 @@
         "description": "Capture tool use observations for continuous learning"
       },
       {
-        "matcher": "*",
+        "matcher": "Bash|Write|Edit|MultiEdit",
         "hooks": [
           {
             "type": "command",
@@ -73,7 +73,7 @@
             "timeout": 15
           }
         ],
-        "description": "InsAIts AI security monitor: detects credential exposure, prompt injection, hallucinations, and 20+ anomaly types before tool execution. Requires: pip install insa-its"
+        "description": "Optional InsAIts AI security monitor for Bash/Edit/Write flows. Enable with ECC_ENABLE_INSAITS=1. Requires: pip install insa-its"
       }
     ],
     "PreCompact": [

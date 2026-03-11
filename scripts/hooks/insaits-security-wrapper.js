@@ -16,6 +16,10 @@ const { spawnSync } = require('child_process');
 
 const MAX_STDIN = 1024 * 1024;
 
+function isEnabled(value) {
+  return ['1', 'true', 'yes', 'on'].includes(String(value || '').toLowerCase());
+}
+
 let raw = '';
 process.stdin.setEncoding('utf8');
 process.stdin.on('data', chunk => {
@@ -25,6 +29,11 @@ process.stdin.on('data', chunk => {
 });
 
 process.stdin.on('end', () => {
+  if (!isEnabled(process.env.ECC_ENABLE_INSAITS)) {
+    process.stdout.write(raw);
+    process.exit(0);
+  }
+
   const scriptDir = __dirname;
   const pyScript = path.join(scriptDir, 'insaits-security-monitor.py');
 

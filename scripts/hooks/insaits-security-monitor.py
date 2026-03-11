@@ -11,17 +11,18 @@ Writes audit events to .insaits_audit_session.jsonl for forensic tracing.
 
 Setup:
   pip install insa-its
+  export ECC_ENABLE_INSAITS=1
 
   Add to .claude/settings.json:
   {
     "hooks": {
       "PreToolUse": [
         {
-          "matcher": ".*",
+          "matcher": "Bash|Write|Edit|MultiEdit",
           "hooks": [
             {
               "type": "command",
-              "command": "python3 scripts/hooks/insaits-security-monitor.py"
+              "command": "node scripts/hooks/insaits-security-wrapper.js"
             }
           ]
         }
