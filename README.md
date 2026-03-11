@@ -156,9 +156,9 @@ git clone https://github.com/affaan-m/everything-claude-code.git
 cd everything-claude-code
 
 # Recommended: use the installer (handles common + language rules safely)
-./install.sh typescript    # or python or golang or perl
+./install.sh typescript    # or python or golang or swift or php
 # You can pass multiple languages:
-# ./install.sh typescript python golang perl
+# ./install.sh typescript python golang swift php
 # or target cursor:
 # ./install.sh --target cursor typescript
 # or target antigravity:
@@ -365,8 +365,8 @@ everything-claude-code/
 |   |-- typescript/          # TypeScript/JavaScript specific
 |   |-- python/              # Python specific
 |   |-- golang/              # Go specific
-|   |-- perl/                # Perl specific (NEW)
 |   |-- swift/               # Swift specific
+|   |-- php/                 # PHP specific (NEW)
 |
 |-- hooks/            # Trigger-based automations
 |   |-- README.md                 # Hook documentation, recipes, and customization guide
@@ -569,7 +569,7 @@ This gives you instant access to all commands, agents, skills, and hooks.
 > cp -r everything-claude-code/rules/typescript/* ~/.claude/rules/   # pick your stack
 > cp -r everything-claude-code/rules/python/* ~/.claude/rules/
 > cp -r everything-claude-code/rules/golang/* ~/.claude/rules/
-> cp -r everything-claude-code/rules/perl/* ~/.claude/rules/
+> cp -r everything-claude-code/rules/php/* ~/.claude/rules/
 >
 > # Option B: Project-level rules (applies to current project only)
 > mkdir -p .claude/rules
@@ -595,7 +595,7 @@ cp -r everything-claude-code/rules/common/* ~/.claude/rules/
 cp -r everything-claude-code/rules/typescript/* ~/.claude/rules/   # pick your stack
 cp -r everything-claude-code/rules/python/* ~/.claude/rules/
 cp -r everything-claude-code/rules/golang/* ~/.claude/rules/
-cp -r everything-claude-code/rules/perl/* ~/.claude/rules/
+cp -r everything-claude-code/rules/php/* ~/.claude/rules/
 
 # Copy commands
 cp everything-claude-code/commands/*.md ~/.claude/commands/
@@ -678,7 +678,8 @@ rules/
   typescript/      # TS/JS specific patterns and tools
   python/          # Python specific patterns and tools
   golang/          # Go specific patterns and tools
-  perl/            # Perl specific patterns and tools
+  swift/           # Swift specific patterns and tools
+  php/             # PHP specific patterns and tools
 ```
 
 See [`rules/README.md`](rules/README.md) for installation and structure details.
@@ -875,7 +876,7 @@ ECC provides **full Cursor IDE support** with hooks, rules, agents, skills, comm
 ```bash
 # Install for your language(s)
 ./install.sh --target cursor typescript
-./install.sh --target cursor python golang swift perl
+./install.sh --target cursor python golang swift php
 ```
 
 ### What's Included
@@ -884,7 +885,7 @@ ECC provides **full Cursor IDE support** with hooks, rules, agents, skills, comm
 |-----------|-------|---------|
 | Hook Events | 15 | sessionStart, beforeShellExecution, afterFileEdit, beforeMCPExecution, beforeSubmitPrompt, and 10 more |
 | Hook Scripts | 16 | Thin Node.js scripts delegating to `scripts/hooks/` via shared adapter |
-| Rules | 34 | 9 common (alwaysApply) + 25 language-specific (TypeScript, Python, Go, Swift, Perl) |
+| Rules | 34 | 9 common (alwaysApply) + 25 language-specific (TypeScript, Python, Go, Swift, PHP) |
 | Agents | Shared | Via AGENTS.md at root (read by Cursor natively) |
 | Skills | Shared + Bundled | Via AGENTS.md at root and `.cursor/skills/` for translated additions |
 | Commands | Shared | `.cursor/commands/` if installed |
