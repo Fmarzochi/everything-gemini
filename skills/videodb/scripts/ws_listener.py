@@ -184,7 +184,7 @@ async def main_async():
     listen_task = asyncio.create_task(listen_with_retry())
     shutdown_task = asyncio.create_task(shutdown_event.wait())
     
-    done, pending = await asyncio.wait(
+    _done, pending = await asyncio.wait(
         [listen_task, shutdown_task],
         return_when=asyncio.FIRST_COMPLETED,
     )
