@@ -10,8 +10,9 @@
 # - https://developers.openai.com/codex/multi-agent
 
 # Model selection
-model = "o4-mini"
-model_provider = "openai"
+# Leave `model` and `model_provider` unset so Codex CLI uses its current
+# built-in defaults. Uncomment and pin them only if you intentionally want
+# repo-local or global model overrides.
 
 # Top-level runtime settings (current Codex schema)
 approval_policy = "on-request"
