@@ -8,14 +8,16 @@ origin: ECC
 
 Distribute content across multiple social platforms with platform-native adaptation.
 
-## When to Activate
+## When to Use
 
 - User wants to post content to multiple platforms
 - Publishing announcements, launches, or updates across social media
 - Repurposing a post from one platform to others
 - User says "crosspost", "post everywhere", "share on all platforms", or "distribute this"
 
-## Core Rules
+## How It Works
+
+### Core Rules
 
 1. **Never post identical content cross-platform.** Each platform gets a native adaptation.
 2. **Primary platform first.** Post to the main platform, then adapt for others.
@@ -23,7 +25,7 @@ Distribute content across multiple social platforms with platform-native adaptat
 4. **One idea per post.** If the source content has multiple ideas, split across posts.
 5. **Attribution matters.** If crossposting someone else's content, credit the source.
 
-## Platform Specifications
+### Platform Specifications
 
 | Platform | Max Length | Link Handling | Hashtags | Media |
 |----------|-----------|---------------|----------|-------|
@@ -32,7 +34,7 @@ Distribute content across multiple social platforms with platform-native adaptat
 | Threads | 500 chars | Separate link attachment | None typical | Images, video |
 | Bluesky | 300 chars | Via facets (rich text) | None (use feeds) | Images |
 
-## Workflow
+### Workflow
 
 ### Step 1: Create Source Content
 
@@ -87,7 +89,7 @@ Post adapted versions to remaining platforms:
 - Stagger timing (not all at once — 30-60 min gaps)
 - Include cross-platform references where appropriate ("longer thread on X" etc.)
 
-## Content Adaptation Examples
+## Examples
 
 ### Source: Product Launch
 

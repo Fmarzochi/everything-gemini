@@ -137,6 +137,44 @@ test('buildOrchestrationPlan normalizes global and worker seed paths', () => {
   ]);
 });
 
+test('buildOrchestrationPlan rejects worker names that collapse to the same slug', () => {
+  assert.throws(
+    () => buildOrchestrationPlan({
+      repoRoot: '/tmp/ecc',
+      sessionName: 'duplicates',
+      launcherCommand: 'echo run',
+      workers: [
+        { name: 'Docs A', task: 'Fix skill docs' },
+        { name: 'Docs/A', task: 'Fix tests' }
+      ]
+    }),
+    /unique slugs/
+  );
+});
+
+test('buildOrchestrationPlan exposes shell-safe launcher placeholders with raw aliases', () => {
+  const repoRoot = path.join('/tmp', 'My Repo');
+  const plan = buildOrchestrationPlan({
+    repoRoot,
+    sessionName: 'Spacing Audit',
+    launcherCommand: 'bash {repo_root}/scripts/orchestrate-codex-worker.sh {task_file} {handoff_file} {status_file} {worker_name} {worker_name_raw}',
+    workers: [{ name: 'Docs Fixer', task: 'Update docs' }]
+  });
+
+  assert.ok(
+    plan.workerPlans[0].launchCommand.includes(`bash '${repoRoot}'/scripts/orchestrate-codex-worker.sh`),
+    'repo_root should be shell-safe by default'
+  );
+  assert.ok(
+    plan.workerPlans[0].launchCommand.includes(`'${plan.workerPlans[0].taskFilePath}'`),
+    'task_file should be shell-safe by default'
+  );
+  assert.ok(
+    plan.workerPlans[0].launchCommand.includes(`'${plan.workerPlans[0].workerName}' ${plan.workerPlans[0].workerName}`),
+    'worker_name_raw should preserve the unquoted value when explicitly requested'
+  );
+});
+
 test('normalizeSeedPaths rejects paths outside the repo root', () => {
   assert.throws(
     () => normalizeSeedPaths(['../outside.txt'], '/tmp/ecc'),
@@ -170,10 +208,17 @@ test('materializePlan keeps worker instructions inside the worktree boundary', (
     materializePlan(plan);
 
     const taskFile = fs.readFileSync(plan.workerPlans[0].taskFilePath, 'utf8');
+    const handoffFile = fs.readFileSync(plan.workerPlans[0].handoffFilePath, 'utf8');
 
     assert.ok(
       taskFile.includes('Report results in your final response.'),
       'Task file should tell the worker to report in stdout'
+    );
+    assert.ok(
+      taskFile.includes('## Summary') &&
+      taskFile.includes('## Validation') &&
+      taskFile.includes('## Remaining Risks'),
+      'Task file should require parser-compatible headings'
     );
     assert.ok(
       taskFile.includes('Do not spawn subagents or external agents for this task.'),
@@ -186,6 +231,18 @@ test('materializePlan keeps worker instructions inside the worktree boundary', (
     assert.ok(
       !taskFile.includes('Update `'),
       'Task file should not instruct the nested worker to update orchestration status files'
+    );
+    assert.ok(
+      handoffFile.includes('## Summary') &&
+      handoffFile.includes('## Validation') &&
+      handoffFile.includes('## Remaining Risks'),
+      'Handoff placeholder should seed parser-compatible headings'
+    );
+    assert.ok(
+      !handoffFile.includes('## Files Changed') &&
+      !handoffFile.includes('## Tests / Verification') &&
+      !handoffFile.includes('## Follow-ups'),
+      'Handoff placeholder should not use legacy headings'
     );
   } finally {
     fs.rmSync(tempRoot, { recursive: true, force: true });

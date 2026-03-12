@@ -106,11 +106,31 @@ function parseWorkerTask(content) {
   };
 }
 
+function parseFirstSection(content, headings) {
+  for (const heading of headings) {
+    const section = parseSection(content, heading);
+    if (section) {
+      return section;
+    }
+  }
+
+  return '';
+}
+
 function parseWorkerHandoff(content) {
   return {
-    summary: parseBullets(parseSection(content, 'Summary')),
-    validation: parseBullets(parseSection(content, 'Validation')),
-    remainingRisks: parseBullets(parseSection(content, 'Remaining Risks'))
+    summary: parseBullets(parseFirstSection(content, ['Summary'])),
+    validation: parseBullets(parseFirstSection(content, [
+      'Validation',
+      'Tests / Verification',
+      'Tests',
+      'Verification'
+    ])),
+    remainingRisks: parseBullets(parseFirstSection(content, [
+      'Remaining Risks',
+      'Follow-ups',
+      'Follow Ups'
+    ]))
   };
 }
 
@@ -250,18 +270,48 @@ function buildSessionSnapshot({ sessionName, coordinationDir, panes }) {
   };
 }
 
+function readPlanConfig(absoluteTarget) {
+  let config;
+
+  try {
+    config = JSON.parse(fs.readFileSync(absoluteTarget, 'utf8'));
+  } catch (error) {
+    throw new Error(`Invalid orchestration plan JSON: ${absoluteTarget}`);
+  }
+
+  if (!config || Array.isArray(config) || typeof config !== 'object') {
+    throw new Error(`Invalid orchestration plan: expected a JSON object (${absoluteTarget})`);
+  }
+
+  return config;
+}
+
+function readPlanString(config, key, absoluteTarget) {
+  const value = config[key];
+
+  if (value === undefined) {
+    return undefined;
+  }
+
+  if (typeof value !== 'string' || value.trim().length === 0) {
+    throw new Error(`Invalid orchestration plan: ${key} must be a non-empty string (${absoluteTarget})`);
+  }
+
+  return value.trim();
+}
+
 function resolveSnapshotTarget(targetPath, cwd = process.cwd()) {
   const absoluteTarget = path.resolve(cwd, targetPath);
 
   if (fs.existsSync(absoluteTarget) && fs.statSync(absoluteTarget).isFile()) {
-    const config = JSON.parse(fs.readFileSync(absoluteTarget, 'utf8'));
-    const repoRoot = path.resolve(config.repoRoot || cwd);
+    const config = readPlanConfig(absoluteTarget);
+    const repoRoot = path.resolve(readPlanString(config, 'repoRoot', absoluteTarget) || cwd);
     const sessionName = normalizeSessionName(
-      config.sessionName || path.basename(repoRoot),
+      readPlanString(config, 'sessionName', absoluteTarget) || path.basename(repoRoot),
       'session'
     );
     const coordinationRoot = path.resolve(
-      config.coordinationRoot || path.join(repoRoot, '.orchestration')
+      readPlanString(config, 'coordinationRoot', absoluteTarget) || path.join(repoRoot, '.orchestration')
     );
 
     return {

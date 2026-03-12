@@ -51,11 +51,11 @@ Rules:
 - Report progress and final results in stdout only.
 - Do not write handoff or status files yourself; the launcher manages those artifacts.
 - If you change code or docs, keep the scope narrow and defensible.
-- In your final response, include exactly these sections:
+- In your final response, include these exact sections:
   1. Summary
-  2. Files Changed
-  3. Validation
-  4. Remaining Risks
+  2. Validation
+  3. Remaining Risks
+- You may include Files Changed if useful, but keep the three sections above exact.
 
 Task file: $task_file
 

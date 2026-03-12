@@ -90,6 +90,7 @@ Options:
   - "Framework & Language" — "Django, Spring Boot, Go, Python, Java, Frontend, Backend patterns"
   - "Database" — "PostgreSQL, ClickHouse, JPA/Hibernate patterns"
   - "Workflow & Quality" — "TDD, verification, learning, security review, compaction"
+  - "Business & Content" — "Article writing, content engine, market research, investor materials, outreach"
   - "Research & APIs" — "Deep research, Exa search, Claude API patterns"
   - "Social & Content Distribution" — "X/Twitter API, crossposting alongside content-engine"
   - "Media Generation" — "fal.ai image/video/audio alongside VideoDB"

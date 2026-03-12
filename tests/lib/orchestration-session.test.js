@@ -109,6 +109,25 @@ test('parseWorkerHandoff also supports bold section headers', () => {
   assert.deepStrictEqual(handoff.remainingRisks, ['No runtime screenshot']);
 });
 
+test('parseWorkerHandoff accepts legacy verification and follow-up headings', () => {
+  const handoff = parseWorkerHandoff([
+    '# Handoff',
+    '',
+    '## Summary',
+    '- Worker completed successfully',
+    '',
+    '## Tests / Verification',
+    '- Ran tests',
+    '',
+    '## Follow-ups',
+    '- Re-run screenshots after deploy'
+  ].join('\n'));
+
+  assert.deepStrictEqual(handoff.summary, ['Worker completed successfully']);
+  assert.deepStrictEqual(handoff.validation, ['Ran tests']);
+  assert.deepStrictEqual(handoff.remainingRisks, ['Re-run screenshots after deploy']);
+});
+
 test('loadWorkerSnapshots reads coordination worker directories', () => {
   const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'ecc-orch-session-'));
   const coordinationDir = path.join(tempRoot, 'coordination');
@@ -232,6 +251,53 @@ test('resolveSnapshotTarget normalizes plan session names and defaults to the re
     const defaultPlan = resolveSnapshotTarget(defaultPlanPath, repoRoot);
     assert.strictEqual(defaultPlan.sessionName, 'my-repo');
     assert.ok(defaultPlan.coordinationDir.endsWith(path.join('.orchestration', 'my-repo')));
+  } finally {
+    fs.rmSync(tempRoot, { recursive: true, force: true });
+  }
+});
+
+test('resolveSnapshotTarget rejects malformed plan files and invalid config fields', () => {
+  const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'ecc-orch-target-'));
+  const repoRoot = path.join(tempRoot, 'repo');
+  fs.mkdirSync(repoRoot, { recursive: true });
+
+  const invalidJsonPath = path.join(repoRoot, 'invalid-json.json');
+  const invalidSessionNamePath = path.join(repoRoot, 'invalid-session.json');
+  const invalidRepoRootPath = path.join(repoRoot, 'invalid-repo-root.json');
+  const invalidCoordinationRootPath = path.join(repoRoot, 'invalid-coordination-root.json');
+
+  fs.writeFileSync(invalidJsonPath, '{not valid json');
+  fs.writeFileSync(invalidSessionNamePath, JSON.stringify({
+    sessionName: '',
+    repoRoot
+  }));
+  fs.writeFileSync(invalidRepoRootPath, JSON.stringify({
+    sessionName: 'workflow',
+    repoRoot: ['not-a-string']
+  }));
+  fs.writeFileSync(invalidCoordinationRootPath, JSON.stringify({
+    sessionName: 'workflow',
+    repoRoot,
+    coordinationRoot: '   '
+  }));
+
+  try {
+    assert.throws(
+      () => resolveSnapshotTarget(invalidJsonPath, repoRoot),
+      /Invalid orchestration plan JSON/
+    );
+    assert.throws(
+      () => resolveSnapshotTarget(invalidSessionNamePath, repoRoot),
+      /sessionName must be a non-empty string/
+    );
+    assert.throws(
+      () => resolveSnapshotTarget(invalidRepoRootPath, repoRoot),
+      /repoRoot must be a non-empty string/
+    );
+    assert.throws(
+      () => resolveSnapshotTarget(invalidCoordinationRootPath, repoRoot),
+      /coordinationRoot must be a non-empty string/
+    );
   } finally {
     fs.rmSync(tempRoot, { recursive: true, force: true });
   }
