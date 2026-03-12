@@ -275,7 +275,7 @@ function readPlanConfig(absoluteTarget) {
 
   try {
     config = JSON.parse(fs.readFileSync(absoluteTarget, 'utf8'));
-  } catch (error) {
+  } catch (_error) {
     throw new Error(`Invalid orchestration plan JSON: ${absoluteTarget}`);
   }
 
