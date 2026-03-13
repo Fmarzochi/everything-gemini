@@ -345,7 +345,10 @@ Quarantine recommendation: Mark as test.fixme() until fixed
 
 ## 相关代理
 
-此命令调用位于 `~/.claude/agents/e2e-runner.md` 的 `e2e-runner` 代理。
+此命令调用由 ECC 提供的 `e2e-runner` 代理。
+
+对于手动安装，源文件位于：
+`agents/e2e-runner.md`
 
 ## 快速命令
 

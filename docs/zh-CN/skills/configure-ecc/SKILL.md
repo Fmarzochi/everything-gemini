@@ -86,7 +86,7 @@ Default: Core only
 
 ### 2b: 选择技能类别
 
-共有 27 项技能，分为 4 个类别。使用 `AskUserQuestion` 和 `multiSelect: true`：
+共有41项技能，分为8个类别。使用 `AskUserQuestion` 配合 `multiSelect: true`：
 
 ```
 Question: "Which skill categories do you want to install?"
@@ -94,6 +94,11 @@ Options:
   - "Framework & Language" — "Django, Spring Boot, Go, Python, Java, Frontend, Backend patterns"
   - "Database" — "PostgreSQL, ClickHouse, JPA/Hibernate patterns"
   - "Workflow & Quality" — "TDD, verification, learning, security review, compaction"
+  - "Business & Content" — "Article writing, content engine, market research, investor materials, outreach"
+  - "Research & APIs" — "Deep research, Exa search, Claude API patterns"
+  - "Social & Content Distribution" — "X/Twitter API, crossposting alongside content-engine"
+  - "Media Generation" — "fal.ai image/video/audio alongside VideoDB"
+  - "Orchestration" — "dmux multi-agent workflows"
   - "All skills" — "Install every available skill"
 ```
 
@@ -153,6 +158,34 @@ Options:
 | `market-research` | 带有来源标注的市场、竞争对手、基金和技术研究 |
 | `investor-materials` | 宣传文稿、一页简介、投资者备忘录和财务模型 |
 | `investor-outreach` | 个性化的投资者冷邮件、熟人介绍和后续跟进 |
+
+**类别：研究与API（3项技能）**
+
+| 技能 | 描述 |
+|-------|-------------|
+| `deep-research` | 使用 firecrawl 和 exa MCP 进行多源深度研究，并生成带引用的报告 |
+| `exa-search` | 通过 Exa MCP 进行网络、代码、公司和人员的神经搜索 |
+| `claude-api` | Anthropic Claude API 模式：消息、流式处理、工具使用、视觉、批处理、Agent SDK |
+
+**类别：社交与内容分发（2项技能）**
+
+| 技能 | 描述 |
+|-------|-------------|
+| `x-api` | X/Twitter API 集成，用于发帖、线程、搜索和分析 |
+| `crosspost` | 多平台内容分发，并进行平台原生适配 |
+
+**类别：媒体生成（2项技能）**
+
+| 技能 | 描述 |
+|-------|-------------|
+| `fal-ai-media` | 通过 fal.ai MCP 进行统一的AI媒体生成（图像、视频、音频） |
+| `video-editing` | AI辅助视频编辑，用于剪辑、结构化和增强实拍素材 |
+
+**类别：编排（1项技能）**
+
+| 技能 | 描述 |
+|-------|-------------|
+| `dmux-workflows` | 使用 dmux 进行多智能体编排，实现并行智能体会话 |
 
 **独立技能**
 
@@ -241,7 +274,11 @@ grep -rn "skills/" $TARGET/skills/
 * `continuous-learning-v2` 引用 `~/.claude/homunculus/` 目录
 * `python-testing` 可能引用 `python-patterns`
 * `golang-testing` 可能引用 `golang-patterns`
-* 特定语言规则引用其 `common/` 对应项
+* `crosspost` 引用 `content-engine` 和 `x-api`
+* `deep-research` 引用 `exa-search`（互补的 MCP 工具）
+* `fal-ai-media` 引用 `videodb`（互补的媒体技能）
+* `x-api` 引用 `content-engine` 和 `crosspost`
+* 语言特定规则引用 `common/` 对应项
 
 ### 4d：报告问题
 

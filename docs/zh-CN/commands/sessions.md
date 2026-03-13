@@ -12,6 +12,8 @@
 
 显示所有会话及其元数据，支持筛选和分页。
 
+当您需要群组的操作员表层上下文时，使用 `/sessions info`：分支、工作树路径和会话最近性。
+
 ```bash
 /sessions                              # List all sessions (default)
 /sessions list                         # Same as above
@@ -26,6 +28,7 @@
 node -e "
 const sm = require((process.env.CLAUDE_PLUGIN_ROOT||require('path').join(require('os').homedir(),'.claude'))+'/scripts/lib/session-manager');
 const aa = require((process.env.CLAUDE_PLUGIN_ROOT||require('path').join(require('os').homedir(),'.claude'))+'/scripts/lib/session-aliases');
+const path = require('path');
 
 const result = sm.getAllSessions({ limit: 20 });
 const aliases = aa.listAliases();
@@ -34,17 +37,18 @@ for (const a of aliases) aliasMap[a.sessionPath] = a.name;
 
 console.log('Sessions (showing ' + result.sessions.length + ' of ' + result.total + '):');
 console.log('');
-console.log('ID        Date        Time     Size     Lines  Alias');
-console.log('────────────────────────────────────────────────────');
+console.log('ID        Date        Time     Branch       Worktree           Alias');
+console.log('────────────────────────────────────────────────────────────────────');
 
 for (const s of result.sessions) {
   const alias = aliasMap[s.filename] || '';
-  const size = sm.getSessionSize(s.sessionPath);
-  const stats = sm.getSessionStats(s.sessionPath);
+  const metadata = sm.parseSessionMetadata(sm.getSessionContent(s.sessionPath));
   const id = s.shortId === 'no-id' ? '(none)' : s.shortId.slice(0, 8);
   const time = s.modifiedTime.toTimeString().slice(0, 5);
+  const branch = (metadata.branch || '-').slice(0, 12);
+  const worktree = metadata.worktree ? path.basename(metadata.worktree).slice(0, 18) : '-';
 
-  console.log(id.padEnd(8) + ' ' + s.date + '  ' + time + '   ' + size.padEnd(7) + '  ' + String(stats.lineCount).padEnd(5) + '  ' + alias);
+  console.log(id.padEnd(8) + ' ' + s.date + '  ' + time + '   ' + branch.padEnd(12) + ' ' + worktree.padEnd(18) + ' ' + alias);
 }
 "
 ```
@@ -109,6 +113,18 @@ if (session.metadata.started) {
 
 if (session.metadata.lastUpdated) {
   console.log('Last Updated: ' + session.metadata.lastUpdated);
+}
+
+if (session.metadata.project) {
+  console.log('Project: ' + session.metadata.project);
+}
+
+if (session.metadata.branch) {
+  console.log('Branch: ' + session.metadata.branch);
+}
+
+if (session.metadata.worktree) {
+  console.log('Worktree: ' + session.metadata.worktree);
 }
 " "$ARGUMENTS"
 ```
@@ -220,6 +236,9 @@ console.log('ID:          ' + (session.shortId === 'no-id' ? '(none)' : session.
 console.log('Filename:    ' + session.filename);
 console.log('Date:        ' + session.date);
 console.log('Modified:    ' + session.modifiedTime.toISOString().slice(0, 19).replace('T', ' '));
+console.log('Project:     ' + (session.metadata.project || '-'));
+console.log('Branch:      ' + (session.metadata.branch || '-'));
+console.log('Worktree:    ' + (session.metadata.worktree || '-'));
 console.log('');
 console.log('Content:');
 console.log('  Lines:         ' + stats.lineCount);
@@ -240,6 +259,11 @@ if (aliases.length > 0) {
 ```bash
 /sessions aliases                      # List all aliases
 ```
+
+## 操作员笔记
+
+* 会话文件在头部持久化 `Project`、`Branch` 和 `Worktree`，以便 `/sessions info` 可以区分并行 tmux/工作树运行。
+* 对于指挥中心式监控，请结合使用 `/sessions info`、`git diff --stat` 以及由 `scripts/hooks/cost-tracker.js` 发出的成本指标。
 
 **脚本：**
 

@@ -72,8 +72,25 @@ Scanning:
 
 ### 第 2 阶段 — 质量评估
 
-启动一个 Task 工具子代理（**Explore 代理，模型：opus**），提供完整的清单和检查清单。
-子代理读取每个技能，应用检查清单，并返回每个技能的 JSON：
+启动一个 **通用代理** 工具子代理，并使用完整的清单和检查项：
+
+```text
+Agent(
+  subagent_type="general-purpose",
+  prompt="
+Evaluate the following skill inventory against the checklist.
+
+[INVENTORY]
+
+[CHECKLIST]
+
+Return JSON for each skill:
+{ \"verdict\": \"Keep\"|\"Improve\"|\"Update\"|\"Retire\"|\"Merge into [X]\", \"reason\": \"...\" }
+"
+)
+```
+
+子代理读取每项技能，应用检查项，并返回每项技能的 JSON 结果：
 
 `{ "verdict": "Keep"|"Improve"|"Update"|"Retire"|"Merge into [X]", "reason": "..." }`
 

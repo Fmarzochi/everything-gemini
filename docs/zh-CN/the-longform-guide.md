@@ -130,7 +130,7 @@ alias claude-research='claude --system-prompt "$(cat ~/.claude/contexts/research
 **定价参考：**
 
 ![Claude Model Pricing](../../assets/images/longform/05-pricing-table.png)
-*来源：<https://platform.claude.com/docs/en/about-claude/pricing>*
+*来源: <https://platform.claude.com/docs/en/about-claude/pricing>*
 
 **工具特定优化：**
 

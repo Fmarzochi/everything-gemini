@@ -210,6 +210,6 @@ Result: throttle.ts, middleware/index.ts, router-setup.ts
 
 ## 相关
 
-* [长篇指南](https://x.com/affaanmustafa/status/2014040193557471352) - 子智能体编排部分
-* `continuous-learning` 技能 - 用于随时间改进的模式
-* 在 `~/.claude/agents/` 中的智能体定义
+* [长篇指南](https://x.com/affaanmustafa/status/2014040193557471352) - 子代理编排章节
+* `continuous-learning` 技能 - 适用于随时间改进的模式
+* 与 ECC 捆绑的代理定义（手动安装路径：`agents/`）

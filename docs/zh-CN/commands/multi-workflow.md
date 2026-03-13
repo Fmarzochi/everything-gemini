@@ -104,6 +104,14 @@ TaskOutput({ task_id: "<task_id>", block: true, timeout: 600000 })
 4. 当评分 < 7 或用户不批准时强制停止。
 5. 需要时（例如确认/选择/批准）使用 `AskUserQuestion` 工具进行用户交互。
 
+## 何时使用外部编排
+
+当工作必须拆分给需要隔离的 git 状态、独立终端或独立构建/测试执行的并行工作器时，请使用外部 tmux/工作树编排。对于轻量级分析、规划或审查（其中主会话是唯一的写入者），请使用进程内子代理。
+
+```bash
+node scripts/orchestrate-worktrees.js .claude/plan/workflow-e2e-test.json --execute
+```
+
 ***
 
 ## 执行工作流程

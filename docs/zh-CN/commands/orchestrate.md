@@ -158,6 +158,61 @@ RECOMMENDATION
 
 ```
 
+对于使用独立 git worktree 的外部 tmux-pane 工作器，请使用 `node scripts/orchestrate-worktrees.js plan.json --execute`。内置的编排模式保持进程内运行；此辅助工具适用于长时间运行或跨测试框架的会话。
+
+当工作器需要查看主检出目录中的脏文件或未跟踪的本地文件时，请在计划文件中添加 `seedPaths`。ECC 仅在 `git worktree add` 之后，将那些选定的路径覆盖到每个工作器的工作树中，这既能保持分支隔离，又能暴露正在处理的本地脚本、计划或文档。
+
+```json
+{
+  "sessionName": "workflow-e2e",
+  "seedPaths": [
+    "scripts/orchestrate-worktrees.js",
+    "scripts/lib/tmux-worktree-orchestrator.js",
+    ".claude/plan/workflow-e2e-test.json"
+  ],
+  "workers": [
+    { "name": "docs", "task": "Update orchestration docs." }
+  ]
+}
+```
+
+要导出实时 tmux/worktree 会话的控制平面快照，请运行：
+
+```bash
+node scripts/orchestration-status.js .claude/plan/workflow-visual-proof.json
+```
+
+快照包含会话活动、tmux 窗格元数据、工作器状态、目标、已播种的覆盖层以及最近的交接摘要，均以 JSON 格式保存。
+
+## 操作员指挥中心交接
+
+当工作流跨越多个会话、工作树或 tmux 窗格时，请在最终交接内容中附加一个控制平面块：
+
+```markdown
+控制平面
+-------------
+会话：
+- 活动会话 ID 或别名
+- 每个活动工作线程的分支 + 工作树路径
+- 适用时的 tmux 窗格或分离会话名称
+
+差异：
+- git 状态摘要
+- 已修改文件的 git diff --stat
+- 合并/冲突风险说明
+
+审批：
+- 待处理的用户审批
+- 等待确认的受阻步骤
+
+遥测：
+- 最后活动时间戳或空闲信号
+- 预估的令牌或成本漂移
+- 由钩子或审查器引发的策略事件
+```
+
+这使得规划者、实施者、审查者和循环工作器在操作员界面上保持清晰可辨。
+
 ## 参数
 
 $ARGUMENTS:
