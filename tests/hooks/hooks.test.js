@@ -193,6 +193,7 @@ async function runTests() {
 
   let passed = 0;
   let failed = 0;
+  let skipped = 0;
 
   const scriptsDir = path.join(__dirname, '..', '..', 'scripts', 'hooks');
 
@@ -2230,7 +2231,11 @@ async function runTests() {
     passed++;
   else failed++;
 
-  if (
+  if (process.platform === 'win32') {
+    console.log('  - detect-project writes project metadata to the registry and project directory');
+    console.log('    (skipped — bash script paths are not Windows-compatible)');
+    skipped++;
+  } else if (
     await asyncTest('detect-project writes project metadata to the registry and project directory', async () => {
       const testRoot = createTestDir();
       const homeDir = path.join(testRoot, 'home');
@@ -4364,12 +4369,12 @@ async function runTests() {
   // ── Round 74: session-start.js main().catch handler ──
   console.log('\nRound 74: session-start.js (main catch — unrecoverable error):');
 
-  if (
+  if (process.platform === 'win32') {
+    console.log('  - session-start exits 0 with error message when HOME is non-directory');
+    console.log('    (skipped — /dev/null not available on Windows)');
+    skipped++;
+  } else if (
     await asyncTest('session-start exits 0 with error message when HOME is non-directory', async () => {
-      if (process.platform === 'win32') {
-        console.log('    (skipped — /dev/null not available on Windows)');
-        return;
-      }
       // HOME=/dev/null makes ensureDir(sessionsDir) throw ENOTDIR,
       // which propagates to main().catch — the top-level error boundary
       const result = await runScript(path.join(scriptsDir, 'session-start.js'), '', {
@@ -4386,12 +4391,12 @@ async function runTests() {
   // ── Round 75: pre-compact.js main().catch handler ──
   console.log('\nRound 75: pre-compact.js (main catch — unrecoverable error):');
 
-  if (
+  if (process.platform === 'win32') {
+    console.log('  - pre-compact exits 0 with error message when HOME is non-directory');
+    console.log('    (skipped — /dev/null not available on Windows)');
+    skipped++;
+  } else if (
     await asyncTest('pre-compact exits 0 with error message when HOME is non-directory', async () => {
-      if (process.platform === 'win32') {
-        console.log('    (skipped — /dev/null not available on Windows)');
-        return;
-      }
       // HOME=/dev/null makes ensureDir(sessionsDir) throw ENOTDIR,
       // which propagates to main().catch — the top-level error boundary
       const result = await runScript(path.join(scriptsDir, 'pre-compact.js'), '', {
@@ -4408,12 +4413,12 @@ async function runTests() {
   // ── Round 75: session-end.js main().catch handler ──
   console.log('\nRound 75: session-end.js (main catch — unrecoverable error):');
 
-  if (
+  if (process.platform === 'win32') {
+    console.log('  - session-end exits 0 with error message when HOME is non-directory');
+    console.log('    (skipped — /dev/null not available on Windows)');
+    skipped++;
+  } else if (
     await asyncTest('session-end exits 0 with error message when HOME is non-directory', async () => {
-      if (process.platform === 'win32') {
-        console.log('    (skipped — /dev/null not available on Windows)');
-        return;
-      }
       // HOME=/dev/null makes ensureDir(sessionsDir) throw ENOTDIR inside main(),
       // which propagates to runMain().catch — the top-level error boundary
       const result = await runScript(path.join(scriptsDir, 'session-end.js'), '{}', {
@@ -4430,12 +4435,12 @@ async function runTests() {
   // ── Round 76: evaluate-session.js main().catch handler ──
   console.log('\nRound 76: evaluate-session.js (main catch — unrecoverable error):');
 
-  if (
+  if (process.platform === 'win32') {
+    console.log('  - evaluate-session exits 0 with error message when HOME is non-directory');
+    console.log('    (skipped — /dev/null not available on Windows)');
+    skipped++;
+  } else if (
     await asyncTest('evaluate-session exits 0 with error message when HOME is non-directory', async () => {
-      if (process.platform === 'win32') {
-        console.log('    (skipped — /dev/null not available on Windows)');
-        return;
-      }
       // HOME=/dev/null makes ensureDir(learnedSkillsPath) throw ENOTDIR,
       // which propagates to main().catch — the top-level error boundary
       const result = await runScript(path.join(scriptsDir, 'evaluate-session.js'), '{}', {
@@ -4452,12 +4457,12 @@ async function runTests() {
   // ── Round 76: suggest-compact.js main().catch handler ──
   console.log('\nRound 76: suggest-compact.js (main catch — double-failure):');
 
-  if (
+  if (process.platform === 'win32') {
+    console.log('  - suggest-compact exits 0 with error when TMPDIR is non-directory');
+    console.log('    (skipped — /dev/null not available on Windows)');
+    skipped++;
+  } else if (
     await asyncTest('suggest-compact exits 0 with error when TMPDIR is non-directory', async () => {
-      if (process.platform === 'win32') {
-        console.log('    (skipped — /dev/null not available on Windows)');
-        return;
-      }
       // TMPDIR=/dev/null causes openSync to fail (ENOTDIR), then the catch
       // fallback writeFile also fails, propagating to main().catch
       const result = await runScript(path.join(scriptsDir, 'suggest-compact.js'), '', {
@@ -4939,7 +4944,8 @@ Some random content without the expected ### Context to Load section
   console.log('\n=== Test Results ===');
   console.log(`Passed: ${passed}`);
   console.log(`Failed: ${failed}`);
-  console.log(`Total:  ${passed + failed}\n`);
+  console.log(`Skipped: ${skipped}`);
+  console.log(`Total:  ${passed + failed + skipped}\n`);
 
   process.exit(failed > 0 ? 1 : 0);
 }
