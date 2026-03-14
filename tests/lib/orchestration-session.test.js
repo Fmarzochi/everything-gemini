@@ -7,6 +7,7 @@ const path = require('path');
 
 const {
   buildSessionSnapshot,
+  listTmuxPanes,
   loadWorkerSnapshots,
   parseWorkerHandoff,
   parseWorkerStatus,
@@ -184,6 +185,16 @@ test('buildSessionSnapshot merges tmux panes with worker metadata', () => {
   } finally {
     fs.rmSync(tempRoot, { recursive: true, force: true });
   }
+});
+
+test('listTmuxPanes returns an empty array when tmux is unavailable', () => {
+  const panes = listTmuxPanes('workflow-visual-proof', {
+    spawnSyncImpl: () => ({
+      error: Object.assign(new Error('tmux not found'), { code: 'ENOENT' })
+    })
+  });
+
+  assert.deepStrictEqual(panes, []);
 });
 
 test('resolveSnapshotTarget handles plan files and direct session names', () => {

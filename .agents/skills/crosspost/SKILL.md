@@ -148,6 +148,7 @@ A pattern I've been using that's made a real difference:
 If using a crossposting service (e.g., Postbridge, Buffer, or a custom API), the pattern looks like:
 
 ```python
+import os
 import requests
 
 resp = requests.post(

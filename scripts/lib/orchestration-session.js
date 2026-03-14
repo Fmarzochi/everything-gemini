@@ -154,7 +154,8 @@ function loadWorkerSnapshots(coordinationDir) {
   });
 }
 
-function listTmuxPanes(sessionName) {
+function listTmuxPanes(sessionName, options = {}) {
+  const { spawnSyncImpl = spawnSync } = options;
   const format = [
     '#{pane_id}',
     '#{window_index}',
@@ -167,12 +168,15 @@ function listTmuxPanes(sessionName) {
     '#{pane_pid}'
   ].join('\t');
 
-  const result = spawnSync('tmux', ['list-panes', '-t', sessionName, '-F', format], {
+  const result = spawnSyncImpl('tmux', ['list-panes', '-t', sessionName, '-F', format], {
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'pipe']
   });
 
   if (result.error) {
+    if (result.error.code === 'ENOENT') {
+      return [];
+    }
     throw result.error;
   }
 

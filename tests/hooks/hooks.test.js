@@ -88,9 +88,7 @@ function runShellScript(scriptPath, args = [], input = '', env = {}, cwd = proce
 
 // Create a temporary test directory
 function createTestDir() {
-  const testDir = path.join(os.tmpdir(), `hooks-test-${Date.now()}`);
-  fs.mkdirSync(testDir, { recursive: true });
-  return testDir;
+  return fs.mkdtempSync(path.join(os.tmpdir(), 'hooks-test-'));
 }
 
 // Clean up test directory
@@ -2159,6 +2157,8 @@ async function runTests() {
       assert.ok(observerLoopSource.includes('ECC_OBSERVER_MAX_TURNS'), 'observer-loop should allow max-turn overrides');
       assert.ok(observerLoopSource.includes('max_turns="${ECC_OBSERVER_MAX_TURNS:-10}"'), 'observer-loop should default to 10 turns');
       assert.ok(!observerLoopSource.includes('--max-turns 3'), 'observer-loop should not hardcode a 3-turn limit');
+      assert.ok(observerLoopSource.includes('ECC_SKIP_OBSERVE=1'), 'observer-loop should suppress observe.sh for automated sessions');
+      assert.ok(observerLoopSource.includes('ECC_HOOK_PROFILE=minimal'), 'observer-loop should run automated analysis with the minimal hook profile');
     })
   )
     passed++;
@@ -2289,6 +2289,77 @@ async function runTests() {
     } finally {
       cleanupTestDir(homeDir);
       cleanupTestDir(projectDir);
+    }
+  })) passed++; else failed++;
+
+  if (await asyncTest('observe.sh skips automated sessions before project detection side effects', async () => {
+    const observePath = path.join(__dirname, '..', '..', 'skills', 'continuous-learning-v2', 'hooks', 'observe.sh');
+    const cases = [
+      {
+        name: 'non-cli entrypoint',
+        env: { CLAUDE_CODE_ENTRYPOINT: 'mcp' }
+      },
+      {
+        name: 'minimal hook profile',
+        env: { CLAUDE_CODE_ENTRYPOINT: 'cli', ECC_HOOK_PROFILE: 'minimal' }
+      },
+      {
+        name: 'cooperative skip env',
+        env: { CLAUDE_CODE_ENTRYPOINT: 'cli', ECC_SKIP_OBSERVE: '1' }
+      },
+      {
+        name: 'subagent payload',
+        env: { CLAUDE_CODE_ENTRYPOINT: 'cli' },
+        payload: { agent_id: 'agent-123' }
+      },
+      {
+        name: 'cwd skip path',
+        env: {
+          CLAUDE_CODE_ENTRYPOINT: 'cli',
+          ECC_OBSERVE_SKIP_PATHS: ' observer-sessions , .claude-mem '
+        },
+        cwdSuffix: path.join('observer-sessions', 'worker')
+      }
+    ];
+
+    for (const testCase of cases) {
+      const homeDir = createTestDir();
+      const projectDir = createTestDir();
+
+      try {
+        const cwd = testCase.cwdSuffix ? path.join(projectDir, testCase.cwdSuffix) : projectDir;
+        fs.mkdirSync(cwd, { recursive: true });
+
+        const payload = JSON.stringify({
+          tool_name: 'Bash',
+          tool_input: { command: 'echo hello' },
+          tool_response: 'ok',
+          session_id: `session-${testCase.name.replace(/[^a-z0-9]+/gi, '-')}`,
+          cwd,
+          ...(testCase.payload || {})
+        });
+
+        const result = await runShellScript(observePath, ['post'], payload, {
+          HOME: homeDir,
+          ...testCase.env
+        }, projectDir);
+
+        assert.strictEqual(result.code, 0, `${testCase.name} should exit successfully, stderr: ${result.stderr}`);
+
+        const homunculusDir = path.join(homeDir, '.claude', 'homunculus');
+        const registryPath = path.join(homunculusDir, 'projects.json');
+        const projectsDir = path.join(homunculusDir, 'projects');
+
+        assert.ok(!fs.existsSync(registryPath), `${testCase.name} should not create projects.json`);
+
+        const projectEntries = fs.existsSync(projectsDir)
+          ? fs.readdirSync(projectsDir).filter(entry => fs.statSync(path.join(projectsDir, entry)).isDirectory())
+          : [];
+        assert.strictEqual(projectEntries.length, 0, `${testCase.name} should not create project directories`);
+      } finally {
+        cleanupTestDir(homeDir);
+        cleanupTestDir(projectDir);
+      }
     }
   })) passed++; else failed++;
 
@@ -4528,8 +4599,11 @@ async function runTests() {
         const content = fs.readFileSync(path.join(sessionsDir, files[0]), 'utf8');
         // The real string message should appear
         assert.ok(content.includes('Real user message'), 'Should include the string content user message');
-        // Numeric/boolean/object content should NOT appear as text
-        assert.ok(!content.includes('42'), 'Numeric content should be skipped (else branch → empty string → filtered)');
+        // Numeric/boolean/object content should NOT appear as task bullets.
+        // The full file may legitimately contain "42" in timestamps like 03:42.
+        assert.ok(!content.includes('\n- 42\n'), 'Numeric content should not be rendered as a task bullet');
+        assert.ok(!content.includes('\n- true\n'), 'Boolean content should not be rendered as a task bullet');
+        assert.ok(!content.includes('\n- [object Object]\n'), 'Object content should not be stringified into a task bullet');
       } finally {
         fs.rmSync(isoHome, { recursive: true, force: true });
       }

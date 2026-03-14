@@ -4,7 +4,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const { collectSessionSnapshot } = require('./lib/orchestration-session');
+const { inspectSessionTarget } = require('./lib/session-adapters/registry');
 
 function usage() {
   console.log([
@@ -35,7 +35,10 @@ function main() {
     process.exit(1);
   }
 
-  const snapshot = collectSessionSnapshot(target, process.cwd());
+  const snapshot = inspectSessionTarget(target, {
+    cwd: process.cwd(),
+    adapterId: 'dmux-tmux'
+  });
   const json = JSON.stringify(snapshot, null, 2);
 
   if (writePath) {
