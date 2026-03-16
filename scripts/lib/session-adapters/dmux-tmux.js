@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 
 const { collectSessionSnapshot } = require('../orchestration-session');
-const { normalizeDmuxSnapshot } = require('./canonical-session');
+const { normalizeDmuxSnapshot, persistCanonicalSnapshot } = require('./canonical-session');
 
 function isPlanFileTarget(target, cwd) {
   if (typeof target !== 'string' || target.length === 0) {
@@ -42,6 +42,7 @@ function buildSourceTarget(target, cwd) {
 
 function createDmuxTmuxAdapter(options = {}) {
   const collectSessionSnapshotImpl = options.collectSessionSnapshotImpl || collectSessionSnapshot;
+  const persistCanonicalSnapshotImpl = options.persistCanonicalSnapshotImpl || persistCanonicalSnapshot;
 
   return {
     id: 'dmux-tmux',
@@ -66,7 +67,16 @@ function createDmuxTmuxAdapter(options = {}) {
         adapterId: 'dmux-tmux',
         getSnapshot() {
           const snapshot = collectSessionSnapshotImpl(target, cwd);
-          return normalizeDmuxSnapshot(snapshot, buildSourceTarget(target, cwd));
+          const canonicalSnapshot = normalizeDmuxSnapshot(snapshot, buildSourceTarget(target, cwd));
+
+          persistCanonicalSnapshotImpl(canonicalSnapshot, {
+            loadStateStoreImpl: options.loadStateStoreImpl,
+            persist: context.persistSnapshots !== false && options.persistSnapshots !== false,
+            recordingDir: context.recordingDir || options.recordingDir,
+            stateStore: options.stateStore
+          });
+
+          return canonicalSnapshot;
         }
       };
     }

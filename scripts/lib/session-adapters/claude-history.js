@@ -5,7 +5,7 @@ const path = require('path');
 
 const sessionManager = require('../session-manager');
 const sessionAliases = require('../session-aliases');
-const { normalizeClaudeHistorySession } = require('./canonical-session');
+const { normalizeClaudeHistorySession, persistCanonicalSnapshot } = require('./canonical-session');
 
 function parseClaudeTarget(target) {
   if (typeof target !== 'string') {
@@ -111,7 +111,9 @@ function resolveSessionRecord(target, cwd) {
   throw new Error(`Unsupported Claude session target: ${target}`);
 }
 
-function createClaudeHistoryAdapter() {
+function createClaudeHistoryAdapter(options = {}) {
+  const persistCanonicalSnapshotImpl = options.persistCanonicalSnapshotImpl || persistCanonicalSnapshot;
+
   return {
     id: 'claude-history',
     description: 'Claude local session history and session-file snapshots',
@@ -135,7 +137,16 @@ function createClaudeHistoryAdapter() {
         adapterId: 'claude-history',
         getSnapshot() {
           const { session, sourceTarget } = resolveSessionRecord(target, cwd);
-          return normalizeClaudeHistorySession(session, sourceTarget);
+          const canonicalSnapshot = normalizeClaudeHistorySession(session, sourceTarget);
+
+          persistCanonicalSnapshotImpl(canonicalSnapshot, {
+            loadStateStoreImpl: options.loadStateStoreImpl,
+            persist: context.persistSnapshots !== false && options.persistSnapshots !== false,
+            recordingDir: context.recordingDir || options.recordingDir,
+            stateStore: options.stateStore
+          });
+
+          return canonicalSnapshot;
         }
       };
     }
