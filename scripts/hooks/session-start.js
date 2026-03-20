@@ -15,6 +15,7 @@ const {
   findFiles,
   ensureDir,
   readFile,
+  stripAnsi,
   log,
   output
 } = require('../lib/utils');
@@ -42,7 +43,8 @@ async function main() {
     const content = readFile(latest.path);
     if (content && !content.includes('[Session context goes here]')) {
       // Only inject if the session has actual content (not the blank template)
-      output(`Previous session summary:\n${content}`);
+      // Strip ANSI escape codes that may have leaked from terminal output (#642)
+      output(`Previous session summary:\n${stripAnsi(content)}`);
     }
   }
 
