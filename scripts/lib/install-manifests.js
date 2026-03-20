@@ -10,6 +10,8 @@ const COMPONENT_FAMILY_PREFIXES = {
   language: 'lang:',
   framework: 'framework:',
   capability: 'capability:',
+  agent: 'agent:',
+  skill: 'skill:',
 };
 const LEGACY_COMPAT_BASE_MODULE_IDS_BY_TARGET = Object.freeze({
   claude: [
