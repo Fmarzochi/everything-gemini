@@ -8,7 +8,7 @@ const assert = require('assert');
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
-const { spawn, spawnSync } = require('child_process');
+const { execFileSync, spawn, spawnSync } = require('child_process');
 
 function toBashPath(filePath) {
   if (process.platform !== 'win32') {
@@ -25,12 +25,34 @@ function fromBashPath(filePath) {
     return filePath;
   }
 
-  const match = String(filePath).match(/^\/([A-Za-z])\/(.*)$/);
-  if (!match) {
-    return filePath;
+  const rawPath = String(filePath || '');
+  if (!rawPath) {
+    return rawPath;
   }
 
-  return `${match[1].toUpperCase()}:\\${match[2].replace(/\//g, '\\')}`;
+  try {
+    return execFileSync(
+      'bash',
+      ['-lc', 'cygpath -w -- "$1"', 'bash', rawPath],
+      { stdio: ['ignore', 'pipe', 'ignore'] }
+    )
+      .toString()
+      .trim();
+  } catch {
+    // Fall back to common Git Bash path shapes when cygpath is unavailable.
+  }
+
+  const match = rawPath.match(/^\/(?:cygdrive\/)?([A-Za-z])\/(.*)$/)
+    || rawPath.match(/^\/\/([A-Za-z])\/(.*)$/);
+  if (match) {
+    return `${match[1].toUpperCase()}:\\${match[2].replace(/\//g, '\\')}`;
+  }
+
+  if (/^[A-Za-z]:\//.test(rawPath)) {
+    return rawPath.replace(/\//g, '\\');
+  }
+
+  return rawPath;
 }
 
 function sleepMs(ms) {
