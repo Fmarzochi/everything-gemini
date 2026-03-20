@@ -16,7 +16,7 @@ function toBashPath(filePath) {
   }
 
   return String(filePath)
-    .replace(/^([A-Za-z]):/, (_, driveLetter) => `/mnt/${driveLetter.toLowerCase()}`)
+    .replace(/^([A-Za-z]):/, (_, driveLetter) => `/${driveLetter.toLowerCase()}`)
     .replace(/\\/g, '/');
 }
 
