@@ -1,11 +1,13 @@
 /**
- * Tests for agent description compression and lazy loading.
+ * Tests for scripts/lib/agent-compress.js
+ *
+ * Run with: node tests/lib/agent-compress.test.js
  */
 
 const assert = require('assert');
+const path = require('path');
 const fs = require('fs');
 const os = require('os');
-const path = require('path');
 
 const {
   parseFrontmatter,
@@ -18,273 +20,249 @@ const {
   lazyLoadAgent,
 } = require('../../scripts/lib/agent-compress');
 
-function createTempDir(prefix) {
-  return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
-}
-
-function cleanupTempDir(dirPath) {
-  fs.rmSync(dirPath, { recursive: true, force: true });
-}
-
-function writeAgent(dir, name, content) {
-  fs.writeFileSync(path.join(dir, `${name}.md`), content, 'utf8');
-}
-
-const SAMPLE_AGENT = `---
-name: test-agent
-description: A test agent for unit testing purposes.
-tools: ["Read", "Grep", "Glob"]
-model: sonnet
----
-
-You are a test agent that validates compression logic.
-
-## Your Role
-
-- Run unit tests
-- Validate compression output
-- Ensure correctness
-
-## Process
-
-### 1. Setup
-- Prepare test fixtures
-- Load agent files
-
-### 2. Validate
-Check the output format and content.
-`;
-
-const MINIMAL_AGENT = `---
-name: minimal
-description: Minimal agent.
-tools: ["Read"]
-model: haiku
----
-
-Short body.
-`;
-
-async function test(name, fn) {
+function test(name, fn) {
   try {
-    await fn();
+    fn();
     console.log(`  \u2713 ${name}`);
     return true;
-  } catch (error) {
+  } catch (err) {
     console.log(`  \u2717 ${name}`);
-    console.log(`    Error: ${error.message}`);
+    console.log(`    Error: ${err.message}`);
     return false;
   }
 }
 
-async function runTests() {
+function runTests() {
   console.log('\n=== Testing agent-compress ===\n');
 
   let passed = 0;
   let failed = 0;
 
-  if (await test('parseFrontmatter extracts YAML frontmatter and body', async () => {
-    const { frontmatter, body } = parseFrontmatter(SAMPLE_AGENT);
+  // --- parseFrontmatter ---
+
+  if (test('parseFrontmatter extracts YAML frontmatter and body', () => {
+    const content = '---\nname: test-agent\ndescription: A test\ntools: ["Read", "Grep"]\nmodel: sonnet\n---\n\nBody text here.';
+    const { frontmatter, body } = parseFrontmatter(content);
     assert.strictEqual(frontmatter.name, 'test-agent');
-    assert.strictEqual(frontmatter.description, 'A test agent for unit testing purposes.');
-    assert.deepStrictEqual(frontmatter.tools, ['Read', 'Grep', 'Glob']);
+    assert.strictEqual(frontmatter.description, 'A test');
+    assert.deepStrictEqual(frontmatter.tools, ['Read', 'Grep']);
     assert.strictEqual(frontmatter.model, 'sonnet');
-    assert.ok(body.includes('You are a test agent'));
-  })) passed += 1; else failed += 1;
+    assert.ok(body.includes('Body text here.'));
+  })) passed++; else failed++;
 
-  if (await test('parseFrontmatter handles content without frontmatter', async () => {
-    const { frontmatter, body } = parseFrontmatter('Just a plain document.');
+  if (test('parseFrontmatter handles content without frontmatter', () => {
+    const content = 'Just a regular markdown file.';
+    const { frontmatter, body } = parseFrontmatter(content);
     assert.deepStrictEqual(frontmatter, {});
-    assert.strictEqual(body, 'Just a plain document.');
-  })) passed += 1; else failed += 1;
+    assert.strictEqual(body, content);
+  })) passed++; else failed++;
 
-  if (await test('extractSummary returns the first paragraph of the body', async () => {
-    const { body } = parseFrontmatter(SAMPLE_AGENT);
+  if (test('parseFrontmatter handles colons in values', () => {
+    const content = '---\nname: test\ndescription: Use this: it works\n---\n\nBody.';
+    const { frontmatter } = parseFrontmatter(content);
+    assert.strictEqual(frontmatter.description, 'Use this: it works');
+  })) passed++; else failed++;
+
+  if (test('parseFrontmatter strips surrounding quotes', () => {
+    const content = '---\nname: "quoted-name"\n---\n\nBody.';
+    const { frontmatter } = parseFrontmatter(content);
+    assert.strictEqual(frontmatter.name, 'quoted-name');
+  })) passed++; else failed++;
+
+  if (test('parseFrontmatter handles content ending right after closing ---', () => {
+    const content = '---\nname: test\ndescription: No body\n---';
+    const { frontmatter, body } = parseFrontmatter(content);
+    assert.strictEqual(frontmatter.name, 'test');
+    assert.strictEqual(frontmatter.description, 'No body');
+    assert.strictEqual(body, '');
+  })) passed++; else failed++;
+
+  // --- extractSummary ---
+
+  if (test('extractSummary returns the first paragraph of the body', () => {
+    const body = '# Heading\n\nThis is the first paragraph. It has two sentences.\n\nSecond paragraph.';
     const summary = extractSummary(body);
-    assert.ok(summary.includes('test agent'));
-    assert.ok(summary.includes('compression logic'));
-  })) passed += 1; else failed += 1;
+    assert.strictEqual(summary, 'This is the first paragraph.');
+  })) passed++; else failed++;
 
-  if (await test('extractSummary returns empty string for empty body', async () => {
+  if (test('extractSummary returns empty string for empty body', () => {
     assert.strictEqual(extractSummary(''), '');
-    assert.strictEqual(extractSummary('# Just a heading'), '');
-  })) passed += 1; else failed += 1;
+    assert.strictEqual(extractSummary('# Only Headings\n\n## Another'), '');
+  })) passed++; else failed++;
 
-  if (await test('loadAgent reads and parses a single agent file', async () => {
-    const tmpDir = createTempDir('ecc-agent-compress-');
-    try {
-      writeAgent(tmpDir, 'test-agent', SAMPLE_AGENT);
-      const agent = loadAgent(path.join(tmpDir, 'test-agent.md'));
-      assert.strictEqual(agent.name, 'test-agent');
-      assert.strictEqual(agent.fileName, 'test-agent');
-      assert.deepStrictEqual(agent.tools, ['Read', 'Grep', 'Glob']);
-      assert.strictEqual(agent.model, 'sonnet');
-      assert.ok(agent.byteSize > 0);
-      assert.ok(agent.body.includes('You are a test agent'));
-    } finally {
-      cleanupTempDir(tmpDir);
-    }
-  })) passed += 1; else failed += 1;
+  if (test('extractSummary skips code blocks', () => {
+    const body = '```\ncode here\n```\n\nActual summary sentence.';
+    const summary = extractSummary(body);
+    assert.strictEqual(summary, 'Actual summary sentence.');
+  })) passed++; else failed++;
 
-  if (await test('loadAgents reads all .md files from a directory', async () => {
-    const tmpDir = createTempDir('ecc-agent-compress-');
-    try {
-      writeAgent(tmpDir, 'agent-a', SAMPLE_AGENT);
-      writeAgent(tmpDir, 'agent-b', MINIMAL_AGENT);
-      const agents = loadAgents(tmpDir);
-      assert.strictEqual(agents.length, 2);
-      assert.strictEqual(agents[0].fileName, 'agent-a');
-      assert.strictEqual(agents[1].fileName, 'agent-b');
-    } finally {
-      cleanupTempDir(tmpDir);
-    }
-  })) passed += 1; else failed += 1;
+  if (test('extractSummary respects maxSentences', () => {
+    const body = 'First sentence. Second sentence. Third sentence.';
+    const one = extractSummary(body, 1);
+    const two = extractSummary(body, 2);
+    assert.strictEqual(one, 'First sentence.');
+    assert.strictEqual(two, 'First sentence. Second sentence.');
+  })) passed++; else failed++;
 
-  if (await test('loadAgents returns empty array for non-existent directory', async () => {
-    const agents = loadAgents('/tmp/nonexistent-ecc-dir-12345');
+  if (test('extractSummary skips plain bullet items', () => {
+    const body = '- plain bullet\n- another bullet\n\nActual paragraph here.';
+    const summary = extractSummary(body);
+    assert.strictEqual(summary, 'Actual paragraph here.');
+  })) passed++; else failed++;
+
+  if (test('extractSummary skips asterisk bullets and numbered lists', () => {
+    const body = '* star bullet\n1. numbered item\n2. second item\n\nReal paragraph.';
+    const summary = extractSummary(body);
+    assert.strictEqual(summary, 'Real paragraph.');
+  })) passed++; else failed++;
+
+  // --- loadAgent / loadAgents ---
+
+  // Create a temp directory with test agent files
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'agent-compress-test-'));
+  const agentContent = '---\nname: test-agent\ndescription: A test agent\ntools: ["Read"]\nmodel: haiku\n---\n\nTest agent body paragraph.\n\n## Details\nMore info.';
+  fs.writeFileSync(path.join(tmpDir, 'test-agent.md'), agentContent);
+  fs.writeFileSync(path.join(tmpDir, 'not-an-agent.txt'), 'ignored');
+
+  if (test('loadAgent reads and parses a single agent file', () => {
+    const agent = loadAgent(path.join(tmpDir, 'test-agent.md'));
+    assert.strictEqual(agent.name, 'test-agent');
+    assert.strictEqual(agent.description, 'A test agent');
+    assert.deepStrictEqual(agent.tools, ['Read']);
+    assert.strictEqual(agent.model, 'haiku');
+    assert.ok(agent.body.includes('Test agent body paragraph'));
+    assert.strictEqual(agent.fileName, 'test-agent');
+    assert.ok(agent.byteSize > 0);
+  })) passed++; else failed++;
+
+  if (test('loadAgents reads all .md files from a directory', () => {
+    const agents = loadAgents(tmpDir);
+    assert.strictEqual(agents.length, 1);
+    assert.strictEqual(agents[0].name, 'test-agent');
+  })) passed++; else failed++;
+
+  if (test('loadAgents returns empty array for non-existent directory', () => {
+    const agents = loadAgents(path.join(os.tmpdir(), 'does-not-exist-agent-compress-test'));
     assert.deepStrictEqual(agents, []);
-  })) passed += 1; else failed += 1;
+  })) passed++; else failed++;
 
-  if (await test('compressToCatalog strips body and keeps only metadata', async () => {
-    const tmpDir = createTempDir('ecc-agent-compress-');
-    try {
-      writeAgent(tmpDir, 'test-agent', SAMPLE_AGENT);
-      const agent = loadAgent(path.join(tmpDir, 'test-agent.md'));
-      const catalog = compressToCatalog(agent);
+  // --- compressToCatalog / compressToSummary ---
 
-      assert.strictEqual(catalog.name, 'test-agent');
-      assert.strictEqual(catalog.description, 'A test agent for unit testing purposes.');
-      assert.deepStrictEqual(catalog.tools, ['Read', 'Grep', 'Glob']);
-      assert.strictEqual(catalog.model, 'sonnet');
-      assert.strictEqual(catalog.body, undefined);
-    } finally {
-      cleanupTempDir(tmpDir);
-    }
-  })) passed += 1; else failed += 1;
+  const sampleAgent = loadAgent(path.join(tmpDir, 'test-agent.md'));
 
-  if (await test('compressToSummary includes first paragraph summary', async () => {
-    const tmpDir = createTempDir('ecc-agent-compress-');
-    try {
-      writeAgent(tmpDir, 'test-agent', SAMPLE_AGENT);
-      const agent = loadAgent(path.join(tmpDir, 'test-agent.md'));
-      const summary = compressToSummary(agent);
+  if (test('compressToCatalog strips body and keeps only metadata', () => {
+    const catalog = compressToCatalog(sampleAgent);
+    assert.strictEqual(catalog.name, 'test-agent');
+    assert.strictEqual(catalog.description, 'A test agent');
+    assert.deepStrictEqual(catalog.tools, ['Read']);
+    assert.strictEqual(catalog.model, 'haiku');
+    assert.strictEqual(catalog.body, undefined);
+    assert.strictEqual(catalog.byteSize, undefined);
+  })) passed++; else failed++;
 
-      assert.strictEqual(summary.name, 'test-agent');
-      assert.ok(summary.summary.length > 0);
-      assert.strictEqual(summary.body, undefined);
-    } finally {
-      cleanupTempDir(tmpDir);
-    }
-  })) passed += 1; else failed += 1;
+  if (test('compressToSummary includes first paragraph summary', () => {
+    const summary = compressToSummary(sampleAgent);
+    assert.strictEqual(summary.name, 'test-agent');
+    assert.ok(summary.summary.includes('Test agent body paragraph'));
+    assert.strictEqual(summary.body, undefined);
+  })) passed++; else failed++;
 
-  if (await test('buildAgentCatalog in catalog mode produces minimal output with stats', async () => {
-    const tmpDir = createTempDir('ecc-agent-compress-');
-    try {
-      writeAgent(tmpDir, 'agent-a', SAMPLE_AGENT);
-      writeAgent(tmpDir, 'agent-b', MINIMAL_AGENT);
+  // --- buildAgentCatalog ---
 
-      const result = buildAgentCatalog(tmpDir, { mode: 'catalog' });
-      assert.strictEqual(result.agents.length, 2);
-      assert.strictEqual(result.stats.totalAgents, 2);
-      assert.strictEqual(result.stats.mode, 'catalog');
-      assert.ok(result.stats.originalBytes > 0);
-      assert.ok(result.stats.compressedBytes > 0);
-      assert.ok(result.stats.compressedBytes < result.stats.originalBytes);
-      assert.ok(result.stats.compressedTokenEstimate > 0);
-
-      // Catalog entries should not have body
-      for (const agent of result.agents) {
-        assert.strictEqual(agent.body, undefined);
-        assert.ok(agent.name);
-        assert.ok(agent.description);
-      }
-    } finally {
-      cleanupTempDir(tmpDir);
-    }
-  })) passed += 1; else failed += 1;
-
-  if (await test('buildAgentCatalog in summary mode includes summaries', async () => {
-    const tmpDir = createTempDir('ecc-agent-compress-');
-    try {
-      writeAgent(tmpDir, 'agent-a', SAMPLE_AGENT);
-
-      const result = buildAgentCatalog(tmpDir, { mode: 'summary' });
-      assert.strictEqual(result.agents.length, 1);
-      assert.ok(result.agents[0].summary);
-      assert.strictEqual(result.agents[0].body, undefined);
-    } finally {
-      cleanupTempDir(tmpDir);
-    }
-  })) passed += 1; else failed += 1;
-
-  if (await test('buildAgentCatalog in full mode preserves body', async () => {
-    const tmpDir = createTempDir('ecc-agent-compress-');
-    try {
-      writeAgent(tmpDir, 'agent-a', SAMPLE_AGENT);
-
-      const result = buildAgentCatalog(tmpDir, { mode: 'full' });
-      assert.strictEqual(result.agents.length, 1);
-      assert.ok(result.agents[0].body.includes('You are a test agent'));
-    } finally {
-      cleanupTempDir(tmpDir);
-    }
-  })) passed += 1; else failed += 1;
-
-  if (await test('buildAgentCatalog supports filter function', async () => {
-    const tmpDir = createTempDir('ecc-agent-compress-');
-    try {
-      writeAgent(tmpDir, 'agent-a', SAMPLE_AGENT);
-      writeAgent(tmpDir, 'agent-b', MINIMAL_AGENT);
-
-      const result = buildAgentCatalog(tmpDir, {
-        mode: 'catalog',
-        filter: agent => agent.model === 'haiku',
-      });
-      assert.strictEqual(result.agents.length, 1);
-      assert.strictEqual(result.agents[0].name, 'minimal');
-    } finally {
-      cleanupTempDir(tmpDir);
-    }
-  })) passed += 1; else failed += 1;
-
-  if (await test('lazyLoadAgent loads a single agent by name', async () => {
-    const tmpDir = createTempDir('ecc-agent-compress-');
-    try {
-      writeAgent(tmpDir, 'test-agent', SAMPLE_AGENT);
-      writeAgent(tmpDir, 'other', MINIMAL_AGENT);
-
-      const agent = lazyLoadAgent(tmpDir, 'test-agent');
-      assert.ok(agent);
-      assert.strictEqual(agent.name, 'test-agent');
-      assert.ok(agent.body.includes('You are a test agent'));
-    } finally {
-      cleanupTempDir(tmpDir);
-    }
-  })) passed += 1; else failed += 1;
-
-  if (await test('lazyLoadAgent returns null for non-existent agent', async () => {
-    const tmpDir = createTempDir('ecc-agent-compress-');
-    try {
-      const agent = lazyLoadAgent(tmpDir, 'nonexistent');
-      assert.strictEqual(agent, null);
-    } finally {
-      cleanupTempDir(tmpDir);
-    }
-  })) passed += 1; else failed += 1;
-
-  if (await test('buildAgentCatalog works with real agents directory', async () => {
-    const agentsDir = path.join(__dirname, '..', '..', 'agents');
-    if (!fs.existsSync(agentsDir)) {
-      // Skip if agents dir doesn't exist (shouldn't happen in this repo)
-      return;
-    }
-
-    const result = buildAgentCatalog(agentsDir, { mode: 'catalog' });
-    assert.ok(result.agents.length > 0, 'Should find at least one agent');
+  if (test('buildAgentCatalog in catalog mode produces minimal output with stats', () => {
+    const result = buildAgentCatalog(tmpDir, { mode: 'catalog' });
+    assert.strictEqual(result.agents.length, 1);
+    assert.strictEqual(result.agents[0].body, undefined);
+    assert.strictEqual(result.stats.totalAgents, 1);
+    assert.strictEqual(result.stats.mode, 'catalog');
     assert.ok(result.stats.originalBytes > 0);
-    assert.ok(result.stats.compressedBytes < result.stats.originalBytes,
-      'Catalog mode should be smaller than full agent files');
-  })) passed += 1; else failed += 1;
+    assert.ok(result.stats.compressedBytes < result.stats.originalBytes);
+    assert.ok(result.stats.compressedTokenEstimate > 0);
+  })) passed++; else failed++;
+
+  if (test('buildAgentCatalog in summary mode includes summaries', () => {
+    const result = buildAgentCatalog(tmpDir, { mode: 'summary' });
+    assert.ok(result.agents[0].summary);
+    assert.strictEqual(result.agents[0].body, undefined);
+  })) passed++; else failed++;
+
+  if (test('buildAgentCatalog in full mode preserves body', () => {
+    const result = buildAgentCatalog(tmpDir, { mode: 'full' });
+    assert.ok(result.agents[0].body);
+  })) passed++; else failed++;
+
+  if (test('buildAgentCatalog throws on invalid mode', () => {
+    assert.throws(
+      () => buildAgentCatalog(tmpDir, { mode: 'invalid' }),
+      /Invalid mode "invalid"/
+    );
+  })) passed++; else failed++;
+
+  if (test('buildAgentCatalog supports filter function', () => {
+    // Add a second agent
+    fs.writeFileSync(
+      path.join(tmpDir, 'other-agent.md'),
+      '---\nname: other\ndescription: Other agent\ntools: ["Bash"]\nmodel: opus\n---\n\nOther body.'
+    );
+    const result = buildAgentCatalog(tmpDir, {
+      filter: a => a.model === 'opus',
+    });
+    assert.strictEqual(result.agents.length, 1);
+    assert.strictEqual(result.agents[0].name, 'other');
+    // Clean up
+    fs.unlinkSync(path.join(tmpDir, 'other-agent.md'));
+  })) passed++; else failed++;
+
+  // --- lazyLoadAgent ---
+
+  if (test('lazyLoadAgent loads a single agent by name', () => {
+    const agent = lazyLoadAgent(tmpDir, 'test-agent');
+    assert.ok(agent);
+    assert.strictEqual(agent.name, 'test-agent');
+    assert.ok(agent.body.includes('Test agent body paragraph'));
+  })) passed++; else failed++;
+
+  if (test('lazyLoadAgent returns null for non-existent agent', () => {
+    const agent = lazyLoadAgent(tmpDir, 'does-not-exist');
+    assert.strictEqual(agent, null);
+  })) passed++; else failed++;
+
+  if (test('lazyLoadAgent rejects path traversal attempts', () => {
+    const agent = lazyLoadAgent(tmpDir, '../etc/passwd');
+    assert.strictEqual(agent, null);
+  })) passed++; else failed++;
+
+  if (test('lazyLoadAgent rejects names with invalid characters', () => {
+    const agent = lazyLoadAgent(tmpDir, 'foo/bar');
+    assert.strictEqual(agent, null);
+    const agent2 = lazyLoadAgent(tmpDir, 'foo bar');
+    assert.strictEqual(agent2, null);
+  })) passed++; else failed++;
+
+  // --- Real agents directory ---
+
+  const realAgentsDir = path.resolve(__dirname, '../../agents');
+  if (test('buildAgentCatalog works with real agents directory', () => {
+    if (!fs.existsSync(realAgentsDir)) return; // skip if not present
+    const result = buildAgentCatalog(realAgentsDir, { mode: 'catalog' });
+    assert.ok(result.agents.length > 0, 'Should find at least one agent');
+    assert.ok(result.stats.compressedBytes < result.stats.originalBytes, 'Catalog should be smaller than original');
+    // Verify significant compression ratio
+    const ratio = result.stats.compressedBytes / result.stats.originalBytes;
+    assert.ok(ratio < 0.5, `Compression ratio ${ratio.toFixed(2)} should be < 0.5`);
+  })) passed++; else failed++;
+
+  if (test('catalog mode token estimate is under 5000 for real agents', () => {
+    if (!fs.existsSync(realAgentsDir)) return;
+    const result = buildAgentCatalog(realAgentsDir, { mode: 'catalog' });
+    assert.ok(
+      result.stats.compressedTokenEstimate < 5000,
+      `Token estimate ${result.stats.compressedTokenEstimate} exceeds 5000`
+    );
+  })) passed++; else failed++;
+
+  // Cleanup
+  fs.rmSync(tmpDir, { recursive: true, force: true });
 
   console.log(`\nResults: Passed: ${passed}, Failed: ${failed}`);
   process.exit(failed > 0 ? 1 : 0);

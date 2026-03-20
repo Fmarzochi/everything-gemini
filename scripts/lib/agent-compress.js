@@ -8,7 +8,7 @@ const path = require('path');
  * Returns { frontmatter: {}, body: string }.
  */
 function parseFrontmatter(content) {
-  const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/);
+  const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n([\s\S]*))?$/);
   if (!match) {
     return { frontmatter: {}, body: content };
   }
@@ -38,20 +38,28 @@ function parseFrontmatter(content) {
     frontmatter[key] = value;
   }
 
-  return { frontmatter, body: match[2] };
+  return { frontmatter, body: match[2] || '' };
 }
 
 /**
  * Extract the first meaningful paragraph from agent body as a summary.
- * Skips headings and blank lines, returns up to maxSentences sentences.
+ * Skips headings, list items, code blocks, and table rows.
  */
 function extractSummary(body, maxSentences = 1) {
   const lines = body.split('\n');
   const paragraphs = [];
   let current = [];
+  let inCodeBlock = false;
 
   for (const line of lines) {
     const trimmed = line.trim();
+
+    // Track fenced code blocks
+    if (trimmed.startsWith('```')) {
+      inCodeBlock = !inCodeBlock;
+      continue;
+    }
+    if (inCodeBlock) continue;
 
     if (trimmed === '') {
       if (current.length > 0) {
@@ -61,17 +69,18 @@ function extractSummary(body, maxSentences = 1) {
       continue;
     }
 
-    // Skip headings
-    if (trimmed.startsWith('#')) {
+    // Skip headings, list items (bold, plain, asterisk), numbered lists, table rows
+    if (
+      trimmed.startsWith('#') ||
+      trimmed.startsWith('- ') ||
+      trimmed.startsWith('* ') ||
+      /^\d+\.\s/.test(trimmed) ||
+      trimmed.startsWith('|')
+    ) {
       if (current.length > 0) {
         paragraphs.push(current.join(' '));
         current = [];
       }
-      continue;
-    }
-
-    // Skip list items, code blocks, etc.
-    if (trimmed.startsWith('```') || trimmed.startsWith('- **') || trimmed.startsWith('|')) {
       continue;
     }
 
@@ -81,20 +90,15 @@ function extractSummary(body, maxSentences = 1) {
     paragraphs.push(current.join(' '));
   }
 
-  // Find first non-empty paragraph
   const firstParagraph = paragraphs.find(p => p.length > 0);
-  if (!firstParagraph) {
-    return '';
-  }
+  if (!firstParagraph) return '';
 
-  // Extract up to maxSentences sentences
   const sentences = firstParagraph.match(/[^.!?]+[.!?]+/g) || [firstParagraph];
-  return sentences.slice(0, maxSentences).join(' ').trim();
+  return sentences.slice(0, maxSentences).map(s => s.trim()).join(' ').trim();
 }
 
 /**
  * Load and parse a single agent file.
- * Returns the full agent object with frontmatter and body.
  */
 function loadAgent(filePath) {
   const content = fs.readFileSync(filePath, 'utf8');
@@ -116,9 +120,7 @@ function loadAgent(filePath) {
  * Load all agents from a directory.
  */
 function loadAgents(agentsDir) {
-  if (!fs.existsSync(agentsDir)) {
-    return [];
-  }
+  if (!fs.existsSync(agentsDir)) return [];
 
   return fs.readdirSync(agentsDir)
     .filter(f => f.endsWith('.md'))
@@ -127,8 +129,7 @@ function loadAgents(agentsDir) {
 }
 
 /**
- * Compress an agent to its catalog entry (metadata only).
- * This is the minimal representation needed for agent selection.
+ * Compress an agent to catalog entry (metadata only).
  */
 function compressToCatalog(agent) {
   return {
@@ -140,31 +141,34 @@ function compressToCatalog(agent) {
 }
 
 /**
- * Compress an agent to a summary entry (metadata + first paragraph).
- * More context than catalog, less than full body.
+ * Compress an agent to summary entry (metadata + first paragraph).
  */
 function compressToSummary(agent) {
   return {
-    name: agent.name,
-    description: agent.description,
-    tools: agent.tools,
-    model: agent.model,
+    ...compressToCatalog(agent),
     summary: extractSummary(agent.body),
   };
 }
 
+const allowedModes = ['catalog', 'summary', 'full'];
+
 /**
- * Build a full compressed catalog from a directory of agents.
+ * Build a compressed catalog from a directory of agents.
  *
  * Modes:
  *  - 'catalog': name, description, tools, model only (~2-3k tokens for 27 agents)
  *  - 'summary': catalog + first paragraph summary (~4-5k tokens)
  *  - 'full':    no compression, full body included
  *
- * Returns { agents: [], stats: { totalAgents, originalBytes, compressedTokenEstimate } }
+ * Returns { agents: [], stats: { totalAgents, originalBytes, compressedBytes, compressedTokenEstimate, mode } }
  */
 function buildAgentCatalog(agentsDir, options = {}) {
   const mode = options.mode || 'catalog';
+
+  if (!allowedModes.includes(mode)) {
+    throw new Error(`Invalid mode "${mode}". Allowed modes: ${allowedModes.join(', ')}`);
+  }
+
   const filter = options.filter || null;
 
   let agents = loadAgents(agentsDir);
@@ -207,14 +211,24 @@ function buildAgentCatalog(agentsDir, options = {}) {
 }
 
 /**
- * Lazy-load a single agent's full content by name from a directory.
+ * Lazy-load a single agent's full content by name.
  * Returns null if not found.
  */
 function lazyLoadAgent(agentsDir, agentName) {
-  const filePath = path.join(agentsDir, `${agentName}.md`);
-  if (!fs.existsSync(filePath)) {
+  // Validate agentName: only allow alphanumeric, hyphen, underscore
+  if (!/^[\w-]+$/.test(agentName)) {
     return null;
   }
+
+  const filePath = path.resolve(agentsDir, `${agentName}.md`);
+
+  // Verify the resolved path is still within agentsDir
+  const resolvedAgentsDir = path.resolve(agentsDir);
+  if (!filePath.startsWith(resolvedAgentsDir + path.sep)) {
+    return null;
+  }
+
+  if (!fs.existsSync(filePath)) return null;
   return loadAgent(filePath);
 }
 
