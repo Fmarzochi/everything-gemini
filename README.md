@@ -45,20 +45,26 @@ This repo is the raw code only. The guides explain everything.
 
 <table>
 <tr>
-<td width="50%">
+<td width="33%">
 <a href="https://x.com/affaanmustafa/status/2012378465664745795">
 <img src="https://github.com/user-attachments/assets/1a471488-59cc-425b-8345-5245c7efbcef" alt="The Shorthand Guide to Everything Claude Code" />
 </a>
 </td>
-<td width="50%">
+<td width="33%">
 <a href="https://x.com/affaanmustafa/status/2014040193557471352">
 <img src="https://github.com/user-attachments/assets/c9ca43bc-b149-427f-b551-af6840c368f0" alt="The Longform Guide to Everything Claude Code" />
+</a>
+</td>
+<td width="33%">
+<a href="https://x.com/affaanmustafa/status/2033263813387223421">
+<img src="./assets/images/security/attack-vectors.png" alt="The Shorthand Guide to Everything Agentic Security" />
 </a>
 </td>
 </tr>
 <tr>
 <td align="center"><b>Shorthand Guide</b><br/>Setup, foundations, philosophy. <b>Read this first.</b></td>
 <td align="center"><b>Longform Guide</b><br/>Token optimization, memory persistence, evals, parallelization.</td>
+<td align="center"><b>Security Guide</b><br/>Attack vectors, sandboxing, sanitization, CVEs, AgentShield.</td>
 </tr>
 </table>
 
