@@ -85,6 +85,9 @@ function runTests() {
     assert.ok(languages.includes('go'));
     assert.ok(languages.includes('golang'));
     assert.ok(languages.includes('kotlin'));
+    assert.ok(languages.includes('rust'));
+    assert.ok(languages.includes('cpp'));
+    assert.ok(languages.includes('csharp'));
   })) passed++; else failed++;
 
   if (test('resolves a real project profile with target-specific skips', () => {
@@ -153,6 +156,39 @@ function runTests() {
     assert.ok(selection.moduleIds.includes('platform-configs'));
     assert.ok(selection.moduleIds.includes('workflow-quality'));
     assert.ok(selection.moduleIds.includes('framework-language'));
+  })) passed++; else failed++;
+
+  if (test('resolves rust legacy compatibility into framework-language module', () => {
+    const selection = resolveLegacyCompatibilitySelection({
+      target: 'cursor',
+      legacyLanguages: ['rust'],
+    });
+
+    assert.ok(selection.moduleIds.includes('rules-core'));
+    assert.ok(selection.moduleIds.includes('framework-language'),
+      'rust should resolve to framework-language module');
+  })) passed++; else failed++;
+
+  if (test('resolves cpp legacy compatibility into framework-language module', () => {
+    const selection = resolveLegacyCompatibilitySelection({
+      target: 'cursor',
+      legacyLanguages: ['cpp'],
+    });
+
+    assert.ok(selection.moduleIds.includes('rules-core'));
+    assert.ok(selection.moduleIds.includes('framework-language'),
+      'cpp should resolve to framework-language module');
+  })) passed++; else failed++;
+
+  if (test('resolves csharp legacy compatibility into framework-language module', () => {
+    const selection = resolveLegacyCompatibilitySelection({
+      target: 'cursor',
+      legacyLanguages: ['csharp'],
+    });
+
+    assert.ok(selection.moduleIds.includes('rules-core'));
+    assert.ok(selection.moduleIds.includes('framework-language'),
+      'csharp should resolve to framework-language module');
   })) passed++; else failed++;
 
   if (test('keeps antigravity legacy compatibility selections target-safe', () => {

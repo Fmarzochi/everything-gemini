@@ -211,6 +211,14 @@
       ]
     },
     {
+      "id": "lang:csharp",
+      "family": "language",
+      "description": "C# coding standards and patterns guidance. Currently resolves through the shared framework-language module.",
+      "modules": [
+        "framework-language"
+      ]
+    },
+    {
       "id": "framework:laravel",
       "family": "framework",
       "description": "Laravel patterns, TDD, verification, and security guidance. Resolves through framework-language and security modules.",
