@@ -96,7 +96,6 @@ Agent (planner):
 **CRITICAL**: O agente planner **NÃO** vai escrever código até você confirmar explicitamente o plano com "yes", "proceed" ou resposta afirmativa similar.
 
 Se quiser mudanças, responda com:
-Se quiser mudanças, responda com:
 - "modificar: [suas alterações]"
 - "abordagem diferente: [alternativa]"
 - "pular fase 2 e fazer fase 3 primeiro"
