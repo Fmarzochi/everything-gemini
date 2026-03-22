@@ -9,12 +9,16 @@ set -euo pipefail
 # - Generates Codex QA wrappers and optional language rule-pack prompts
 # - Installs global git safety hooks (pre-commit and pre-push)
 # - Runs a post-sync global regression sanity check
-# - Normalizes MCP server entries to pnpm dlx and removes duplicate Context7 block
+# - Merges ECC MCP servers into config.toml (add-only via Node TOML parser)
 
 MODE="apply"
-if [[ "${1:-}" == "--dry-run" ]]; then
-  MODE="dry-run"
-fi
+UPDATE_MCP=""
+for arg in "$@"; do
+  case "$arg" in
+    --dry-run)    MODE="dry-run" ;;
+    --update-mcp) UPDATE_MCP="--update-mcp" ;;
+  esac
+done
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
@@ -123,6 +127,8 @@ generate_prompt_file() {
   } > "$out"
 }
 
+MCP_MERGE_SCRIPT="$REPO_ROOT/scripts/codex/merge-mcp-config.js"
+
 require_path "$REPO_ROOT/AGENTS.md" "ECC AGENTS.md"
 require_path "$AGENTS_CODEX_SUPP_SRC" "ECC Codex AGENTS supplement"
 require_path "$SKILLS_SRC" "ECC skills directory"
@@ -131,6 +137,12 @@ require_path "$HOOKS_INSTALLER" "ECC global git hooks installer"
 require_path "$SANITY_CHECKER" "ECC global sanity checker"
 require_path "$CURSOR_RULES_DIR" "ECC Cursor rules directory"
 require_path "$CONFIG_FILE" "Codex config.toml"
+require_path "$MCP_MERGE_SCRIPT" "ECC MCP merge script"
+
+if ! command -v node >/dev/null 2>&1; then
+  log "ERROR: node is required for MCP config merging but was not found"
+  exit 1
+fi
 
 log "Mode: $MODE"
 log "Repo root: $REPO_ROOT"
@@ -183,22 +195,36 @@ else
     compose_ecc_block > "$AGENTS_FILE"
   elif awk -v b="$ECC_BEGIN_MARKER" -v e="$ECC_END_MARKER" '
         { gsub(/\r$/, "") }
-        $0 == b { found_b = NR } $0 == e { found_e = NR }
-        END { exit !(found_b && found_e && found_b < found_e) }
+        $0 == b { bc++; if (!fb) fb = NR }
+        $0 == e { ec++; if (!fe) fe = NR }
+        END { exit !(bc == 1 && ec == 1 && fb < fe) }
       ' "$AGENTS_FILE"; then
-    # Existing file with matched, correctly ordered ECC markers — replace only the ECC section
+    # Exactly one BEGIN/END pair in correct order — replace only the ECC section
     replace_ecc_section
-  elif grep -qF "$ECC_BEGIN_MARKER" "$AGENTS_FILE"; then
-    # BEGIN marker exists but END marker is missing (corrupted). Warn and
-    # replace the file entirely to restore a valid state. Backup was saved.
-    log "WARNING: found BEGIN marker but no END marker — replacing file (backup saved)"
-    compose_ecc_block > "$AGENTS_FILE"
+  elif awk -v b="$ECC_BEGIN_MARKER" -v e="$ECC_END_MARKER" '
+        { gsub(/\r$/, "") }
+        $0 == b { bc++ } $0 == e { ec++ }
+        END { exit !((bc + ec) > 0) }
+      ' "$AGENTS_FILE"; then
+    # Markers present but not exactly one valid BEGIN/END pair (missing END,
+    # duplicates, or out-of-order). Strip all marker lines, then append a
+    # fresh marked block. This preserves user content outside markers.
+    log "WARNING: ECC markers found but not a clean pair — stripping markers and re-appending"
+    _fix_tmp="$(mktemp)"
+    awk -v b="$ECC_BEGIN_MARKER" -v e="$ECC_END_MARKER" '
+      { gsub(/\r$/, "") }
+      $0 == b { skip = 1; next }
+      $0 == e { skip = 0; next }
+      !skip   { print }
+    ' "$AGENTS_FILE" > "$_fix_tmp"
+    cat "$_fix_tmp" > "$AGENTS_FILE"
+    rm -f "$_fix_tmp"
+    { printf '\n\n'; compose_ecc_block; } >> "$AGENTS_FILE"
   else
-    # Existing file without markers — append ECC block, preserve user content.
-    # Note: legacy ECC-only files (from old '>' overwrite) will get a second copy
-    # on this first run. This is intentional — the alternative (heading-match
-    # heuristic) risks false-positive overwrites of user-authored files. The next
-    # run deduplicates via markers, and a timestamped backup was saved above.
+    # Existing file without markers — append ECC block, preserving existing content.
+    # Legacy ECC-only files will have duplicate content after this first run, but
+    # subsequent runs use marker-based replacement so only the marked section updates.
+    # A timestamped backup was already saved above for recovery if needed.
     log "No ECC markers found — appending managed block (backup saved)"
     {
       printf '\n\n'
@@ -435,63 +461,11 @@ if [[ "$MODE" == "apply" ]]; then
   sort -u "$extension_manifest" -o "$extension_manifest"
 fi
 
-if [[ "$MODE" == "apply" ]]; then
-  log "Normalizing MCP server config to pnpm"
-
-  supabase_token="$(extract_toml_value "$CONFIG_FILE" "mcp_servers.supabase.env" "SUPABASE_ACCESS_TOKEN")"
-  context7_key="$(extract_context7_key "$CONFIG_FILE")"
-  github_bootstrap='token=$(gh auth token 2>/dev/null || true); if [ -n "$token" ]; then export GITHUB_PERSONAL_ACCESS_TOKEN="$token"; fi; exec pnpm dlx @modelcontextprotocol/server-github'
-
-  remove_section_inplace "$CONFIG_FILE" "mcp_servers.github.env"
-  remove_section_inplace "$CONFIG_FILE" "mcp_servers.github"
-  remove_section_inplace "$CONFIG_FILE" "mcp_servers.memory"
-  remove_section_inplace "$CONFIG_FILE" "mcp_servers.sequential-thinking"
-  remove_section_inplace "$CONFIG_FILE" "mcp_servers.context7"
-  remove_section_inplace "$CONFIG_FILE" "mcp_servers.context7-mcp"
-  remove_section_inplace "$CONFIG_FILE" "mcp_servers.playwright"
-  remove_section_inplace "$CONFIG_FILE" "mcp_servers.supabase.env"
-  remove_section_inplace "$CONFIG_FILE" "mcp_servers.supabase"
-
-  {
-    printf '\n[mcp_servers.supabase]\n'
-    printf 'command = "pnpm"\n'
-    printf 'args = ["dlx", "@supabase/mcp-server-supabase@latest", "--features=account,docs,database,debugging,development,functions,storage,branching"]\n'
-    printf 'startup_timeout_sec = 20.0\n'
-    printf 'tool_timeout_sec = 120.0\n'
-
-    if [[ -n "$supabase_token" ]]; then
-      printf '\n[mcp_servers.supabase.env]\n'
-      printf 'SUPABASE_ACCESS_TOKEN = "%s"\n' "$(toml_escape "$supabase_token")"
-    fi
-
-    printf '\n[mcp_servers.playwright]\n'
-    printf 'command = "pnpm"\n'
-    printf 'args = ["dlx", "@playwright/mcp@latest"]\n'
-
-    if [[ -n "$context7_key" ]]; then
-      printf '\n[mcp_servers.context7-mcp]\n'
-      printf 'command = "pnpm"\n'
-      printf 'args = ["dlx", "@smithery/cli@latest", "run", "@upstash/context7-mcp", "--key", "%s"]\n' "$(toml_escape "$context7_key")"
-    else
-      printf '\n[mcp_servers.context7-mcp]\n'
-      printf 'command = "pnpm"\n'
-      printf 'args = ["dlx", "@upstash/context7-mcp"]\n'
-    fi
-
-    printf '\n[mcp_servers.github]\n'
-    printf 'command = "bash"\n'
-    printf 'args = ["-lc", "%s"]\n' "$(toml_escape "$github_bootstrap")"
-
-    printf '\n[mcp_servers.memory]\n'
-    printf 'command = "pnpm"\n'
-    printf 'args = ["dlx", "@modelcontextprotocol/server-memory"]\n'
-
-    printf '\n[mcp_servers.sequential-thinking]\n'
-    printf 'command = "pnpm"\n'
-    printf 'args = ["dlx", "@modelcontextprotocol/server-sequential-thinking"]\n'
-  } >> "$CONFIG_FILE"
+log "Merging ECC MCP servers into $CONFIG_FILE (add-only, preserving user config)"
+if [[ "$MODE" == "dry-run" ]]; then
+  node "$MCP_MERGE_SCRIPT" "$CONFIG_FILE" --dry-run $UPDATE_MCP
 else
-  log "Skipping MCP config normalization in dry-run mode"
+  node "$MCP_MERGE_SCRIPT" "$CONFIG_FILE" $UPDATE_MCP
 fi
 
 log "Installing global git safety hooks"
