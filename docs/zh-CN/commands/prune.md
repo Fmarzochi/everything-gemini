@@ -1,6 +1,5 @@
 ---
 description: 删除超过 30 天且从未被提升的待处理本能
-description: 删除超过 30 天且从未被提升的待处理 instinct
 command: true
 ---
 
