@@ -356,11 +356,11 @@ description: /help に表示される短い説明
 ### 1. PRタイトル形式
 
 ```
-feat(skills): add rust-patterns skill
-feat(agents): add api-designer agent
-feat(hooks): add auto-format hook
-fix(skills): update React patterns
-docs: improve contributing guide
+feat(skills): Rustパターンスキルを追加
+feat(agents): APIデザイナーエージェントを追加
+feat(hooks): 自動フォーマットフックを追加
+fix(skills): Reactパターンを更新
+docs: 貢献ガイドを改善
 ```
 
 ### 2. PR説明
