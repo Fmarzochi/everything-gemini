@@ -47,6 +47,16 @@ ALWAYS write tests first, then implement code to make tests pass.
 - Browser automation
 - UI interactions
 
+### 4. Git Checkpoints
+- If the repository is under Git, create a checkpoint commit after each TDD stage
+- Do not squash or rewrite these checkpoint commits until the workflow is complete
+- Each checkpoint commit message must describe the stage and the exact evidence captured
+- The preferred compact workflow is:
+  - one commit for failing test added and RED validated
+  - one commit for minimal fix applied and GREEN validated
+  - one optional commit for refactor complete
+- Separate evidence-only commits are not required if the test commit clearly corresponds to RED and the fix commit clearly corresponds to GREEN
+
 ## TDD Workflow Steps
 
 ### Step 1: Write User Journeys
@@ -87,6 +97,25 @@ npm test
 # Tests should fail - we haven't implemented yet
 ```
 
+This step is mandatory and is the RED gate for all production changes.
+
+Before modifying business logic or other production code, you must verify all of the following:
+- The relevant test target compiles successfully
+- The new or changed test is actually executed
+- The result is RED
+- The failure is caused by the intended business-logic bug, undefined behavior, or missing implementation
+- A compile-time RED is valid if the new test newly instantiates, references, or exercises the buggy code path and exposes the intended defect
+- The failure is not caused only by unrelated syntax errors, broken test setup, missing dependencies, or unrelated regressions
+
+A test that was only written but not compiled and executed does not count as RED.
+
+Do not edit production code until this RED state is confirmed.
+
+If the repository is under Git, create a checkpoint commit immediately after this stage is validated.
+Recommended commit message format:
+- `test: add reproducer for <bug>`
+- This commit may also serve as the RED validation checkpoint if the reproducer was compiled and executed and failed for the intended reason
+
 ### Step 4: Implement Code
 Write minimal code to make tests pass:
 
@@ -97,11 +126,23 @@ export async function searchMarkets(query: string) {
 }
 ```
 
+If the repository is under Git, create a checkpoint commit immediately after the minimal fix is in place.
+Recommended commit message format:
+- `fix: minimal fix for <bug>`
+
 ### Step 5: Run Tests Again
 ```bash
 npm test
 # Tests should now pass
 ```
+
+Rerun the same relevant test target after the fix and confirm the previously failing test is now GREEN.
+
+Only after a valid GREEN result may you proceed to refactor.
+
+If the repository is under Git, create a checkpoint commit immediately after GREEN is validated.
+Recommended commit message format:
+- The fix commit may also serve as the GREEN validation checkpoint if the same relevant test target was rerun and passed
 
 ### Step 6: Refactor
 Improve code quality while keeping tests green:
@@ -109,6 +150,10 @@ Improve code quality while keeping tests green:
 - Improve naming
 - Optimize performance
 - Enhance readability
+
+If the repository is under Git, create a checkpoint commit immediately after refactoring is complete and tests remain green.
+Recommended commit message format:
+- `refactor: clean up after <bug> fix`
 
 ### Step 7: Verify Coverage
 ```bash
