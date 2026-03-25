@@ -36,6 +36,21 @@ pub async fn stop_session(db: &StateStore, id: &str) -> Result<()> {
     stop_session_with_options(db, id, true).await
 }
 
+pub async fn resume_session(db: &StateStore, id: &str) -> Result<String> {
+    let session = resolve_session(db, id)?;
+
+    if session.state == SessionState::Completed {
+        anyhow::bail!("Completed sessions cannot be resumed: {}", session.id);
+    }
+
+    if session.state == SessionState::Running {
+        anyhow::bail!("Session is already running: {}", session.id);
+    }
+
+    db.update_state_and_pid(&session.id, &SessionState::Pending, None)?;
+    Ok(session.id)
+}
+
 fn agent_program(agent_type: &str) -> Result<PathBuf> {
     match agent_type {
         "claude" => Ok(PathBuf::from("claude")),
@@ -571,6 +586,36 @@ mod tests {
             !cleanup_worktree.exists(),
             "worktree should be removed when cleanup is enabled"
         );
+
+        Ok(())
+    }
+
+    #[tokio::test(flavor = "current_thread")]
+    async fn resume_session_requeues_failed_session() -> Result<()> {
+        let tempdir = TestDir::new("manager-resume-session")?;
+        let cfg = build_config(tempdir.path());
+        let db = StateStore::open(&cfg.db_path)?;
+        let now = Utc::now();
+
+        db.insert_session(&Session {
+            id: "deadbeef".to_string(),
+            task: "resume previous task".to_string(),
+            agent_type: "claude".to_string(),
+            state: SessionState::Failed,
+            pid: Some(31337),
+            worktree: None,
+            created_at: now - Duration::minutes(1),
+            updated_at: now,
+            metrics: SessionMetrics::default(),
+        })?;
+
+        let resumed_id = resume_session(&db, "deadbeef").await?;
+        let resumed = db
+            .get_session(&resumed_id)?
+            .context("resumed session should exist")?;
+
+        assert_eq!(resumed.state, SessionState::Pending);
+        assert_eq!(resumed.pid, None);
 
         Ok(())
     }

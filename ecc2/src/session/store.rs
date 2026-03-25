@@ -124,6 +124,29 @@ impl StateStore {
         Ok(())
     }
 
+    pub fn update_state_and_pid(
+        &self,
+        session_id: &str,
+        state: &SessionState,
+        pid: Option<u32>,
+    ) -> Result<()> {
+        let updated = self.conn.execute(
+            "UPDATE sessions SET state = ?1, pid = ?2, updated_at = ?3 WHERE id = ?4",
+            rusqlite::params![
+                state.to_string(),
+                pid.map(i64::from),
+                chrono::Utc::now().to_rfc3339(),
+                session_id,
+            ],
+        )?;
+
+        if updated == 0 {
+            anyhow::bail!("Session not found: {session_id}");
+        }
+
+        Ok(())
+    }
+
     pub fn update_state(&self, session_id: &str, state: &SessionState) -> Result<()> {
         let current_state = self
             .conn

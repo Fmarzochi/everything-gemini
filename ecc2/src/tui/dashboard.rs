@@ -422,7 +422,10 @@ impl Dashboard {
 
     pub fn stop_selected(&mut self) {
         if let Some(session) = self.sessions.get(self.selected_session) {
-            if let Err(error) = self.db.update_state(&session.id, &SessionState::Stopped) {
+            if let Err(error) =
+                self.db
+                    .update_state_and_pid(&session.id, &SessionState::Stopped, None)
+            {
                 tracing::warn!("Failed to stop session {}: {error}", session.id);
                 return;
             }
