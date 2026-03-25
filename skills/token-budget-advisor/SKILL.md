@@ -85,8 +85,8 @@ Precision: heuristic estimate ~85-90% accuracy (±15%).
 ```
 
 Level token estimates (within the response window):
-- 25%  → `min + (max - min) × 0.15`
-- 50%  → `min + (max - min) × 0.45`
+- 25%  → `min + (max - min) × 0.25`
+- 50%  → `min + (max - min) × 0.50`
 - 75%  → `min + (max - min) × 0.75`
 - 100% → `max`
 
