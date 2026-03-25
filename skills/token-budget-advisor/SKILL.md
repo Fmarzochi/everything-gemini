@@ -8,8 +8,7 @@ description: >-
   TRIGGER when: "token budget", "token count", "token usage", "token limit",
   "respuesta corta vs larga", "cuántos tokens", "ahorrar tokens",
   "responde al 50%", "dame la versión corta", "quiero controlar cuánto usas",
-  "ajusta tu respuesta", "short version", "tldr", "brief", "25%", "50%",
-  "75%", "at 25%", "at 50%", "at 75%", "exhaustive", or any variant where the user wants
+  "75%", "100%", "at 25%", "at 50%", "at 75%", "at 100%", "exhaustive", or any variant where the user wants
   to control length, depth, or token usage — even without mentioning tokens.
   DO NOT TRIGGER when: user has already specified a level in the current
   session (maintain it) or the request is clearly a one-word answer.
