@@ -5,7 +5,7 @@ description: >-
   how much depth/tokens to consume — BEFORE responding. Use this skill
   when the user wants to control token consumption, adjust response depth,
   choose between short/long answers, or optimize their prompt.
-  TRIGGER when: "tokens", "token budget", "profundidad", "consumo",
+  TRIGGER when: "token budget", "token count", "token usage", "token limit",
   "respuesta corta vs larga", "cuántos tokens", "ahorrar tokens",
   "responde al 50%", "dame la versión corta", "quiero controlar cuánto usas",
   "ajusta tu respuesta", "short version", "tldr", "brief", "in 25%",
