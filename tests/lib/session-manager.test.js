@@ -341,8 +341,10 @@ src/main.ts
   // Override HOME to a temp dir for isolated getAllSessions/getSessionById tests
   // On Windows, os.homedir() uses USERPROFILE, not HOME — set both for cross-platform
   const tmpHome = path.join(os.tmpdir(), `ecc-session-mgr-test-${Date.now()}`);
-  const tmpSessionsDir = path.join(tmpHome, '.claude', 'sessions');
-  fs.mkdirSync(tmpSessionsDir, { recursive: true });
+  const tmpCanonicalSessionsDir = path.join(tmpHome, '.claude', 'session-data');
+  const tmpLegacySessionsDir = path.join(tmpHome, '.claude', 'sessions');
+  fs.mkdirSync(tmpCanonicalSessionsDir, { recursive: true });
+  fs.mkdirSync(tmpLegacySessionsDir, { recursive: true });
   const origHome = process.env.HOME;
   const origUserProfile = process.env.USERPROFILE;
 
@@ -355,7 +357,10 @@ src/main.ts
     { name: '2026-02-10-session.tmp', content: '# Old format session' },
   ];
   for (let i = 0; i < testSessions.length; i++) {
-    const filePath = path.join(tmpSessionsDir, testSessions[i].name);
+    const targetDir = testSessions[i].name === '2026-02-10-session.tmp'
+      ? tmpLegacySessionsDir
+      : tmpCanonicalSessionsDir;
+    const filePath = path.join(targetDir, testSessions[i].name);
     fs.writeFileSync(filePath, testSessions[i].content);
     // Stagger modification times so sort order is deterministic
     const mtime = new Date(Date.now() - (testSessions.length - i) * 60000);
@@ -423,8 +428,8 @@ src/main.ts
   })) passed++; else failed++;
 
   if (test('getAllSessions ignores non-.tmp files', () => {
-    fs.writeFileSync(path.join(tmpSessionsDir, 'notes.txt'), 'not a session');
-    fs.writeFileSync(path.join(tmpSessionsDir, 'compaction-log.txt'), 'log');
+    fs.writeFileSync(path.join(tmpCanonicalSessionsDir, 'notes.txt'), 'not a session');
+    fs.writeFileSync(path.join(tmpCanonicalSessionsDir, 'compaction-log.txt'), 'log');
     const result = sessionManager.getAllSessions({ limit: 100 });
     assert.strictEqual(result.total, 5, 'Should only count .tmp session files');
   })) passed++; else failed++;

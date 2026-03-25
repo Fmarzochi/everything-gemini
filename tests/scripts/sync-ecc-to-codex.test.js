@@ -8,6 +8,11 @@ const path = require('path');
 
 const scriptPath = path.join(__dirname, '..', '..', 'scripts', 'sync-ecc-to-codex.sh');
 const source = fs.readFileSync(scriptPath, 'utf8');
+const runOrEchoStart = source.indexOf('run_or_echo() {');
+const runOrEchoEnd = source.indexOf('\n\nrequire_path() {', runOrEchoStart);
+const runOrEchoSource = runOrEchoStart >= 0 && runOrEchoEnd > runOrEchoStart
+  ? source.slice(runOrEchoStart, runOrEchoEnd)
+  : '';
 
 function test(name, fn) {
   try {
@@ -28,15 +33,16 @@ function runTests() {
   let failed = 0;
 
   if (test('run_or_echo does not use eval', () => {
-    assert.ok(!source.includes('eval "$@"'), 'run_or_echo should not execute through eval');
+    assert.ok(runOrEchoSource, 'Expected to locate run_or_echo function body');
+    assert.ok(!runOrEchoSource.includes('eval "$@"'), 'run_or_echo should not execute through eval');
   })) passed++; else failed++;
 
   if (test('run_or_echo executes argv directly', () => {
-    assert.ok(source.includes('    "$@"'), 'run_or_echo should execute the argv vector directly');
+    assert.ok(runOrEchoSource.includes('    "$@"'), 'run_or_echo should execute the argv vector directly');
   })) passed++; else failed++;
 
   if (test('dry-run output shell-escapes argv', () => {
-    assert.ok(source.includes(`printf ' %q' "$@"`), 'Dry-run mode should print shell-escaped argv');
+    assert.ok(runOrEchoSource.includes(`printf ' %q' "$@"`), 'Dry-run mode should print shell-escaped argv');
   })) passed++; else failed++;
 
   if (test('filesystem-changing calls use argv-form run_or_echo invocations', () => {

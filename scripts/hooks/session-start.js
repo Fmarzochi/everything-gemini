@@ -22,6 +22,36 @@ const {
 const { getPackageManager, getSelectionPrompt } = require('../lib/package-manager');
 const { listAliases } = require('../lib/session-aliases');
 const { detectProjectType } = require('../lib/project-detect');
+const path = require('path');
+
+function dedupeRecentSessions(searchDirs) {
+  const recentSessionsByName = new Map();
+
+  for (const [dirIndex, dir] of searchDirs.entries()) {
+    const matches = findFiles(dir, '*-session.tmp', { maxAge: 7 });
+
+    for (const match of matches) {
+      const basename = path.basename(match.path);
+      const current = {
+        ...match,
+        basename,
+        dirIndex,
+      };
+      const existing = recentSessionsByName.get(basename);
+
+      if (
+        !existing
+        || current.mtime > existing.mtime
+        || (current.mtime === existing.mtime && current.dirIndex < existing.dirIndex)
+      ) {
+        recentSessionsByName.set(basename, current);
+      }
+    }
+  }
+
+  return Array.from(recentSessionsByName.values())
+    .sort((left, right) => right.mtime - left.mtime || left.dirIndex - right.dirIndex);
+}
 
 async function main() {
   const sessionsDir = getSessionsDir();
@@ -33,9 +63,7 @@ async function main() {
   ensureDir(learnedDir);
 
   // Check for recent session files (last 7 days)
-  const recentSessions = getSessionSearchDirs()
-    .flatMap(dir => findFiles(dir, '*-session.tmp', { maxAge: 7 }))
-    .sort((a, b) => b.mtime - a.mtime);
+  const recentSessions = dedupeRecentSessions(getSessionSearchDirs());
 
   if (recentSessions.length > 0) {
     const latest = recentSessions[0];

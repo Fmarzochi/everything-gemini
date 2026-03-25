@@ -146,6 +146,15 @@ function runTests() {
     assert.strictEqual(utils.sanitizeSessionId('my-project_123'), 'my-project_123');
   })) passed++; else failed++;
 
+  if (test('sanitizeSessionId avoids Windows reserved device names', () => {
+    for (const reservedName of ['CON', 'prn', 'Aux', 'nul', 'COM1', 'lpt9']) {
+      const sanitized = utils.sanitizeSessionId(reservedName);
+      assert.ok(sanitized, `Expected sanitized output for ${reservedName}`);
+      assert.notStrictEqual(sanitized.toUpperCase(), reservedName.toUpperCase());
+      assert.ok(/-[a-f0-9]{6}$/i.test(sanitized), `Expected deterministic hash suffix for ${reservedName}, got ${sanitized}`);
+    }
+  })) passed++; else failed++;
+
   if (test('sanitizeSessionId returns null for empty or punctuation-only values', () => {
     assert.strictEqual(utils.sanitizeSessionId(''), null);
     assert.strictEqual(utils.sanitizeSessionId(null), null);

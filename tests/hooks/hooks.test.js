@@ -437,10 +437,12 @@ async function runTests() {
       const isoHome = path.join(os.tmpdir(), `ecc-canonical-start-${Date.now()}`);
       const canonicalDir = getCanonicalSessionsDir(isoHome);
       const legacyDir = getLegacySessionsDir(isoHome);
-      const filename = '2026-02-11-dupe1234-session.tmp';
+      const now = new Date();
+      const filename = `${now.toISOString().slice(0, 10)}-dupe1234-session.tmp`;
       const canonicalFile = path.join(canonicalDir, filename);
       const legacyFile = path.join(legacyDir, filename);
-      const sameTime = new Date('2026-02-11T12:00:00Z');
+      const canonicalTime = new Date(now.getTime() - 60 * 1000);
+      const legacyTime = new Date(now.getTime() - 120 * 1000);
 
       fs.mkdirSync(canonicalDir, { recursive: true });
       fs.mkdirSync(legacyDir, { recursive: true });
@@ -448,8 +450,8 @@ async function runTests() {
 
       fs.writeFileSync(canonicalFile, '# Canonical Session\n\nUse the canonical session-data copy.\n');
       fs.writeFileSync(legacyFile, '# Legacy Session\n\nDo not prefer the legacy duplicate.\n');
-      fs.utimesSync(canonicalFile, sameTime, sameTime);
-      fs.utimesSync(legacyFile, sameTime, sameTime);
+      fs.utimesSync(canonicalFile, canonicalTime, canonicalTime);
+      fs.utimesSync(legacyFile, legacyTime, legacyTime);
 
       try {
         const result = await runScript(path.join(scriptsDir, 'session-start.js'), '', {

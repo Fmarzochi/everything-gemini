@@ -66,6 +66,16 @@ function emitHookResult(raw, output) {
   return 0;
 }
 
+function writeLegacySpawnOutput(raw, result) {
+  const stdout = typeof result.stdout === 'string' ? result.stdout : '';
+  if (stdout) {
+    process.stdout.write(stdout);
+    return;
+  }
+
+  process.stdout.write(raw);
+}
+
 function getPluginRoot() {
   if (process.env.CLAUDE_PLUGIN_ROOT && process.env.CLAUDE_PLUGIN_ROOT.trim()) {
     return process.env.CLAUDE_PLUGIN_ROOT;
@@ -135,7 +145,7 @@ async function main() {
   }
 
   // Legacy path: spawn a child Node process for hooks without run() export
-  const result = spawnSync('node', [scriptPath], {
+  const result = spawnSync(process.execPath, [scriptPath], {
     input: raw,
     encoding: 'utf8',
     env: {
@@ -147,11 +157,20 @@ async function main() {
     timeout: 30000
   });
 
-  if (result.stdout) process.stdout.write(result.stdout);
+  writeLegacySpawnOutput(raw, result);
   if (result.stderr) process.stderr.write(result.stderr);
 
-  const code = Number.isInteger(result.status) ? result.status : 0;
-  process.exit(code);
+  if (result.error || result.signal || result.status === null) {
+    const failureDetail = result.error
+      ? result.error.message
+      : result.signal
+        ? `terminated by signal ${result.signal}`
+        : 'missing exit status';
+    writeStderr(`[Hook] legacy hook execution failed for ${hookId}: ${failureDetail}`);
+    process.exit(1);
+  }
+
+  process.exit(Number.isInteger(result.status) ? result.status : 0);
 }
 
 main().catch(err => {

@@ -32,8 +32,18 @@ function cleanup(dirPath) {
   fs.rmSync(dirPath, { recursive: true, force: true });
 }
 
+function toBashPath(filePath) {
+  if (process.platform !== 'win32') {
+    return filePath;
+  }
+
+  return String(filePath)
+    .replace(/^([A-Za-z]):/, (_, driveLetter) => `/${driveLetter.toLowerCase()}`)
+    .replace(/\\/g, '/');
+}
+
 function runBash(scriptPath, args = [], env = {}, cwd = repoRoot) {
-  return spawnSync('bash', [scriptPath, ...args], {
+  return spawnSync('bash', [toBashPath(scriptPath), ...args], {
     cwd,
     env: {
       ...process.env,
@@ -64,8 +74,8 @@ if (
 
     try {
       const result = runBash(installScript, [], {
-        HOME: homeDir,
-        ECC_GLOBAL_HOOKS_DIR: weirdHooksDir
+        HOME: toBashPath(homeDir),
+        ECC_GLOBAL_HOOKS_DIR: toBashPath(weirdHooksDir)
       });
 
       assert.strictEqual(result.status, 0, result.stderr || result.stdout);

@@ -94,6 +94,7 @@ function getSessionStartPayload(stdout) {
   assert.ok(stdout.trim(), 'Expected SessionStart hook to emit stdout payload');
   const payload = JSON.parse(stdout);
   assert.strictEqual(payload.hookSpecificOutput?.hookEventName, 'SessionStart');
+  assert.strictEqual(typeof payload.hookSpecificOutput?.additionalContext, 'string');
   return payload;
 }
 
