@@ -8,11 +8,9 @@ const path = require('path');
 
 const scriptPath = path.join(__dirname, '..', '..', 'scripts', 'sync-ecc-to-codex.sh');
 const source = fs.readFileSync(scriptPath, 'utf8');
-const runOrEchoStart = source.indexOf('run_or_echo() {');
-const runOrEchoEnd = source.indexOf('\n\nrequire_path() {', runOrEchoStart);
-const runOrEchoSource = runOrEchoStart >= 0 && runOrEchoEnd > runOrEchoStart
-  ? source.slice(runOrEchoStart, runOrEchoEnd)
-  : '';
+const normalizedSource = source.replace(/\r\n/g, '\n');
+const runOrEchoMatch = normalizedSource.match(/^run_or_echo\(\)\s*\{[\s\S]*?^}/m);
+const runOrEchoSource = runOrEchoMatch ? runOrEchoMatch[0] : '';
 
 function test(name, fn) {
   try {
