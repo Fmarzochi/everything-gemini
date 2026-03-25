@@ -107,7 +107,7 @@ If the user already signals a level, respond at that level immediately without a
 |----------------------------------------------------|-------|
 | "25%" / "short" / "brief" / "tldr" / "one-liner"  | 25%   |
 | "50%" / "moderate" / "normal"                      | 50%   |
-| "75%" / "detailed" / "thorough" / "complete"       | 75%   |
+| "75%" / "detailed" / "thorough"                        | 75%   |
 | "75%" / "detailed" / "thorough"                        | 75%   |
 
 If the user set a level earlier in the session, **maintain it silently** for subsequent responses unless they change it.
