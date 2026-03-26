@@ -123,7 +123,7 @@ The untested modules are the ones doing I/O (spawning processes, writing to SQLi
 
 ### P0 — Quick Wins
 
-1. **Remove `git2` from `Cargo.toml`** — unused dependency, reduces build time and binary size.
+2. **Add environment variable support to `Config::load()`** — `ECC_DB_PATH`, `ECC_WORKTREE_ROOT`, `ECC_DEFAULT_AGENT`. Standard practice for CLI tools.
 2. **Add environment variable support to `Config::load()`** — `ECC_DB_PATH`, `ECC_WORKTREE_ROOT`, `ECC_DEFAULT_AGENT`. Standard practice for CLI tools.
 
 ### P1 — Feature Completions
