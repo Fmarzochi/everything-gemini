@@ -62,11 +62,11 @@ ECC2 is a Rust TUI application that orchestrates AI coding agent sessions. It us
 
 ### 3.4 Config — File-Only
 
-`Config::load()` reads `~/.claude/ecc2.toml` only. No environment variable overrides. No CLI flags for config. No `ECC_DB_PATH`, `ECC_WORKTREE_ROOT`, etc.
+`Config::load()` reads `~/.claude/ecc2.toml` only. The implementation lacks environment variable overrides (e.g., `ECC_DB_PATH`, `ECC_WORKTREE_ROOT`) and CLI flags for configuration.
 
-### 3.5 Unused Dependency: `git2`
+### 3.5 Legacy Dependency: `git2`
 
-`git2 = "0.20"` is declared in `Cargo.toml` but the `worktree` module shells out to `git` CLI instead. The dependency adds ~30s to clean builds and increases binary size.
+`git2 = "0.20"` was previously declared in `Cargo.toml` but the `worktree` module shells out to `git` CLI instead. The dependency adds ~30s to clean builds and increases binary size.
 
 ### 3.6 No Metrics Aggregation
 
@@ -108,17 +108,16 @@ The untested modules are the ones doing I/O (spawning processes, writing to SQLi
 
 | Crate | Version | Latest | Notes |
 |-------|---------|--------|-------|
-| ratatui | 0.29 | 0.29 | Current |
-| crossterm | 0.28 | 0.28 | Current |
-| tokio | 1 | 1.x | Current |
-| rusqlite | 0.32 | 0.32 | Current |
-| git2 | 0.20 | 0.20 | **Unused — remove** |
-| serde | 1 | 1 | Current |
-| clap | 4 | 4 | Current |
-| chrono | 0.4 | 0.4 | Current |
-| uuid | 1 | 1 | Current |
+| ratatui | 0.29 | **0.30.0** | Update available |
+| crossterm | 0.28 | **0.29.0** | Update available |
+| rusqlite | 0.32 | **0.39.0** | Update available |
+| tokio | 1 | **1.50.0** | Update available |
+| serde | 1 | **1.0.228** | Update available |
+| clap | 4 | **4.6.0** | Update available |
+| chrono | 0.4 | **0.4.44** | Update available |
+| uuid | 1 | **1.22.0** | Update available |
 
-All dependencies are current. `git2` should be removed.
+`git2` has been removed (it was unused — the `worktree` module shells out to `git` CLI). Several other dependencies are outdated; update before the next release.
 
 ## 7. Recommendations (Prioritized)
 
@@ -137,12 +136,13 @@ All dependencies are current. `git2` should be removed.
 
 6. **Add integration tests for `manager.rs` and `runtime.rs`** — these modules do process spawning and I/O. Test with mock agents (`/bin/echo`, `/bin/false`).
 7. **Add daemon health reporting** — PID file, structured logging, graceful shutdown via signal handler.
-8. **Break up `dashboard.rs`** — extract SessionsPane, OutputPane, MetricsPane, LogPane into separate files under `tui/panes/`.
+8. **Task string security audit** — The session task uses `claude --print` via `tokio::process::Command`. Verify arguments are never shell-interpreted. Checklist: confirm `Command` arg usage, threat-model metacharacter injection, input validation/escaping strategy, logging of raw inputs, and automated tests. Re-audit if invocation code changes.
+9. **Break up `dashboard.rs`** — extract SessionsPane, OutputPane, MetricsPane, LogPane into separate files under `tui/panes/`.
 
 ### P3 — Extensibility
 
-9. **Multi-agent support** — make `agent_program()` pluggable. Add `codex`, `opencode`, `custom` agent types.
-10. **Config validation** — validate risk thresholds sum correctly, budget values are positive, paths exist.
+10. **Multi-agent support** — make `agent_program()` pluggable. Add `codex`, `opencode`, `custom` agent types.
+11. **Config validation** — validate risk thresholds sum correctly, budget values are positive, paths exist.
 
 ## 8. Comparison with Ratatui 0.29 Best Practices
 
@@ -160,7 +160,7 @@ The codebase follows ratatui conventions well:
 
 | Risk | Likelihood | Impact | Mitigation |
 |------|-----------|--------|------------|
-| Dashboard file exceeds 1500 lines | High | Medium | Extract panes into modules |
+| Dashboard file exceeds 1500 lines (projected) | High | Medium | At 1,273 lines currently (Section 2); extract panes into modules before it grows further |
 | SQLite lock contention | Low | High | DbWriter pattern already handles this |
 | No agent diversity | Medium | Medium | Pluggable agent support |
 | Stale `git2` dependency | Low | Low | Remove from Cargo.toml |
