@@ -9,7 +9,7 @@
  */
 
 import { readFileSync, existsSync } from 'fs';
-import { resolve } from 'path';
+import { resolve, basename } from 'path';
 import { readProjects } from './shared.mjs';
 
 const cwd = process.env.PWD || process.cwd();
@@ -137,7 +137,7 @@ if (readme && !output.description) {
 
 // ── Name fallback: directory name ─────────────────────────────────────────────
 if (!output.name) {
-  output.name = cwd.split('/').pop().toLowerCase().replace(/\s+/g, '-');
+  output.name = basename(cwd).toLowerCase().replace(/\s+/g, '-');
 }
 
 console.log(JSON.stringify(output, null, 2));

@@ -85,7 +85,7 @@ if (isInit) {
   };
   writeProjects(projects);
 
-  console.log(`✓ Project '${contextDir}' registered.`);
+  console.log(`✓ Project '${name}' registered.`);
   console.log(`  Use /ck:save to save session state and /ck:resume to reload it next time.`);
   process.exit(0);
 }

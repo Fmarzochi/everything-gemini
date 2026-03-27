@@ -86,6 +86,9 @@ function main() {
   const projects = readJson(PROJECTS_FILE) || {};
   const entry = projects[cwd];
 
+  // Read previous session BEFORE overwriting current-session.json
+  const prevSession = readJson(CURRENT_SESSION);
+
   // Write current-session.json
   try {
     writeFileSync(CURRENT_SESSION, JSON.stringify({
@@ -108,17 +111,17 @@ function main() {
       const latest = context.sessions?.[context.sessions.length - 1] || {};
       const sessionDate = latest.date || context.createdAt;
       const sessionCount = context.sessions?.length || 0;
+      const displayName = context.displayName ?? context.name;
 
       // ── Compact summary block (~100 tokens) ──────────────────────────────
       const summaryLines = [
-        `ck: ${context.name} | ${daysAgo(sessionDate)} | ${sessionCount} session${sessionCount !== 1 ? 's' : ''}`,
+        `ck: ${displayName} | ${daysAgo(sessionDate)} | ${sessionCount} session${sessionCount !== 1 ? 's' : ''}`,
         `Goal: ${context.goal || '—'}`,
         latest.leftOff ? `Left off: ${latest.leftOff.split('\n')[0]}` : null,
         latest.nextSteps?.length ? `Next: ${latest.nextSteps.slice(0, 2).join(' · ')}` : null,
       ].filter(Boolean);
 
       // ── Unsaved session detection ─────────────────────────────────────────
-      const prevSession = readJson(CURRENT_SESSION);
       if (prevSession?.sessionId && prevSession.sessionId !== sessionId) {
         // Check if previous session ID exists in sessions array
         const alreadySaved = context.sessions?.some(s => s.id === prevSession.sessionId);
@@ -141,7 +144,7 @@ function main() {
 
       parts.push([
         `---`,
-        `## ck: ${context.name}`,
+        `## ck: ${displayName}`,
         ``,
         summaryLines.join('\n'),
       ].join('\n'));

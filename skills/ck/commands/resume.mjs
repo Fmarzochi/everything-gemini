@@ -8,8 +8,8 @@
  * exit 0: success  exit 1: not found
  */
 
+import { existsSync } from 'fs';
 import { resolveContext, renderBriefingBox } from './shared.mjs';
-import { execSync } from 'child_process';
 
 const arg = process.argv[2];
 const cwd = process.env.PWD || process.cwd();
@@ -25,16 +25,11 @@ const { context, projectPath } = resolved;
 
 // Attempt to cd to the project path
 if (projectPath && projectPath !== cwd) {
-  try {
-    const exists = execSync(`test -d "${projectPath}" && echo yes || echo no`, {
-      stdio: 'pipe', encoding: 'utf8', timeout: 2000,
-    }).trim();
-    if (exists === 'yes') {
-      console.log(`→ cd ${projectPath}`);
-    } else {
-      console.log(`⚠  Path not found: ${projectPath}`);
-    }
-  } catch { /* non-fatal */ }
+  if (existsSync(projectPath)) {
+    console.log(`→ cd ${projectPath}`);
+  } else {
+    console.log(`⚠  Path not found: ${projectPath}`);
+  }
 }
 
 console.log('');
