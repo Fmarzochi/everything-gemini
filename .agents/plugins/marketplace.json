@@ -8,7 +8,7 @@
       "name": "everything-claude-code",
       "source": {
         "source": "local",
-        "path": "./everything-claude-code"
+        "path": "./.agents/plugins/everything-claude-code"
       },
       "policy": {
         "installation": "AVAILABLE",
