@@ -6,6 +6,7 @@
  * target-specific mutation logic into testable Node code.
  */
 
+const os = require('os');
 const {
   SUPPORTED_INSTALL_TARGETS,
   listLegacyCompatibilityLanguages,
@@ -118,7 +119,7 @@ function main() {
     });
     const plan = createInstallPlanFromRequest(request, {
       projectRoot: process.cwd(),
-      homeDir: process.env.HOME,
+      homeDir: process.env.HOME || os.homedir(),
       claudeRulesDir: process.env.CLAUDE_RULES_DIR || null,
     });
 
