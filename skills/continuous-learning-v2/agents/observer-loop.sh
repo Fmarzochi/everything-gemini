@@ -126,7 +126,7 @@ PROMPT
 
   # Ensure CWD is PROJECT_DIR so the relative analysis_relpath resolves correctly
   # on all platforms, not just when the observer happens to be launched from the project root.
-  cd "$PROJECT_DIR" || { echo "[$(date)] Failed to cd to PROJECT_DIR ($PROJECT_DIR), skipping analysis" >> "$LOG_FILE"; return; }
+  cd "$PROJECT_DIR" || { echo "[$(date)] Failed to cd to PROJECT_DIR ($PROJECT_DIR), skipping analysis" >> "$LOG_FILE"; rm -f "$prompt_file" "$analysis_file"; return; }
 
   # Prevent observe.sh from recording this automated Haiku session as observations.
   # Pass prompt via -p flag instead of stdin redirect for Windows compatibility (#842).
