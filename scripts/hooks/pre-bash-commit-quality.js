@@ -49,7 +49,7 @@ function getStagedFileContent(filePath) {
 
 /**
  * Check if a file should be quality-checked
- * @param {string} filePath 
+ * @param {string} filePath
  * @returns {boolean}
  */
 function shouldCheckFile(filePath) {
@@ -59,22 +59,22 @@ function shouldCheckFile(filePath) {
 
 /**
  * Find issues in file content
- * @param {string} filePath 
+ * @param {string} filePath
  * @returns {object[]} Array of issues found
  */
 function findFileIssues(filePath) {
   const issues = [];
-  
+
   try {
     const content = getStagedFileContent(filePath);
     if (content == null) {
       return issues;
     }
     const lines = content.split('\n');
-    
+
     lines.forEach((line, index) => {
       const lineNum = index + 1;
-      
+
       // Check for console.log
       if (line.includes('console.log') && !line.trim().startsWith('//') && !line.trim().startsWith('*')) {
         issues.push({
@@ -84,7 +84,7 @@ function findFileIssues(filePath) {
           severity: 'warning'
         });
       }
-      
+
       // Check for debugger statements
       if (/\bdebugger\b/.test(line) && !line.trim().startsWith('//')) {
         issues.push({
@@ -94,7 +94,7 @@ function findFileIssues(filePath) {
           severity: 'error'
         });
       }
-      
+
       // Check for TODO/FIXME without issue reference
       const todoMatch = line.match(/\/\/\s*(TODO|FIXME):?\s*(.+)/);
       if (todoMatch && !todoMatch[2].match(/#\d+|issue/i)) {
@@ -105,7 +105,7 @@ function findFileIssues(filePath) {
           severity: 'info'
         });
       }
-      
+
       // Check for hardcoded secrets (basic patterns)
       const secretPatterns = [
         { pattern: /sk-[a-zA-Z0-9]{20,}/, name: 'OpenAI API key' },
@@ -113,7 +113,7 @@ function findFileIssues(filePath) {
         { pattern: /AKIA[A-Z0-9]{16}/, name: 'AWS Access Key' },
         { pattern: /api[_-]?key\s*[=:]\s*['"][^'"]+['"]/i, name: 'API key' }
       ];
-      
+
       for (const { pattern, name } of secretPatterns) {
         if (pattern.test(line)) {
           issues.push({
@@ -128,23 +128,23 @@ function findFileIssues(filePath) {
   } catch {
     // File not readable, skip
   }
-  
+
   return issues;
 }
 
 /**
  * Validate commit message format
- * @param {string} command 
+ * @param {string} command
  * @returns {object|null} Validation result or null if no message to validate
  */
 function validateCommitMessage(command) {
   // Extract commit message from command
   const messageMatch = command.match(/(?:-m|--message)[=\s]+["']?([^"']+)["']?/);
   if (!messageMatch) return null;
-  
+
   const message = messageMatch[1];
   const issues = [];
-  
+
   // Check conventional commit format
   const conventionalCommit = /^(feat|fix|docs|style|refactor|test|chore|build|ci|perf|revert)(\(.+\))?:\s*.+/;
   if (!conventionalCommit.test(message)) {
@@ -154,7 +154,7 @@ function validateCommitMessage(command) {
       suggestion: 'Use format: type(scope): description (e.g., "feat(auth): add login flow")'
     });
   }
-  
+
   // Check message length
   if (message.length > 72) {
     issues.push({
@@ -163,7 +163,7 @@ function validateCommitMessage(command) {
       suggestion: 'Keep the first line under 72 characters'
     });
   }
-  
+
   // Check for lowercase first letter (conventional)
   if (conventionalCommit.test(message)) {
     const afterColon = message.split(':')[1];
@@ -175,7 +175,7 @@ function validateCommitMessage(command) {
       });
     }
   }
-  
+
   // Check for trailing period
   if (message.endsWith('.')) {
     issues.push({
@@ -184,26 +184,26 @@ function validateCommitMessage(command) {
       suggestion: 'Remove the trailing period'
     });
   }
-  
+
   return { message, issues };
 }
 
 /**
  * Run linter on staged files
- * @param {string[]} files 
+ * @param {string[]} files
  * @returns {object} Lint results
  */
 function runLinter(files) {
   const jsFiles = files.filter(f => /\.(js|jsx|ts|tsx)$/.test(f));
   const pyFiles = files.filter(f => f.endsWith('.py'));
   const goFiles = files.filter(f => f.endsWith('.go'));
-  
+
   const results = {
     eslint: null,
     pylint: null,
     golint: null
   };
-  
+
   // Run ESLint if available
   if (jsFiles.length > 0) {
     const eslintBin = process.platform === 'win32' ? 'eslint.cmd' : 'eslint';
@@ -220,7 +220,7 @@ function runLinter(files) {
       };
     }
   }
-  
+
   // Run Pylint if available
   if (pyFiles.length > 0) {
     try {
@@ -241,7 +241,7 @@ function runLinter(files) {
       // Pylint not available
     }
   }
-  
+
   // Run golint if available
   if (goFiles.length > 0) {
     try {
@@ -262,7 +262,7 @@ function runLinter(files) {
       // golint not available
     }
   }
-  
+
   return results;
 }
 
@@ -275,40 +275,40 @@ function evaluate(rawInput) {
   try {
     const input = JSON.parse(rawInput);
     const command = input.tool_input?.command || '';
-    
+
     // Only run for git commit commands
     if (!command.includes('git commit')) {
       return { output: rawInput, exitCode: 0 };
     }
-    
+
     // Check if this is an amend (skip checks for amends to avoid blocking)
     if (command.includes('--amend')) {
       return { output: rawInput, exitCode: 0 };
     }
-    
+
     // Get staged files
     const stagedFiles = getStagedFiles();
-    
+
     if (stagedFiles.length === 0) {
       console.error('[Hook] No staged files found. Use "git add" to stage files first.');
       return { output: rawInput, exitCode: 0 };
     }
-    
+
     console.error(`[Hook] Checking ${stagedFiles.length} staged file(s)...`);
-    
+
     // Check each staged file
     const filesToCheck = stagedFiles.filter(shouldCheckFile);
     let totalIssues = 0;
     let errorCount = 0;
     let warningCount = 0;
     let infoCount = 0;
-    
+
     for (const file of filesToCheck) {
       const fileIssues = findFileIssues(file);
       if (fileIssues.length > 0) {
-        console.error(`\n📁 ${file}`);
+        console.error(`\n ${file}`);
         for (const issue of fileIssues) {
-          const icon = issue.severity === 'error' ? '❌' : issue.severity === 'warning' ? '⚠️' : 'ℹ️';
+          const icon = issue.severity === 'error' ? 'FAIL:' : issue.severity === 'warning' ? 'WARNING:' : '';
           console.error(`  ${icon} Line ${issue.line}: ${issue.message}`);
           totalIssues++;
           if (issue.severity === 'error') errorCount++;
@@ -317,65 +317,65 @@ function evaluate(rawInput) {
         }
       }
     }
-    
+
     // Validate commit message if provided
     const messageValidation = validateCommitMessage(command);
     if (messageValidation && messageValidation.issues.length > 0) {
-      console.error('\n📝 Commit Message Issues:');
+      console.error('\n Commit Message Issues:');
       for (const issue of messageValidation.issues) {
-        console.error(`  ⚠️ ${issue.message}`);
+        console.error(`  WARNING: ${issue.message}`);
         if (issue.suggestion) {
-          console.error(`     💡 ${issue.suggestion}`);
+          console.error(`      ${issue.suggestion}`);
         }
         totalIssues++;
         warningCount++;
       }
     }
-    
+
     // Run linter
     const lintResults = runLinter(filesToCheck);
-    
+
     if (lintResults.eslint && !lintResults.eslint.success) {
-      console.error('\n🔍 ESLint Issues:');
+      console.error('\n ESLint Issues:');
       console.error(lintResults.eslint.output);
       totalIssues++;
       errorCount++;
     }
-    
+
     if (lintResults.pylint && !lintResults.pylint.success) {
-      console.error('\n🔍 Pylint Issues:');
+      console.error('\n Pylint Issues:');
       console.error(lintResults.pylint.output);
       totalIssues++;
       errorCount++;
     }
-    
+
     if (lintResults.golint && !lintResults.golint.success) {
-      console.error('\n🔍 golint Issues:');
+      console.error('\n golint Issues:');
       console.error(lintResults.golint.output);
       totalIssues++;
       errorCount++;
     }
-    
+
     // Summary
     if (totalIssues > 0) {
-      console.error(`\n📊 Summary: ${totalIssues} issue(s) found (${errorCount} error(s), ${warningCount} warning(s), ${infoCount} info)`);
-      
+      console.error(`\n Summary: ${totalIssues} issue(s) found (${errorCount} error(s), ${warningCount} warning(s), ${infoCount} info)`);
+
       if (errorCount > 0) {
-        console.error('\n[Hook] ❌ Commit blocked due to critical issues. Fix them before committing.');
+        console.error('\n[Hook] FAIL: Commit blocked due to critical issues. Fix them before committing.');
         return { output: rawInput, exitCode: 2 };
       } else {
-        console.error('\n[Hook] ⚠️ Warnings found. Consider fixing them, but commit is allowed.');
+        console.error('\n[Hook] WARNING: Warnings found. Consider fixing them, but commit is allowed.');
         console.error('[Hook] To bypass these checks, use: git commit --no-verify');
       }
     } else {
-      console.error('\n[Hook] ✅ All checks passed!');
+      console.error('\n[Hook] PASS: All checks passed!');
     }
-    
+
   } catch (error) {
     console.error(`[Hook] Error: ${error.message}`);
     // Non-blocking on error
   }
-  
+
   return { output: rawInput, exitCode: 0 };
 }
 
@@ -387,14 +387,14 @@ function run(rawInput) {
 if (require.main === module) {
   let data = '';
   process.stdin.setEncoding('utf8');
-  
+
   process.stdin.on('data', chunk => {
     if (data.length < MAX_STDIN) {
       const remaining = MAX_STDIN - data.length;
       data += chunk.substring(0, remaining);
     }
   });
-  
+
   process.stdin.on('end', () => {
     const result = evaluate(data);
     process.stdout.write(result.output);

@@ -228,7 +228,7 @@ const results = await batchFetch(['user1', 'user2', 'user3']);
 const fetchWithCache = async (url: string, ttl = 300000) => {
   const cached = cache.get(url);
   if (cached) return cached;
-  
+
   const data = await fetch(url).then(r => r.json());
   cache.set(url, data, ttl);
   return data;
@@ -376,16 +376,16 @@ getTTFB(console.log); // Time to First Byte
 ## Bundle Analysis
 | Metric | Current | Target | Status |
 |--------|---------|--------|--------|
-| Total Size (gzip) | XXX KB | < 200 KB | ⚠️ |
-| Main Bundle | XXX KB | < 100 KB | ✅ |
-| Vendor Bundle | XXX KB | < 150 KB | ⚠️ |
+| Total Size (gzip) | XXX KB | < 200 KB | WARNING: |
+| Main Bundle | XXX KB | < 100 KB | PASS: |
+| Vendor Bundle | XXX KB | < 150 KB | WARNING: |
 
 ## Web Vitals
 | Metric | Current | Target | Status |
 |--------|---------|--------|--------|
-| LCP | X.Xs | < 2.5s | ✅ |
-| FID | XXms | < 100ms | ✅ |
-| CLS | X.XX | < 0.1 | ⚠️ |
+| LCP | X.Xs | < 2.5s | PASS: |
+| FID | XXms | < 100ms | PASS: |
+| CLS | X.XX | < 0.1 | WARNING: |
 
 ## Critical Issues
 

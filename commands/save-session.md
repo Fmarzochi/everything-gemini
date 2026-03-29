@@ -130,10 +130,10 @@ If nothing is queued: "No specific untried approaches identified."
 
 | File              | Status         | Notes                      |
 | ----------------- | -------------- | -------------------------- |
-| `path/to/file.ts` | ✅ Complete    | [what it does]             |
-| `path/to/file.ts` | 🔄 In Progress | [what's done, what's left] |
-| `path/to/file.ts` | ❌ Broken      | [what's wrong]             |
-| `path/to/file.ts` | 🗒️ Not Started | [planned but not touched]  |
+| `path/to/file.ts` | PASS: Complete    | [what it does]             |
+| `path/to/file.ts` |  In Progress | [what's done, what's left] |
+| `path/to/file.ts` | FAIL: Broken      | [what's wrong]             |
+| `path/to/file.ts` |  Not Started | [planned but not touched]  |
 
 If no files were touched: "No files modified this session."
 
@@ -235,11 +235,11 @@ refreshes without exposing the token to JavaScript.
 
 | File                             | Status         | Notes                                           |
 | -------------------------------- | -------------- | ----------------------------------------------- |
-| `app/api/auth/register/route.ts` | ✅ Complete    | Works, tested                                   |
-| `app/api/auth/login/route.ts`    | 🔄 In Progress | Token generates but not setting cookie yet      |
-| `lib/auth.ts`                    | ✅ Complete    | JWT helpers, all tested                         |
-| `middleware.ts`                  | 🗒️ Not Started | Route protection, needs cookie read logic first |
-| `app/login/page.tsx`             | 🗒️ Not Started | UI not started                                  |
+| `app/api/auth/register/route.ts` | PASS: Complete    | Works, tested                                   |
+| `app/api/auth/login/route.ts`    |  In Progress | Token generates but not setting cookie yet      |
+| `lib/auth.ts`                    | PASS: Complete    | JWT helpers, all tested                         |
+| `middleware.ts`                  |  Not Started | Route protection, needs cookie read logic first |
+| `app/login/page.tsx`             |  Not Started | UI not started                                  |
 
 ---
 

@@ -62,10 +62,10 @@ Choose model tier based on task complexity:
 
 - **Haiku**: Classification, boilerplate transforms, narrow edits
   - Example: Rename variable, add type annotation, format code
-  
+
 - **Sonnet**: Implementation and refactors
   - Example: Implement feature, refactor module, write tests
-  
+
 - **Opus**: Architecture, root-cause analysis, multi-file invariants
   - Example: Design system, debug complex issue, review architecture
 
@@ -75,10 +75,10 @@ Choose model tier based on task complexity:
 
 - **Continue session** for closely-coupled units
   - Example: Implementing related functions in same module
-  
+
 - **Start fresh session** after major phase transitions
   - Example: Moving from implementation to testing
-  
+
 - **Compact after milestone completion**, not during active debugging
   - Example: After feature complete, before starting next feature
 

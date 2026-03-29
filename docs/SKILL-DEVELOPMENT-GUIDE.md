@@ -122,7 +122,7 @@ Link to complementary skills.
 
 Good skills are **focused and actionable**:
 
-| ✅ Good Focus | ❌ Too Broad |
+| PASS: Good Focus | FAIL: Too Broad |
 |---------------|--------------|
 | `react-hook-patterns` | `react` |
 | `postgresql-indexing` | `databases` |
@@ -186,11 +186,11 @@ Another pattern with code.
 
 Write content that Claude can **immediately use**:
 
-- ✅ Copy-pasteable code examples
-- ✅ Clear decision trees
-- ✅ Checklists for verification
-- ❌ Vague explanations without examples
-- ❌ Long prose without actionable guidance
+- PASS: Copy-pasteable code examples
+- PASS: Clear decision trees
+- PASS: Checklists for verification
+- FAIL: Vague explanations without examples
+- FAIL: Long prose without actionable guidance
 
 ---
 
@@ -334,11 +334,11 @@ Good:
 async function fetchData(url: string) {
   try {
     const response = await fetch(url)
-    
+
     if (!response.ok) {
       throw new Error(\`HTTP \${response.status}: \${response.statusText}\`)
     }
-    
+
     return await response.json()
   } catch (error) {
     console.error('Fetch failed:', error)
@@ -361,7 +361,7 @@ Show what NOT to do:
 ```markdown
 ## Anti-Patterns
 
-### ❌ Direct State Mutation
+### FAIL: Direct State Mutation
 
 \`\`\`typescript
 // NEVER do this
@@ -369,7 +369,7 @@ user.name = 'New Name'
 items.push(newItem)
 \`\`\`
 
-### ✅ Immutable Updates
+### PASS: Immutable Updates
 
 \`\`\`typescript
 // ALWAYS do this
@@ -583,7 +583,7 @@ description: Quick reference for [API/Library].
 2. **Test with Claude Code**:
    ```
    You: "I need to [task that should trigger your skill]"
-   
+
    Claude should reference your skill's patterns.
    ```
 
@@ -729,12 +729,12 @@ origin: ECC
 ### Borrowing Rules
 
 \`\`\`rust
-// ✅ CORRECT: Borrow when you don't need ownership
+// PASS: CORRECT: Borrow when you don't need ownership
 fn process_data(data: &str) -> usize {
     data.len()
 }
 
-// ✅ CORRECT: Take ownership when you need to modify or consume
+// PASS: CORRECT: Take ownership when you need to modify or consume
 fn consume_data(data: Vec<u8>) -> String {
     String::from_utf8(data).unwrap()
 }
@@ -751,7 +751,7 @@ use thiserror::Error;
 pub enum AppError {
     #[error("IO error: {0}")]
     Io(#[from] std::io::Error),
-    
+
     #[error("Parse error: {0}")]
     Parse(#[from] std::num::ParseIntError),
 }

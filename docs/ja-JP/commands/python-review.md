@@ -89,7 +89,7 @@ Agent:
 ## 静的解析結果
 ✓ ruff: 問題なし
 ✓ mypy: エラーなし
-⚠️ black: 2ファイルが再フォーマット必要
+WARNING: black: 2ファイルが再フォーマット必要
 ✓ bandit: セキュリティ問題なし
 
 ## 発見された問題
@@ -155,7 +155,7 @@ with open("config.json") as f:  # 良い
 - HIGH: 1
 - MEDIUM: 2
 
-推奨: ❌ CRITICAL問題が修正されるまでマージをブロック
+推奨: FAIL: CRITICAL問題が修正されるまでマージをブロック
 
 ## フォーマット必要
 実行: `black app/routes/user.py app/services/auth.py`
@@ -165,9 +165,9 @@ with open("config.json") as f:  # 良い
 
 | ステータス | 条件 |
 |--------|-----------|
-| ✅ 承認 | CRITICALまたはHIGH問題なし |
-| ⚠️ 警告 | MEDIUM問題のみ(注意してマージ) |
-| ❌ ブロック | CRITICALまたはHIGH問題が発見された |
+| PASS: 承認 | CRITICALまたはHIGH問題なし |
+| WARNING: 警告 | MEDIUM問題のみ(注意してマージ) |
+| FAIL: ブロック | CRITICALまたはHIGH問題が発見された |
 
 ## 他のコマンドとの統合
 

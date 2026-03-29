@@ -192,7 +192,7 @@ func TestValidate(t *testing.T) {
         {"valid", "test@example.com", false},
         {"invalid", "not-an-email", true},
     }
-    
+
     for _, tt := range tests {
         t.Run(tt.name, func(t *testing.T) {
             err := Validate(tt.input)

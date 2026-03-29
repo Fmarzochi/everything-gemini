@@ -65,9 +65,9 @@ WHAT WE'RE BUILDING:
 [2-3 sentence summary in your own words]
 
 CURRENT STATE:
-✅ Working: [count] items confirmed
-🔄 In Progress: [list files that are in progress]
-🗒️ Not Started: [list planned but untouched]
+PASS: Working: [count] items confirmed
+ In Progress: [list files that are in progress]
+ Not Started: [list planned but untouched]
 
 WHAT NOT TO RETRY:
 [list every failed approach with its reason — this is critical]
@@ -99,10 +99,10 @@ If no next step is defined — ask the user where to start, and optionally sugge
 Load the most recently modified matching file for that date, regardless of whether it uses the legacy no-id format or the current short-id format.
 
 **Session file references files that no longer exist:**
-Note this during the briefing — "⚠️ `path/to/file.ts` referenced in session but not found on disk."
+Note this during the briefing — "WARNING: `path/to/file.ts` referenced in session but not found on disk."
 
 **Session file is from more than 7 days ago:**
-Note the gap — "⚠️ This session is from N days ago (threshold: 7 days). Things may have changed." — then proceed normally.
+Note the gap — "WARNING: This session is from N days ago (threshold: 7 days). Things may have changed." — then proceed normally.
 
 **User provides a file path directly (e.g., forwarded from a teammate):**
 Read it and follow the same briefing process — the format is the same regardless of source.
@@ -126,13 +126,13 @@ Register and login endpoints are partially done. Route protection
 via middleware hasn't been started yet.
 
 CURRENT STATE:
-✅ Working: 3 items (register endpoint, JWT generation, password hashing)
-🔄 In Progress: app/api/auth/login/route.ts (token works, cookie not set yet)
-🗒️ Not Started: middleware.ts, app/login/page.tsx
+PASS: Working: 3 items (register endpoint, JWT generation, password hashing)
+ In Progress: app/api/auth/login/route.ts (token works, cookie not set yet)
+ Not Started: middleware.ts, app/login/page.tsx
 
 WHAT NOT TO RETRY:
-❌ Next-Auth — conflicts with custom Prisma adapter, threw adapter error on every request
-❌ localStorage for JWT — causes SSR hydration mismatch, incompatible with Next.js
+FAIL: Next-Auth — conflicts with custom Prisma adapter, threw adapter error on every request
+FAIL: localStorage for JWT — causes SSR hydration mismatch, incompatible with Next.js
 
 OPEN QUESTIONS / BLOCKERS:
 - Does cookies().set() work inside a Route Handler or only Server Actions?

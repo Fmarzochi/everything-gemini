@@ -23,7 +23,7 @@ Use **pytest** as the testing framework for its powerful features and clean synt
 def test_user_creation():
     """Test that a user can be created with valid data"""
     user = User(name="Alice", email="alice@example.com")
-    
+
     assert user.name == "Alice"
     assert user.email == "alice@example.com"
     assert user.is_active is True
@@ -52,12 +52,12 @@ def db_session():
     engine = create_engine("sqlite:///:memory:")
     Session = sessionmaker(bind=engine)
     session = Session()
-    
+
     # Setup
     Base.metadata.create_all(engine)
-    
+
     yield session
-    
+
     # Teardown
     session.close()
 
@@ -65,7 +65,7 @@ def test_user_repository(db_session):
     """Test using the db_session fixture"""
     repo = UserRepository(db_session)
     user = repo.create(name="Alice", email="alice@example.com")
-    
+
     assert user.id is not None
 ```
 
@@ -206,10 +206,10 @@ def test_user_service_with_mock():
     """Test with mock repository"""
     mock_repo = Mock()
     mock_repo.find_by_id.return_value = User(id="1", name="Alice")
-    
+
     service = UserService(mock_repo)
     user = service.get_user("1")
-    
+
     assert user.name == "Alice"
     mock_repo.find_by_id.assert_called_once_with("1")
 
@@ -218,7 +218,7 @@ def test_send_notification(mock_email_service):
     """Test with patched dependency"""
     service = NotificationService()
     service.send("user@example.com", "Hello")
-    
+
     mock_email_service.send.assert_called_once()
 ```
 
@@ -229,10 +229,10 @@ def test_with_mocker(mocker):
     """Using pytest-mock plugin"""
     mock_repo = mocker.Mock()
     mock_repo.find_by_id.return_value = User(id="1", name="Alice")
-    
+
     service = UserService(mock_repo)
     user = service.get_user("1")
-    
+
     assert user.name == "Alice"
 ```
 
@@ -357,7 +357,7 @@ def test_with_context():
     """pytest provides detailed assertion introspection"""
     result = calculate_total([1, 2, 3])
     expected = 6
-    
+
     # pytest shows: assert 5 == 6
     assert result == expected
 ```
@@ -378,7 +378,7 @@ import pytest
 def test_float_comparison():
     result = 0.1 + 0.2
     assert result == pytest.approx(0.3)
-    
+
     # With tolerance
     assert result == pytest.approx(0.3, abs=1e-9)
 ```
@@ -402,7 +402,7 @@ def test_exception_details():
     """Capture and inspect exception"""
     with pytest.raises(ValidationError) as exc_info:
         validate_user(name="", age=-1)
-    
+
     assert "name" in exc_info.value.errors
     assert "age" in exc_info.value.errors
 ```

@@ -49,7 +49,7 @@ func TestValidateEmail(t *testing.T) {
         t.Run(tt.name, func(t *testing.T) {
             err := ValidateEmail(tt.email)
             if (err != nil) != tt.wantErr {
-                t.Errorf("ValidateEmail(%q) error = %v, wantErr %v", 
+                t.Errorf("ValidateEmail(%q) error = %v, wantErr %v",
                     tt.email, err, tt.wantErr)
             }
         })
@@ -95,19 +95,19 @@ Use `t.Cleanup()` for resource cleanup:
 ```go
 func testDB(t *testing.T) *sql.DB {
     t.Helper()
-    
+
     db, err := sql.Open("sqlite3", ":memory:")
     if err != nil {
         t.Fatalf("failed to open test db: %v", err)
     }
-    
+
     // Cleanup runs after test completes
     t.Cleanup(func() {
         if err := db.Close(); err != nil {
             t.Errorf("failed to close db: %v", err)
         }
     })
-    
+
     return db
 }
 
@@ -164,7 +164,7 @@ go test -cover ./... | grep -E 'coverage: [0-7][0-9]\.[0-9]%' && exit 1
 ```go
 func BenchmarkValidateEmail(b *testing.B) {
     email := "user@example.com"
-    
+
     b.ResetTimer()
     for i := 0; i < b.N; i++ {
         ValidateEmail(email)
@@ -212,7 +212,7 @@ func TestUserService(t *testing.T) {
             "1": {ID: "1", Name: "Alice"},
         },
     }
-    
+
     service := NewUserService(mock)
     // ... test logic
 }
@@ -245,16 +245,16 @@ func TestWithPostgres(t *testing.T) {
     if testing.Short() {
         t.Skip("skipping integration test")
     }
-    
+
     // Setup test container
     ctx := context.Background()
     container, err := testcontainers.GenericContainer(ctx, ...)
     assertNoError(t, err)
-    
+
     t.Cleanup(func() {
         container.Terminate(ctx)
     })
-    
+
     // ... test logic
 }
 ```
@@ -290,10 +290,10 @@ package user
 func TestUserHandler(t *testing.T) {
     req := httptest.NewRequest("GET", "/users/1", nil)
     rec := httptest.NewRecorder()
-    
+
     handler := NewUserHandler(mockRepo)
     handler.ServeHTTP(rec, req)
-    
+
     assertEqual(t, rec.Code, http.StatusOK)
 }
 ```
@@ -304,7 +304,7 @@ func TestUserHandler(t *testing.T) {
 func TestWithTimeout(t *testing.T) {
     ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
     defer cancel()
-    
+
     err := SlowOperation(ctx)
     if !errors.Is(err, context.DeadlineExceeded) {
         t.Errorf("expected timeout error, got %v", err)

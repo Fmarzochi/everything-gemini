@@ -597,7 +597,7 @@ For more detailed information, see the `docs/` directory:
 
 ## Contributers
 
-- Himanshu Sharma [@ihimanss](https://github.com/ihimanss) 
+- Himanshu Sharma [@ihimanss](https://github.com/ihimanss)
 - Sungmin Hong [@aws-hsungmin](https://github.com/aws-hsungmin)
 
 

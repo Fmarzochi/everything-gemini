@@ -45,7 +45,7 @@ python3 ~/.claude/skills/continuous-learning-v2/scripts/instinct-cli.py import <
 ## インポートプロセス
 
 ```
-📥 instinctsをインポート中: team-instincts.yaml
+ instinctsをインポート中: team-instincts.yaml
 ================================================
 
 12件のinstinctsが見つかりました。
@@ -61,19 +61,19 @@ python3 ~/.claude/skills/continuous-learning-v2/scripts/instinct-cli.py import <
 
 ## 重複instincts (3)
 類似のinstinctsが既に存在:
-  ⚠️ prefer-functional-style
+  WARNING: prefer-functional-style
      ローカル: 信頼度0.8, 12回の観測
      インポート: 信頼度0.7
      → ローカルを保持 (信頼度が高い)
 
-  ⚠️ test-first-workflow
+  WARNING: test-first-workflow
      ローカル: 信頼度0.75
      インポート: 信頼度0.9
      → インポートに更新 (信頼度が高い)
 
 ## 競合instincts (1)
 ローカルのinstinctsと矛盾:
-  ❌ use-classes-for-services
+  FAIL: use-classes-for-services
      競合: avoid-classes
      → スキップ (手動解決が必要)
 
@@ -130,7 +130,7 @@ Skill Creatorからインポートする場合:
 
 インポート後:
 ```
-✅ インポート完了!
+PASS: インポート完了!
 
 追加: 8件のinstincts
 更新: 1件のinstinct

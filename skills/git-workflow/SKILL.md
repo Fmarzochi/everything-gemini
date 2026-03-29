@@ -138,8 +138,7 @@ Create `.gitmessage` in repo root:
 
 ```
 # <type>(<scope>): <subject>
-# 
-# Types: feat, fix, docs, style, refactor, test, chore, perf, ci, revert
+# # Types: feat, fix, docs, style, refactor, test, chore, perf, ci, revert
 # Scope: api, ui, db, auth, etc.
 # Subject: imperative mood, no period, max 50 chars
 #

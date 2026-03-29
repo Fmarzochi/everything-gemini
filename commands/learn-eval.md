@@ -73,7 +73,7 @@ origin: auto-extracted
    | **Absorb into [X]** | Should be appended to an existing skill | Show target skill and additions → Step 6 |
    | **Drop** | Trivial, redundant, or too abstract | Explain reasoning and stop |
 
-   **Guideline dimensions** (informing the verdict, not scored):
+**Guideline dimensions** (informing the verdict, not scored):
 
    - **Specificity & Actionability**: Contains code examples or commands that are immediately usable
    - **Scope Fit**: Name, trigger conditions, and content are aligned and focused on a single pattern

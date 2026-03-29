@@ -39,7 +39,7 @@ python3 ~/.claude/skills/continuous-learning-v2/scripts/instinct-cli.py status
 ## 出力形式
 
 ```
-📊 instinctステータス
+ instinctステータス
 ==================
 
 ## コードスタイル (4 instincts)

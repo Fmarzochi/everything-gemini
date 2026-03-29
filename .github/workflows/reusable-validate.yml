@@ -44,3 +44,6 @@ jobs:
 
       - name: Validate rules
         run: node scripts/ci/validate-rules.js
+
+      - name: Check unicode safety
+        run: node scripts/ci/check-unicode-safety.js

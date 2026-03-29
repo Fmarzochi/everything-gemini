@@ -124,16 +124,16 @@ return fmt.Errorf("get user %s: %w", userID, err)
 - HIGH: 1
 - MEDIUM: 0
 
-推奨: ❌ CRITICAL問題が修正されるまでマージをブロック
+推奨: FAIL: CRITICAL問題が修正されるまでマージをブロック
 ```
 
 ## 承認基準
 
 | ステータス | 条件 |
 |--------|-----------|
-| ✅ 承認 | CRITICALまたはHIGH問題なし |
-| ⚠️ 警告 | MEDIUM問題のみ(注意してマージ) |
-| ❌ ブロック | CRITICALまたはHIGH問題が発見された |
+| PASS: 承認 | CRITICALまたはHIGH問題なし |
+| WARNING: 警告 | MEDIUM問題のみ(注意してマージ) |
+| FAIL: ブロック | CRITICALまたはHIGH問題が発見された |
 
 ## 他のコマンドとの統合
 

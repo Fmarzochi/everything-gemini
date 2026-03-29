@@ -30,7 +30,7 @@ class UserRepository:
     def find_by_id(self, id: str) -> dict | None:
         # implementation
         pass
-    
+
     def save(self, entity: dict) -> dict:
         # implementation
         pass
@@ -104,11 +104,11 @@ class FileProcessor:
     def __init__(self, filename: str):
         self.filename = filename
         self.file = None
-    
+
     def __enter__(self):
         self.file = open(self.filename, 'r')
         return self.file
-    
+
     def __exit__(self, exc_type, exc_val, exc_tb):
         if self.file:
             self.file.close()
@@ -173,13 +173,13 @@ def slow_function():
 def singleton(cls):
     """Decorator to make a class a singleton"""
     instances = {}
-    
+
     @wraps(cls)
     def get_instance(*args, **kwargs):
         if cls not in instances:
             instances[cls] = cls(*args, **kwargs)
         return instances[cls]
-    
+
     return get_instance
 
 @singleton
@@ -216,7 +216,7 @@ class AsyncDatabase:
     async def __aenter__(self):
         await self.connect()
         return self
-    
+
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         await self.disconnect()
 
@@ -238,7 +238,7 @@ class Repository(Generic[T]):
     """Generic repository pattern"""
     def __init__(self, entity_type: type[T]):
         self.entity_type = entity_type
-    
+
     def find_by_id(self, id: str) -> T | None:
         # implementation
         pass
@@ -280,17 +280,17 @@ class UserService:
         self.repository = repository
         self.logger = logger
         self.cache = cache
-    
+
     def get_user(self, user_id: str) -> User | None:
         if self.cache:
             cached = self.cache.get(user_id)
             if cached:
                 return cached
-        
+
         user = self.repository.find_by_id(user_id)
         if user and self.cache:
             self.cache.set(user_id, user)
-        
+
         return user
 ```
 
@@ -375,16 +375,16 @@ class User:
     def __init__(self, name: str):
         self._name = name
         self._email = None
-    
+
     @property
     def name(self) -> str:
         """Read-only property"""
         return self._name
-    
+
     @property
     def email(self) -> str | None:
         return self._email
-    
+
     @email.setter
     def email(self, value: str) -> None:
         if '@' not in value:
