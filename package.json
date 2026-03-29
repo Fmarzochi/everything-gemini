@@ -89,6 +89,9 @@
     "AGENTS.md",
     ".claude-plugin/plugin.json",
     ".claude-plugin/README.md",
+    ".codex-plugin/plugin.json",
+    ".codex-plugin/README.md",
+    ".mcp.json",
     "install.sh",
     "install.ps1",
     "llms.txt"
@@ -110,11 +113,11 @@
   },
   "dependencies": {
     "@iarna/toml": "^2.2.5",
+    "ajv": "^8.18.0",
     "sql.js": "^1.14.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
-    "ajv": "^8.18.0",
     "c8": "^10.1.2",
     "eslint": "^9.39.2",
     "globals": "^17.1.0",
@@ -122,5 +125,6 @@
   },
   "engines": {
     "node": ">=18"
-  }
+  },
+  "packageManager": "yarn@4.9.2+sha512.1fc009bc09d13cfd0e19efa44cbfc2b9cf6ca61482725eb35bbc5e257e093ebf4130db6dfe15d604ff4b79efd8e1e8e99b25fa7d0a6197c9f9826358d4d65c3c"
 }

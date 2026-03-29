@@ -234,14 +234,14 @@ setCount(count + 1)  // Can be stale in async scenarios
 ### REST API規約
 
 ```
-GET    /api/markets              # List all markets
-GET    /api/markets/:id          # Get specific market
-POST   /api/markets              # Create new market
-PUT    /api/markets/:id          # Update market (full)
-PATCH  /api/markets/:id          # Update market (partial)
-DELETE /api/markets/:id          # Delete market
+GET    /api/markets              # すべてのマーケットを一覧
+GET    /api/markets/:id          # 特定のマーケットを取得
+POST   /api/markets              # 新しいマーケットを作成
+PUT    /api/markets/:id          # マーケットを更新（全体）
+PATCH  /api/markets/:id          # マーケットを更新（部分）
+DELETE /api/markets/:id          # マーケットを削除
 
-# Query parameters for filtering
+# フィルタリング用クエリパラメータ
 GET /api/markets?status=active&limit=10&offset=0
 ```
 
@@ -312,29 +312,29 @@ export async function POST(request: Request) {
 ```
 src/
 ├── app/                    # Next.js App Router
-│   ├── api/               # API routes
-│   ├── markets/           # Market pages
-│   └── (auth)/           # Auth pages (route groups)
-├── components/            # React components
-│   ├── ui/               # Generic UI components
-│   ├── forms/            # Form components
-│   └── layouts/          # Layout components
-├── hooks/                # Custom React hooks
-├── lib/                  # Utilities and configs
-│   ├── api/             # API clients
-│   ├── utils/           # Helper functions
-│   └── constants/       # Constants
-├── types/                # TypeScript types
-└── styles/              # Global styles
+│   ├── api/               # API ルート
+│   ├── markets/           # マーケットページ
+│   └── (auth)/           # 認証ページ（ルートグループ）
+├── components/            # React コンポーネント
+│   ├── ui/               # 汎用 UI コンポーネント
+│   ├── forms/            # フォームコンポーネント
+│   └── layouts/          # レイアウトコンポーネント
+├── hooks/                # カスタム React フック
+├── lib/                  # ユーティリティと設定
+│   ├── api/             # API クライアント
+│   ├── utils/           # ヘルパー関数
+│   └── constants/       # 定数
+├── types/                # TypeScript 型定義
+└── styles/              # グローバルスタイル
 ```
 
 ### ファイル命名
 
 ```
-components/Button.tsx          # PascalCase for components
-hooks/useAuth.ts              # camelCase with 'use' prefix
-lib/formatDate.ts             # camelCase for utilities
-types/market.types.ts         # camelCase with .types suffix
+components/Button.tsx          # コンポーネントは PascalCase
+hooks/useAuth.ts              # フックは 'use' プレフィックス付き camelCase
+lib/formatDate.ts             # ユーティリティは camelCase
+types/market.types.ts         # 型定義は .types サフィックス付き camelCase
 ```
 
 ## コメントとドキュメント

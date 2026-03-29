@@ -38,24 +38,24 @@ e2e-runner エージェントは：
 ## 使用します示例
 
 ````
-User: /e2e Test the market search and view flow
+User: /e2e マーケット検索と表示フローをテスト
 
 Agent (e2e-runner):
-# E2E Test Generation: Market Search and View Flow
+# E2Eテスト生成: マーケット検索と表示フロー
 
-## Test Scenario Identified
+## 特定されたテストシナリオ
 
-**User Journey:** Market Search → View Results → Click Market → View Details
+**ユーザージャーニー:** マーケット検索 → 結果表示 → マーケットクリック → 詳細表示
 
-**Test Coverage:**
-1. Navigate to markets page
-2. Perform semantic search
-3. Verify search results
-4. Click on first result
-5. Verify market details page loads
-6. Verify chart renders
+**テストカバレッジ:**
+1. マーケットページに遷移
+2. セマンティック検索を実行
+3. 検索結果を検証
+4. 最初の結果をクリック
+5. マーケット詳細ページの読み込みを検証
+6. チャートの描画を検証
 
-## Generated Test Code
+## 生成されたテストコード
 
 ```typescript
 // tests/e2e/markets/search-and-view.spec.ts
@@ -160,7 +160,7 @@ test.describe('Market Search and View Flow', () => {
 ## テスト実行
 
 ```bash
-# Run the generated test
+# 生成されたテストを実行
 npx playwright test tests/e2e/markets/search-and-view.spec.ts
 
 Running 3 tests using 3 workers
@@ -181,54 +181,54 @@ Artifacts generated:
 
 ```
 ╔══════════════════════════════════════════════════════════════╗
-║                    E2E Test Results                          ║
+║                    E2Eテスト結果                          ║
 ╠══════════════════════════════════════════════════════════════╣
-║ Status:     ✅ ALL TESTS PASSED                              ║
-║ Total:      3 tests                                          ║
-║ Passed:     3 (100%)                                         ║
-║ Failed:     0                                                ║
-║ Flaky:      0                                                ║
-║ Duration:   9.1s                                             ║
+║ ステータス: ✅ 全テスト合格                              ║
+║ 合計:       3テスト                                          ║
+║ 合格:       3 (100%)                                         ║
+║ 失敗:       0                                                ║
+║ 不安定:     0                                                ║
+║ 所要時間:   9.1s                                             ║
 ╚══════════════════════════════════════════════════════════════╝
 
-Artifacts:
-📸 Screenshots: 2 files
-📹 Videos: 0 files (only on failure)
-🔍 Traces: 0 files (only on failure)
-📊 HTML Report: playwright-report/index.html
+アーティファクト:
+📸 スクリーンショット: 2ファイル
+📹 ビデオ: 0ファイル (失敗時のみ)
+🔍 トレース: 0ファイル (失敗時のみ)
+📊 HTMLレポート: playwright-report/index.html
 
-View report: npx playwright show-report
+レポート表示: npx playwright show-report
 ```
 
 ✅ E2E テストスイートは CI/CD 統合の準備ができました！
 
 ````
 
-## Test Artifacts
+## テストアーティファクト
 
-When tests run, the following artifacts are captured:
+テスト実行時、以下のアーティファクトがキャプチャされます:
 
-**On All Tests:**
-- HTML Report with timeline and results
-- JUnit XML for CI integration
+**全テスト共通:**
+- タイムラインと結果を含むHTMLレポート
+- CI統合用のJUnit XML
 
-**On Failure Only:**
-- Screenshot of the failing state
-- Video recording of the test
-- Trace file for debugging (step-by-step replay)
-- Network logs
-- Console logs
+**失敗時のみ:**
+- 失敗状態のスクリーンショット
+- テストのビデオ録画
+- デバッグ用トレースファイル (ステップバイステップ再生)
+- ネットワークログ
+- コンソールログ
 
-## Viewing Artifacts
+## アーティファクトの確認
 
 ```bash
-# View HTML report in browser
+# ブラウザでHTMLレポートを表示
 npx playwright show-report
 
-# View specific trace file
+# 特定のトレースファイルを表示
 npx playwright show-trace artifacts/trace-abc123.zip
 
-# Screenshots are saved in artifacts/ directory
+# スクリーンショットはartifacts/ディレクトリに保存
 open artifacts/search-results.png
 ````
 
@@ -239,18 +239,18 @@ open artifacts/search-results.png
 ```
 ⚠️  FLAKY TEST DETECTED: tests/e2e/markets/trade.spec.ts
 
-Test passed 7/10 runs (70% pass rate)
+テストは10回中7回合格 (合格率70%)
 
-Common failure:
+よくある失敗:
 "Timeout waiting for element '[data-testid="confirm-btn"]'"
 
-Recommended fixes:
-1. Add explicit wait: await page.waitForSelector('[data-testid="confirm-btn"]')
-2. Increase timeout: { timeout: 10000 }
-3. Check for race conditions in component
-4. Verify element is not hidden by animation
+推奨修正:
+1. 明示的な待機を追加: await page.waitForSelector('[data-testid="confirm-btn"]')
+2. タイムアウトを増加: { timeout: 10000 }
+3. コンポーネントの競合状態を確認
+4. 要素がアニメーションで隠れていないか確認
 
-Quarantine recommendation: Mark as test.fixme() until fixed
+隔離推奨: 修正されるまでtest.fixme()としてマーク
 ```
 
 ## ブラウザ設定
@@ -350,21 +350,21 @@ PMX の場合、以下の E2E テストを優先：
 ## 快速命令
 
 ```bash
-# Run all E2E tests
+# 全E2Eテストを実行
 npx playwright test
 
-# Run specific test file
+# 特定のテストファイルを実行
 npx playwright test tests/e2e/markets/search.spec.ts
 
-# Run in headed mode (see browser)
+# ヘッドモードで実行 (ブラウザ表示)
 npx playwright test --headed
 
-# Debug test
+# テストをデバッグ
 npx playwright test --debug
 
-# Generate test code
+# テストコードを生成
 npx playwright codegen http://localhost:3000
 
-# View report
+# レポートを表示
 npx playwright show-report
 ```

@@ -82,13 +82,16 @@
 # 首先克隆仓库
 git clone https://github.com/affaan-m/everything-claude-code.git
 
-# 复制规则（通用 + 语言特定）
-cp -r everything-claude-code/rules/common/* ~/.claude/rules/
-cp -r everything-claude-code/rules/typescript/* ~/.claude/rules/   # 选择你的技术栈
-cp -r everything-claude-code/rules/python/* ~/.claude/rules/
-cp -r everything-claude-code/rules/golang/* ~/.claude/rules/
-cp -r everything-claude-code/rules/perl/* ~/.claude/rules/
+# 复制规则目录（通用 + 语言特定）
+mkdir -p ~/.claude/rules
+cp -r everything-claude-code/rules/common ~/.claude/rules/
+cp -r everything-claude-code/rules/typescript ~/.claude/rules/   # 选择你的技术栈
+cp -r everything-claude-code/rules/python ~/.claude/rules/
+cp -r everything-claude-code/rules/golang ~/.claude/rules/
+cp -r everything-claude-code/rules/perl ~/.claude/rules/
 ```
+
+复制规则时，请复制整个目录（例如 `rules/common`、`rules/golang`），而不是复制目录内的文件；这样可以保留相对引用，并避免不同规则集中的同名文件互相覆盖。
 
 ### 第三步：开始使用
 
@@ -104,6 +107,20 @@ cp -r everything-claude-code/rules/perl/* ~/.claude/rules/
 ```
 
 ✨ **完成！** 你现在可以使用 13 个代理、43 个技能和 31 个命令。
+
+### multi-* 命令需要额外配置
+
+> ⚠️ 上面的基础插件 / rules 安装**不包含** `multi-*` 命令所需的运行时。
+>
+> 如果要使用 `/multi-plan`、`/multi-execute`、`/multi-backend`、`/multi-frontend` 和 `/multi-workflow`，还需要额外安装 `ccg-workflow` 运行时。
+>
+> 可通过 `npx ccg-workflow` 完成初始化安装。
+>
+> 该运行时会提供这些命令依赖的关键组件，包括：
+> - `~/.claude/bin/codeagent-wrapper`
+> - `~/.claude/.ccg/prompts/*`
+>
+> 未安装 `ccg-workflow` 时，这些 `multi-*` 命令将无法正常运行。
 
 ---
 
@@ -352,11 +369,20 @@ everything-claude-code/
 > git clone https://github.com/affaan-m/everything-claude-code.git
 >
 > # 选项 A：用户级规则（应用于所有项目）
-> cp -r everything-claude-code/rules/* ~/.claude/rules/
+> mkdir -p ~/.claude/rules
+> cp -r everything-claude-code/rules/common ~/.claude/rules/
+> cp -r everything-claude-code/rules/typescript ~/.claude/rules/
+> cp -r everything-claude-code/rules/python ~/.claude/rules/
+> cp -r everything-claude-code/rules/golang ~/.claude/rules/
+> cp -r everything-claude-code/rules/perl ~/.claude/rules/
 >
 > # 选项 B：项目级规则（仅应用于当前项目）
 > mkdir -p .claude/rules
-> cp -r everything-claude-code/rules/* .claude/rules/
+> cp -r everything-claude-code/rules/common .claude/rules/
+> cp -r everything-claude-code/rules/typescript .claude/rules/
+> cp -r everything-claude-code/rules/python .claude/rules/
+> cp -r everything-claude-code/rules/golang .claude/rules/
+> cp -r everything-claude-code/rules/perl .claude/rules/
 > ```
 
 ---
@@ -372,12 +398,13 @@ git clone https://github.com/affaan-m/everything-claude-code.git
 # 将代理复制到你的 Claude 配置
 cp everything-claude-code/agents/*.md ~/.claude/agents/
 
-# 复制规则（通用 + 语言特定）
-cp -r everything-claude-code/rules/common/* ~/.claude/rules/
-cp -r everything-claude-code/rules/typescript/* ~/.claude/rules/   # 选择你的技术栈
-cp -r everything-claude-code/rules/python/* ~/.claude/rules/
-cp -r everything-claude-code/rules/golang/* ~/.claude/rules/
-cp -r everything-claude-code/rules/perl/* ~/.claude/rules/
+# 复制规则目录（通用 + 语言特定）
+mkdir -p ~/.claude/rules
+cp -r everything-claude-code/rules/common ~/.claude/rules/
+cp -r everything-claude-code/rules/typescript ~/.claude/rules/   # 选择你的技术栈
+cp -r everything-claude-code/rules/python ~/.claude/rules/
+cp -r everything-claude-code/rules/golang ~/.claude/rules/
+cp -r everything-claude-code/rules/perl ~/.claude/rules/
 
 # 复制命令
 cp everything-claude-code/commands/*.md ~/.claude/commands/

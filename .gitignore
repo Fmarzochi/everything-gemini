@@ -83,6 +83,9 @@ temp/
 *.bak
 *.backup
 
+# Observer temp files (continuous-learning-v2)
+.observer-tmp/
+
 # Rust build artifacts
 ecc2/target/
 

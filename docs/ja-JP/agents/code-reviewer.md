@@ -77,9 +77,9 @@ model: opus
 各問題について:
 ```
 [CRITICAL] ハードコードされたAPIキー
-File: src/api/client.ts:42
-Issue: APIキーがソースコードに公開されている
-Fix: 環境変数に移動
+ファイル: src/api/client.ts:42
+問題: APIキーがソースコードに公開されている
+修正: 環境変数に移動
 
 const apiKey = "sk-abc123";  // ❌ Bad
 const apiKey = process.env.API_KEY;  // ✓ Good
