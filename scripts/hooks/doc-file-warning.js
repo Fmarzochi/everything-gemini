@@ -44,7 +44,7 @@ function isSuspiciousDocPath(filePath) {
  * Exportable run() for in-process execution via run-with-flags.js.
  * Avoids the ~50-100ms spawnSync overhead when available.
  */
-function run(inputOrRaw, options = {}) {
+function run(inputOrRaw, _options = {}) {
   let input;
   try {
     input = typeof inputOrRaw === 'string'
