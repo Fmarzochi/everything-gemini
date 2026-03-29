@@ -9,7 +9,7 @@
  *   - .claude-plugin/PLUGIN_SCHEMA_NOTES.md (Claude Code validator rules)
  *   - https://platform.openai.com/docs/codex/plugins (Codex official docs)
  *
- * Run with: node tests/plugin-manifest.test.js
+ * Run with: node tests/run-all.js
  */
 
 'use strict';
@@ -18,7 +18,8 @@ const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
 
-const repoRoot = path.join(__dirname, '..');
+const repoRoot = path.resolve(__dirname, '..');
+const repoRootWithSep = `${repoRoot}${path.sep}`;
 
 let passed = 0;
 let failed = 0;
@@ -35,6 +36,34 @@ function test(name, fn) {
   }
 }
 
+function loadJsonObject(filePath, label) {
+  assert.ok(fs.existsSync(filePath), `Expected ${label} to exist`);
+
+  let parsed;
+  try {
+    parsed = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+  } catch (error) {
+    assert.fail(`Expected ${label} to contain valid JSON: ${error.message}`);
+  }
+
+  assert.ok(
+    parsed && typeof parsed === 'object' && !Array.isArray(parsed),
+    `Expected ${label} to contain a JSON object`,
+  );
+
+  return parsed;
+}
+
+function assertSafeRepoRelativePath(relativePath, label) {
+  const normalized = path.posix.normalize(relativePath.replace(/\\/g, '/'));
+
+  assert.ok(!path.isAbsolute(relativePath), `${label} must not be absolute: ${relativePath}`);
+  assert.ok(
+    !normalized.startsWith('../') && !normalized.includes('/../'),
+    `${label} must not traverse directories: ${relativePath}`,
+  );
+}
+
 // ── Claude plugin manifest ────────────────────────────────────────────────────
 console.log('\n=== .claude-plugin/plugin.json ===\n');
 
@@ -44,7 +73,7 @@ test('claude plugin.json exists', () => {
   assert.ok(fs.existsSync(claudePluginPath), 'Expected .claude-plugin/plugin.json to exist');
 });
 
-const claudePlugin = JSON.parse(fs.readFileSync(claudePluginPath, 'utf8'));
+const claudePlugin = loadJsonObject(claudePluginPath, '.claude-plugin/plugin.json');
 
 test('claude plugin.json has version field', () => {
   assert.ok(claudePlugin.version, 'Expected version field');
@@ -56,6 +85,7 @@ test('claude plugin.json agents is an array', () => {
 
 test('claude plugin.json agents uses explicit file paths (not directories)', () => {
   for (const agentPath of claudePlugin.agents) {
+    assertSafeRepoRelativePath(agentPath, 'Agent path');
     assert.ok(
       agentPath.endsWith('.md'),
       `Expected explicit .md file path, got: ${agentPath}`,
@@ -69,7 +99,12 @@ test('claude plugin.json agents uses explicit file paths (not directories)', () 
 
 test('claude plugin.json all agent files exist', () => {
   for (const agentRelPath of claudePlugin.agents) {
-    const absolute = path.join(repoRoot, agentRelPath.replace(/^\.\//, ''));
+    assertSafeRepoRelativePath(agentRelPath, 'Agent path');
+    const absolute = path.resolve(repoRoot, agentRelPath);
+    assert.ok(
+      absolute === repoRoot || absolute.startsWith(repoRootWithSep),
+      `Agent path resolves outside repo root: ${agentRelPath}`,
+    );
     assert.ok(
       fs.existsSync(absolute),
       `Agent file missing: ${agentRelPath}`,
@@ -105,7 +140,7 @@ test('codex plugin.json exists', () => {
   assert.ok(fs.existsSync(codexPluginPath), 'Expected .codex-plugin/plugin.json to exist');
 });
 
-const codexPlugin = JSON.parse(fs.readFileSync(codexPluginPath, 'utf8'));
+const codexPlugin = loadJsonObject(codexPluginPath, '.codex-plugin/plugin.json');
 
 test('codex plugin.json has name field', () => {
   assert.ok(codexPlugin.name, 'Expected name field');
@@ -165,7 +200,7 @@ test('.mcp.json exists at plugin root (not inside .codex-plugin/)', () => {
   );
 });
 
-const mcpConfig = JSON.parse(fs.readFileSync(mcpJsonPath, 'utf8'));
+const mcpConfig = loadJsonObject(mcpJsonPath, '.mcp.json');
 
 test('.mcp.json has mcpServers object', () => {
   assert.ok(
@@ -194,7 +229,7 @@ test('marketplace.json exists at .agents/plugins/', () => {
   );
 });
 
-const marketplace = JSON.parse(fs.readFileSync(marketplacePath, 'utf8'));
+const marketplace = loadJsonObject(marketplacePath, '.agents/plugins/marketplace.json');
 
 test('marketplace.json has name field', () => {
   assert.ok(marketplace.name, 'Expected name field');

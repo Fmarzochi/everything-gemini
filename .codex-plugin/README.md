@@ -26,6 +26,8 @@ codex plugin install affaan-m/everything-claude-code
 
 # Or reference locally during development
 codex plugin install ./
+
+Run this from the repository root so `./` points to the repo root and `.mcp.json` resolves correctly.
 ```
 
 ## MCP Servers Included
