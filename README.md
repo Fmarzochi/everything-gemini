@@ -187,6 +187,7 @@ npm install        # or: pnpm install | yarn install | bun install
 # ./install.sh typescript python golang swift php
 # ./install.sh --target cursor typescript
 # ./install.sh --target antigravity typescript
+# ./install.sh --target gemini --profile full
 ```
 
 ```powershell
@@ -200,6 +201,7 @@ npm install        # or: pnpm install | yarn install | bun install
 # .\install.ps1 typescript python golang swift php
 # .\install.ps1 --target cursor typescript
 # .\install.ps1 --target antigravity typescript
+# .\install.ps1 --target gemini --profile full
 
 # npm-installed compatibility entrypoint also works cross-platform
 npx ecc-install typescript
@@ -885,6 +887,7 @@ Each component is fully independent.
 
 Yes. ECC is cross-platform:
 - **Cursor**: Pre-translated configs in `.cursor/`. See [Cursor IDE Support](#cursor-ide-support).
+- **Gemini CLI**: Experimental project-local support via `.gemini/GEMINI.md` and shared installer plumbing.
 - **OpenCode**: Full plugin support in `.opencode/`. See [OpenCode Support](#-opencode-support).
 - **Codex**: First-class support for both macOS app and CLI, with adapter drift guards and SessionStart fallback. See PR [#257](https://github.com/affaan-m/everything-claude-code/pull/257).
 - **Antigravity**: Tightly integrated setup for workflows, skills, and flattened rules in `.agent/`. See [Antigravity Guide](docs/ANTIGRAVITY-GUIDE.md).
