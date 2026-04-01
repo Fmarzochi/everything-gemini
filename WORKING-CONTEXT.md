@@ -61,6 +61,7 @@ Public ECC plugin repo for agents, skills, commands, hooks, rules, install surfa
   - `#844` ui-demo skill
   - `#1110` install-time Claude hook root resolution
   - `#1106` portable Codex Context7 key extraction
+  - `#1107` Codex baseline merge and sample agent-role sync
 - Port or rebuild inside ECC after full audit:
   - `#894` Jira integration
   - `#814` + `#808` rebuild as a single consolidated notifications lane for Opencode and cross-harness surfaces
@@ -102,3 +103,4 @@ Keep this file detailed for only the current sprint, blockers, and next actions.
 - 2026-04-01: Direct-ported the real fix from the unresolved hook-path PR lane into the active installer. Claude installs now replace `${CLAUDE_PLUGIN_ROOT}` with the concrete install root in both `settings.json` and the copied `hooks/hooks.json`, which keeps PreToolUse/PostToolUse hooks working outside plugin-managed env injection.
 - 2026-04-01: Replaced the GNU-only `grep -P` parser in `scripts/sync-ecc-to-codex.sh` with a portable Node parser for Context7 key extraction. Added source-level regression coverage so BSD/macOS syncs do not drift back to non-portable parsing.
 - 2026-04-01: Targeted regression suite after the direct ports is green: `tests/scripts/install-apply.test.js`, `tests/scripts/sync-ecc-to-codex.test.js`, and `tests/scripts/codex-hooks.test.js`.
+- 2026-04-01: Ported the useful core of `#1107` directly into `main` as an add-only Codex baseline merge. `scripts/sync-ecc-to-codex.sh` now fills missing non-MCP defaults from `.codex/config.toml`, syncs sample agent role files into `~/.codex/agents`, and preserves user config instead of replacing it. Added regression coverage for sparse configs and implicit parent tables.
