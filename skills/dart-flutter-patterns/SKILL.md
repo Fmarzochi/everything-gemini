@@ -2,7 +2,20 @@
 name: dart-flutter-patterns
 description: Production-ready Dart and Flutter patterns covering null safety, immutable state, async composition, widget architecture, popular state management frameworks (BLoC, Riverpod, Provider), GoRouter navigation, Dio networking, Freezed code generation, and clean architecture.
 origin: ECC
+tools: ["run_shell_command", "replace", "read_file", "grep_search", "glob", "list_directory", "write_file"]
 ---
+
+
+**CRITICAL INSTRUCTION FOR GEMINI CLI:**
+When executing the logic of this skill, you MUST map the conceptual steps to your native toolset:
+- Use `read_file` to read file contents.
+- Use `replace` to edit files exactly (do not use sed or echo).
+- Use `write_file` to create new files.
+- Use `grep_search` and `glob` to search across the codebase.
+- Use `list_directory` to explore folders.
+- Use `run_shell_command` to execute tests, builds, or other terminal commands.
+Always verify the output of your tools before proceeding to the next logical step.
+
 
 # Dart/Flutter Patterns
 
@@ -66,6 +79,18 @@ double cartTotal(Ref ref) {
 Practical, production-ready patterns for Dart and Flutter applications. Library-agnostic where possible, with explicit coverage of the most common ecosystem packages.
 
 ---
+
+
+**CRITICAL INSTRUCTION FOR GEMINI CLI:**
+When executing the logic of this skill, you MUST map the conceptual steps to your native toolset:
+- Use `read_file` to read file contents.
+- Use `replace` to edit files exactly (do not use sed or echo).
+- Use `write_file` to create new files.
+- Use `grep_search` and `glob` to search across the codebase.
+- Use `list_directory` to explore folders.
+- Use `run_shell_command` to execute tests, builds, or other terminal commands.
+Always verify the output of your tools before proceeding to the next logical step.
+
 
 ## 1. Null Safety Fundamentals
 
@@ -171,6 +196,18 @@ final fromJson = User.fromJson(json);
 ```
 
 ---
+
+
+**CRITICAL INSTRUCTION FOR GEMINI CLI:**
+When executing the logic of this skill, you MUST map the conceptual steps to your native toolset:
+- Use `read_file` to read file contents.
+- Use `replace` to edit files exactly (do not use sed or echo).
+- Use `write_file` to create new files.
+- Use `grep_search` and `glob` to search across the codebase.
+- Use `list_directory` to explore folders.
+- Use `run_shell_command` to execute tests, builds, or other terminal commands.
+Always verify the output of your tools before proceeding to the next logical step.
+
 
 ## 3. Async Composition
 
@@ -321,6 +358,18 @@ class _CounterDisplay extends ConsumerWidget {
 
 ---
 
+
+**CRITICAL INSTRUCTION FOR GEMINI CLI:**
+When executing the logic of this skill, you MUST map the conceptual steps to your native toolset:
+- Use `read_file` to read file contents.
+- Use `replace` to edit files exactly (do not use sed or echo).
+- Use `write_file` to create new files.
+- Use `grep_search` and `glob` to search across the codebase.
+- Use `list_directory` to explore folders.
+- Use `run_shell_command` to execute tests, builds, or other terminal commands.
+Always verify the output of your tools before proceeding to the next logical step.
+
+
 ## 5. State Management: BLoC/Cubit
 
 ```dart
@@ -411,6 +460,18 @@ double cartTotal(Ref ref) {
 
 ---
 
+
+**CRITICAL INSTRUCTION FOR GEMINI CLI:**
+When executing the logic of this skill, you MUST map the conceptual steps to your native toolset:
+- Use `read_file` to read file contents.
+- Use `replace` to edit files exactly (do not use sed or echo).
+- Use `write_file` to create new files.
+- Use `grep_search` and `glob` to search across the codebase.
+- Use `list_directory` to explore folders.
+- Use `run_shell_command` to execute tests, builds, or other terminal commands.
+Always verify the output of your tools before proceeding to the next logical step.
+
+
 ## 7. Navigation with GoRouter
 
 ```dart
@@ -489,6 +550,18 @@ class UserApiDataSource {
 
 ---
 
+
+**CRITICAL INSTRUCTION FOR GEMINI CLI:**
+When executing the logic of this skill, you MUST map the conceptual steps to your native toolset:
+- Use `read_file` to read file contents.
+- Use `replace` to edit files exactly (do not use sed or echo).
+- Use `write_file` to create new files.
+- Use `grep_search` and `glob` to search across the codebase.
+- Use `list_directory` to explore folders.
+- Use `run_shell_command` to execute tests, builds, or other terminal commands.
+Always verify the output of your tools before proceeding to the next logical step.
+
+
 ## 9. Error Handling Architecture
 
 ```dart
@@ -550,6 +623,18 @@ testWidgets('CartBadge shows item count', (tester) async {
 ```
 
 ---
+
+
+**CRITICAL INSTRUCTION FOR GEMINI CLI:**
+When executing the logic of this skill, you MUST map the conceptual steps to your native toolset:
+- Use `read_file` to read file contents.
+- Use `replace` to edit files exactly (do not use sed or echo).
+- Use `write_file` to create new files.
+- Use `grep_search` and `glob` to search across the codebase.
+- Use `list_directory` to explore folders.
+- Use `run_shell_command` to execute tests, builds, or other terminal commands.
+Always verify the output of your tools before proceeding to the next logical step.
+
 
 ## References
 

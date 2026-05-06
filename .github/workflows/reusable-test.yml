@@ -143,7 +143,7 @@ jobs:
       - name: Run tests
         run: node tests/run-all.js
         env:
-          CLAUDE_CODE_PACKAGE_MANAGER: ${{ inputs.package-manager }}
+          GEMINI_CODE_PACKAGE_MANAGER: ${{ inputs.package-manager }}
 
       - name: Upload test artifacts
         if: failure()

@@ -1,6 +1,6 @@
 # Troubleshooting Guide
 
-Common issues and solutions for Everything Claude Code (ECC) plugin.
+Common issues and solutions for Everything Gemini (ECC) plugin.
 
 ## Table of Contents
 
@@ -28,7 +28,7 @@ Common issues and solutions for Everything Claude Code (ECC) plugin.
 **Solutions:**
 ```bash
 # 1. Clear conversation history and start fresh
-# Use Claude Code: "New Chat" or Cmd/Ctrl+Shift+N
+# Use Gemini CLI: "New Chat" or Cmd/Ctrl+Shift+N
 
 # 2. Reduce file size before analysis
 head -n 100 large-file.log > sample.log
@@ -53,12 +53,12 @@ head -n 50 large-file.txt
 **Solutions:**
 ```bash
 # Check if observations are being recorded
-ls ~/.claude/homunculus/projects/*/observations.jsonl
+ls ~/.gemini/homunculus/projects/*/observations.jsonl
 
 # Find the current project's hash id
 python3 - <<'PY'
 import json, os
-registry_path = os.path.expanduser("~/.claude/homunculus/projects.json")
+registry_path = os.path.expanduser("~/.gemini/homunculus/projects.json")
 with open(registry_path) as f:
     registry = json.load(f)
 for project_id, meta in registry.items():
@@ -66,18 +66,18 @@ for project_id, meta in registry.items():
         print(project_id)
         break
 else:
-    raise SystemExit("Project hash not found in ~/.claude/homunculus/projects.json")
+    raise SystemExit("Project hash not found in ~/.gemini/homunculus/projects.json")
 PY
 
 # View recent observations for that project
-tail -20 ~/.claude/homunculus/projects/<project-hash>/observations.jsonl
+tail -20 ~/.gemini/homunculus/projects/<project-hash>/observations.jsonl
 
 # Back up a corrupted observations file before recreating it
-mv ~/.claude/homunculus/projects/<project-hash>/observations.jsonl \
-  ~/.claude/homunculus/projects/<project-hash>/observations.jsonl.bak.$(date +%Y%m%d-%H%M%S)
+mv ~/.gemini/homunculus/projects/<project-hash>/observations.jsonl \
+  ~/.gemini/homunculus/projects/<project-hash>/observations.jsonl.bak.$(date +%Y%m%d-%H%M%S)
 
 # Verify hooks are enabled
-grep -r "observe" ~/.claude/settings.json
+grep -r "observe" ~/.gemini/settings.json
 ```
 
 ---
@@ -96,16 +96,16 @@ grep -r "observe" ~/.claude/settings.json
 **Solutions:**
 ```bash
 # Check plugin installation
-ls ~/.claude/plugins/cache/
+ls ~/.gemini/plugins/cache/
 
 # Verify agent exists (marketplace install)
-ls ~/.claude/plugins/cache/*/agents/
+ls ~/.gemini/plugins/cache/*/agents/
 
 # For manual install, agents should be in:
-ls ~/.claude/agents/  # Custom agents only
+ls ~/.gemini/agents/  # Custom agents only
 
 # Reload plugin
-# Claude Code → Settings → Extensions → Reload
+# Gemini CLI → Settings → Extensions → Reload
 ```
 
 ### Workflow Execution Hangs
@@ -120,16 +120,16 @@ ls ~/.claude/agents/  # Custom agents only
 **Solutions:**
 ```bash
 # 1. Check for stuck processes
-ps aux | grep claude
+ps aux | grep gemini
 
 # 2. Enable debug mode
-export CLAUDE_DEBUG=1
+export GEMINI_DEBUG=1
 
 # 3. Set shorter timeouts
-export CLAUDE_TIMEOUT=30
+export GEMINI_TIMEOUT=30
 
 # 4. Check network connectivity
-curl -I https://api.anthropic.com
+curl -I https://generativelanguage.googleapis.com
 ```
 
 ### Tool Use Errors
@@ -147,8 +147,8 @@ curl -I https://api.anthropic.com
 which node python3 npm git
 
 # Fix permissions on hook scripts
-chmod +x ~/.claude/plugins/cache/*/hooks/*.sh
-chmod +x ~/.claude/plugins/cache/*/skills/*/hooks/*.sh
+chmod +x ~/.gemini/plugins/cache/*/hooks/*.sh
+chmod +x ~/.gemini/plugins/cache/*/skills/*/hooks/*.sh
 
 # Check PATH includes necessary binaries
 echo $PATH
@@ -170,16 +170,16 @@ echo $PATH
 **Solutions:**
 ```bash
 # Check hooks are registered
-grep -A 10 '"hooks"' ~/.claude/settings.json
+grep -A 10 '"hooks"' ~/.gemini/settings.json
 
 # Verify hook files exist and are executable
-ls -la ~/.claude/plugins/cache/*/hooks/
+ls -la ~/.gemini/plugins/cache/*/hooks/
 
 # Test hook manually
-bash ~/.claude/plugins/cache/*/hooks/pre-bash.sh <<< '{"command":"echo test"}'
+bash ~/.gemini/plugins/cache/*/hooks/pre-bash.sh <<< '{"command":"echo test"}'
 
 # Re-register hooks (if using plugin)
-# Disable and re-enable plugin in Claude Code settings
+# Disable and re-enable plugin in Gemini CLI settings
 ```
 
 ### Python/Node Version Mismatches
@@ -230,7 +230,7 @@ tmux new-session -d -s dev "npm run dev"
 tmux attach -t dev
 
 # Disable hook temporarily if needed
-# Edit ~/.claude/settings.json and remove pre-bash hook
+# Edit ~/.gemini/settings.json and remove pre-bash hook
 ```
 
 ---
@@ -243,9 +243,9 @@ tmux attach -t dev
 
 **Causes:**
 - Marketplace cache not updated
-- Claude Code version incompatibility
+- Gemini CLI version incompatibility
 - Corrupted plugin files
-- Local Claude setup was wiped or reset
+- Local Gemini setup was wiped or reset
 
 **Solutions:**
 ```bash
@@ -257,25 +257,25 @@ ecc repair
 # Only reinstall if doctor/repair cannot restore the missing files
 
 # Inspect the plugin cache before changing it
-ls -la ~/.claude/plugins/cache/
+ls -la ~/.gemini/plugins/cache/
 
 # Back up the plugin cache instead of deleting it in place
-mv ~/.claude/plugins/cache ~/.claude/plugins/cache.backup.$(date +%Y%m%d-%H%M%S)
-mkdir -p ~/.claude/plugins/cache
+mv ~/.gemini/plugins/cache ~/.gemini/plugins/cache.backup.$(date +%Y%m%d-%H%M%S)
+mkdir -p ~/.gemini/plugins/cache
 
 # Reinstall from marketplace
-# Claude Code → Extensions → Everything Claude Code → Uninstall
+# Gemini CLI → Extensions → Everything Gemini → Uninstall
 # Then reinstall from marketplace
 
 # If the issue is marketplace/account access, use ECC Tools billing/account recovery separately; do not use reinstall as a proxy for account recovery
 
-# Check Claude Code version
-claude --version
-# Requires Claude Code 2.0+
+# Check Gemini CLI version
+gemini --version
+# Requires Gemini CLI 2.0+
 
 # Manual install (if marketplace fails)
-git clone https://github.com/affaan-m/everything-claude-code.git
-cp -r everything-claude-code ~/.claude/plugins/ecc
+git clone https://github.com/fmarzochi/everything-gemini.git
+cp -r everything-gemini ~/.gemini/plugins/ecc
 ```
 
 ### Package Manager Detection Fails
@@ -284,17 +284,17 @@ cp -r everything-claude-code ~/.claude/plugins/ecc
 
 **Causes:**
 - No lock file present
-- CLAUDE_PACKAGE_MANAGER not set
+- GEMINI_PACKAGE_MANAGER not set
 - Multiple lock files confusing detection
 
 **Solutions:**
 ```bash
 # Set preferred package manager globally
-export CLAUDE_PACKAGE_MANAGER=pnpm
+export GEMINI_PACKAGE_MANAGER=pnpm
 # Add to ~/.bashrc or ~/.zshrc
 
 # Or set per-project
-echo '{"packageManager": "pnpm"}' > .claude/package-manager.json
+echo '{"packageManager": "pnpm"}' > .gemini/package-manager.json
 
 # Or use package.json field
 npm pkg set packageManager="pnpm@8.15.0"
@@ -321,9 +321,9 @@ rm package-lock.json  # If using pnpm/yarn/bun
 **Solutions:**
 ```bash
 # Archive large observations instead of deleting them
-archive_dir="$HOME/.claude/homunculus/archive/$(date +%Y%m%d)"
+archive_dir="$HOME/.gemini/homunculus/archive/$(date +%Y%m%d)"
 mkdir -p "$archive_dir"
-find ~/.claude/homunculus/projects -name "observations.jsonl" -size +10M -exec sh -c '
+find ~/.gemini/homunculus/projects -name "observations.jsonl" -size +10M -exec sh -c '
   for file do
     base=$(basename "$(dirname "$file")")
     gzip -c "$file" > "'"$archive_dir"'/${base}-observations.jsonl.gz"
@@ -332,15 +332,15 @@ find ~/.claude/homunculus/projects -name "observations.jsonl" -size +10M -exec s
 ' sh {} +
 
 # Disable unused hooks temporarily
-# Edit ~/.claude/settings.json
+# Edit ~/.gemini/settings.json
 
 # Keep active observation files small
-# Large archives should live under ~/.claude/homunculus/archive/
+# Large archives should live under ~/.gemini/homunculus/archive/
 ```
 
 ### High CPU Usage
 
-**Symptom:** Claude Code consuming 100% CPU
+**Symptom:** Gemini CLI consuming 100% CPU
 
 **Causes:**
 - Infinite observation loops
@@ -350,16 +350,16 @@ find ~/.claude/homunculus/projects -name "observations.jsonl" -size +10M -exec s
 **Solutions:**
 ```bash
 # Check for runaway processes
-top -o cpu | grep claude
+top -o cpu | grep gemini
 
 # Disable continuous learning temporarily
-touch ~/.claude/homunculus/disabled
+touch ~/.gemini/homunculus/disabled
 
-# Restart Claude Code
+# Restart Gemini CLI
 # Cmd/Ctrl+Q then reopen
 
 # Check observation file size
-du -sh ~/.claude/homunculus/*/
+du -sh ~/.gemini/homunculus/*/
 ```
 
 ---
@@ -370,21 +370,21 @@ du -sh ~/.claude/homunculus/*/
 
 ```bash
 # Fix hook permissions
-find ~/.claude/plugins -name "*.sh" -exec chmod +x {} \;
+find ~/.gemini/plugins -name "*.sh" -exec chmod +x {} \;
 
 # Fix observation directory permissions
-chmod -R u+rwX,go+rX ~/.claude/homunculus
+chmod -R u+rwX,go+rX ~/.gemini/homunculus
 ```
 
 ### "MODULE_NOT_FOUND"
 
 ```bash
 # Install plugin dependencies
-cd ~/.claude/plugins/cache/ecc
+cd ~/.gemini/plugins/cache/ecc
 npm install
 
 # Or for manual install
-cd ~/.claude/plugins/ecc
+cd ~/.gemini/plugins/ecc
 npm install
 ```
 
@@ -393,7 +393,7 @@ npm install
 ```bash
 # Windows-specific: Ensure scripts use correct line endings
 # Convert CRLF to LF
-find ~/.claude/plugins -name "*.sh" -exec dos2unix {} \;
+find ~/.gemini/plugins -name "*.sh" -exec dos2unix {} \;
 
 # Or install dos2unix
 # macOS: brew install dos2unix
@@ -406,19 +406,19 @@ find ~/.claude/plugins -name "*.sh" -exec dos2unix {} \;
 
  If you're still experiencing issues:
 
-1. **Check GitHub Issues**: [github.com/affaan-m/everything-claude-code/issues](https://github.com/affaan-m/everything-claude-code/issues)
+1. **Check GitHub Issues**: [github.com/fmarzochi/everything-gemini/issues](https://github.com/fmarzochi/everything-gemini/issues)
 2. **Enable Debug Logging**:
    ```bash
-   export CLAUDE_DEBUG=1
-   export CLAUDE_LOG_LEVEL=debug
+   export GEMINI_DEBUG=1
+   export GEMINI_LOG_LEVEL=debug
    ```
 3. **Collect Diagnostic Info**:
    ```bash
-   claude --version
+   gemini --version
    node --version
    python3 --version
-   echo $CLAUDE_PACKAGE_MANAGER
-   ls -la ~/.claude/plugins/cache/
+   echo $GEMINI_PACKAGE_MANAGER
+   ls -la ~/.gemini/plugins/cache/
    ```
 4. **Open an Issue**: Include debug logs, error messages, and diagnostic info
 

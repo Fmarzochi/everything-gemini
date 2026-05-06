@@ -136,7 +136,7 @@
     "devfleet": {
       "type": "http",
       "url": "http://localhost:18801/mcp",
-      "description": "Multi-agent orchestration — dispatch parallel Claude Code agents in isolated worktrees. Plan projects, auto-chain missions, read structured reports. Repo: https://github.com/LEC-AI/claude-devfleet"
+      "description": "Multi-agent orchestration — dispatch parallel Gemini CLI agents in isolated worktrees. Plan projects, auto-chain missions, read structured reports. Repo: https://github.com/LEC-AI/gemini-devfleet"
     },
     "token-optimizer": {
       "command": "npx",
@@ -168,7 +168,7 @@
     }
   },
   "_comments": {
-    "usage": "Copy the servers you need to your ~/.claude.json mcpServers section",
+    "usage": "Copy the servers you need to your ~/.gemini.json mcpServers section",
     "env_vars": "Replace YOUR_*_HERE placeholders with actual values",
     "disabling": "Use ECC_DISABLED_MCPS=github,context7,... to disable bundled ECC MCPs during install/sync, or use disabledMcpServers in project config for per-project overrides",
     "context_warning": "Keep under 10 MCPs enabled to preserve context window"

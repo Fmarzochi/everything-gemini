@@ -5,4 +5,4 @@ README.zh-CN.md
 scripts/release.sh
 
 # Plugin dev notes (not needed by consumers)
-.claude-plugin/PLUGIN_SCHEMA_NOTES.md
+.gemini-plugin/PLUGIN_SCHEMA_NOTES.md

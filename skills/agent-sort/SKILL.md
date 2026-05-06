@@ -2,7 +2,20 @@
 name: agent-sort
 description: Build an evidence-backed ECC install plan for a specific repo by sorting skills, commands, rules, hooks, and extras into DAILY vs LIBRARY buckets using parallel repo-aware review passes. Use when ECC should be trimmed to what a project actually needs instead of loading the full bundle.
 origin: ECC
+tools: ["run_shell_command", "replace", "read_file", "grep_search", "glob", "list_directory", "write_file"]
 ---
+
+
+**CRITICAL INSTRUCTION FOR GEMINI CLI:**
+When executing the logic of this skill, you MUST map the conceptual steps to your native toolset:
+- Use `read_file` to read file contents.
+- Use `replace` to edit files exactly (do not use sed or echo).
+- Use `write_file` to create new files.
+- Use `grep_search` and `glob` to search across the codebase.
+- Use `list_directory` to explore folders.
+- Use `run_shell_command` to execute tests, builds, or other terminal commands.
+Always verify the output of your tools before proceeding to the next logical step.
+
 
 # Agent Sort
 
@@ -141,7 +154,7 @@ Demote to `LIBRARY` when:
 
 Translate the classification into action:
 
-- DAILY skills -> install or keep in `.claude/skills/`
+- DAILY skills -> install or keep in `.gemini/skills/`
 - DAILY commands -> keep as explicit shims only if still useful
 - DAILY rules -> install only matching language sets
 - DAILY hooks/scripts -> keep only compatible ones
@@ -153,7 +166,7 @@ If the repo already uses selective installs, update that plan instead of creatin
 
 If the project wants a searchable library surface, create:
 
-- `.claude/skills/skill-library/SKILL.md`
+- `.gemini/skills/skill-library/SKILL.md`
 
 That router should contain:
 

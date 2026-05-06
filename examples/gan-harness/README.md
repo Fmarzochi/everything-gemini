@@ -21,7 +21,7 @@ GAN_MAX_ITERATIONS=5 GAN_PASS_THRESHOLD=6.5 ./scripts/gan-harness.sh "Build a to
 ## Example: Using the Command
 
 ```bash
-# In Claude Code interactive mode:
+# In Gemini CLI interactive mode:
 /project:gan-build "Build a music streaming dashboard with playlists, visualizer, and social features"
 
 # With options:
@@ -34,27 +34,27 @@ For maximum control, run each agent separately:
 
 ```bash
 # Step 1: Plan (produces spec.md)
-claude -p --model opus "$(cat agents/gan-planner.md)
+gemini -p --model opus "$(cat agents/gan-planner.md)
 
 Your brief: 'Build a retro game maker with sprite editor and level designer'
 
 Write the full spec to gan-harness/spec.md and eval rubric to gan-harness/eval-rubric.md."
 
 # Step 2: Generate (iteration 1)
-claude -p --model opus "$(cat agents/gan-generator.md)
+gemini -p --model opus "$(cat agents/gan-generator.md)
 
 Iteration 1. Read gan-harness/spec.md. Build the initial application.
 Start dev server on port 3000. Commit as iteration-001."
 
 # Step 3: Evaluate (iteration 1)
-claude -p --model opus "$(cat agents/gan-evaluator.md)
+gemini -p --model opus "$(cat agents/gan-evaluator.md)
 
 Iteration 1. Read gan-harness/eval-rubric.md.
 Test http://localhost:3000. Write feedback to gan-harness/feedback/feedback-001.md.
 Be ruthlessly strict."
 
 # Step 4: Generate (iteration 2 — reads feedback)
-claude -p --model opus "$(cat agents/gan-generator.md)
+gemini -p --model opus "$(cat agents/gan-generator.md)
 
 Iteration 2. Read gan-harness/feedback/feedback-001.md FIRST.
 Address every issue. Then read gan-harness/spec.md for remaining features.

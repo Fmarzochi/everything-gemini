@@ -18,7 +18,7 @@ Neural search for web content, code, companies, and people via the Exa MCP serve
 
 ## MCP Requirement
 
-Exa MCP server must be configured. Add to `~/.claude.json`:
+Exa MCP server must be configured. Add to `~/.gemini.json`:
 
 ```json
 "exa-web-search": {
@@ -87,7 +87,7 @@ get_code_context_exa(query: "Python asyncio patterns", tokensNum: 3000)
 Research companies for business intelligence and news.
 
 ```
-company_research_exa(companyName: "Anthropic", numResults: 5)
+company_research_exa(companyName: "Google", numResults: 5)
 ```
 
 **Parameters:**
@@ -101,7 +101,7 @@ company_research_exa(companyName: "Anthropic", numResults: 5)
 Find professional profiles and bios.
 
 ```
-people_search_exa(query: "AI safety researchers at Anthropic", numResults: 5)
+people_search_exa(query: "AI safety researchers at Google", numResults: 5)
 ```
 
 ### crawling_exa

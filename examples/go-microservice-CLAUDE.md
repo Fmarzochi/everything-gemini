@@ -1,4 +1,4 @@
-# Go Microservice — Project CLAUDE.md
+# Go Microservice — Project GEMINI.md
 
 > Real-world example for a Go microservice with PostgreSQL, gRPC, and Docker.
 > Copy this to your project root and customize for your service.

@@ -18,7 +18,7 @@
     "target": {
       "type": "string",
       "enum": [
-        "claude",
+        "gemini",
         "cursor",
         "antigravity",
         "codex",

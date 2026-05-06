@@ -1,9 +1,21 @@
 ---
 name: opensource-sanitizer
 description: Verify an open-source fork is fully sanitized before release. Scans for leaked secrets, PII, internal references, and dangerous files using 20+ regex patterns. Generates a PASS/FAIL/PASS-WITH-WARNINGS report. Second stage of the opensource-pipeline skill. Use PROACTIVELY before any public release.
-tools: ["Read", "Grep", "Glob", "Bash"]
+tools: ["run_shell_command", "replace", "read_file", "grep_search", "glob", "list_directory", "write_file"]
 model: sonnet
 ---
+
+
+**CRITICAL INSTRUCTION FOR GEMINI CLI:**
+When executing the logic of this skill, you MUST map the conceptual steps to your native toolset:
+- Use `read_file` to read file contents.
+- Use `replace` to edit files exactly (do not use sed or echo).
+- Use `write_file` to create new files.
+- Use `grep_search` and `glob` to search across the codebase.
+- Use `list_directory` to explore folders.
+- Use `run_shell_command` to execute tests, builds, or other terminal commands.
+Always verify the output of your tools before proceeding to the next logical step.
+
 
 # Open-Source Sanitizer
 
@@ -102,7 +114,7 @@ Verify these do NOT exist:
 *.pem, *.key, *.p12, *.pfx, *.jks
 credentials.json, service-account*.json
 .secrets/, secrets/
-.claude/settings.json
+.gemini/settings.json
 sessions/
 *.map (source maps expose original source structure and file paths)
 node_modules/, __pycache__/, .venv/, venv/

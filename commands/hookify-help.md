@@ -6,19 +6,19 @@ Display comprehensive hookify documentation.
 
 ## Hook System Overview
 
-Hookify creates rule files that integrate with Claude Code's hook system to prevent unwanted behaviors.
+Hookify creates rule files that integrate with Gemini CLI's hook system to prevent unwanted behaviors.
 
 ### Event Types
 
-- `bash`: triggers on Bash tool use and matches command patterns
-- `file`: triggers on Write/Edit tool use and matches file paths
+- `bash`: triggers on run_shell_command tool use and matches command patterns
+- `file`: triggers on Write/replace tool use and matches file paths
 - `stop`: triggers when a session ends
 - `prompt`: triggers on user message submission and matches input patterns
 - `all`: triggers on all events
 
 ### Rule File Format
 
-Files are stored as `.claude/hookify.{name}.local.md`:
+Files are stored as `.gemini/hookify.{name}.local.md`:
 
 ```yaml
 ---

@@ -3,6 +3,18 @@ name: foundation-models-on-device
 description: Apple FoundationModels framework for on-device LLM — text generation, guided generation with @Generable, tool calling, and snapshot streaming in iOS 26+.
 ---
 
+
+**CRITICAL INSTRUCTION FOR GEMINI CLI:**
+When executing the logic of this skill, you MUST map the conceptual steps to your native toolset:
+- Use `read_file` to read file contents.
+- Use `replace` to edit files exactly (do not use sed or echo).
+- Use `write_file` to create new files.
+- Use `grep_search` and `glob` to search across the codebase.
+- Use `list_directory` to explore folders.
+- Use `run_shell_command` to execute tests, builds, or other terminal commands.
+Always verify the output of your tools before proceeding to the next logical step.
+
+
 # FoundationModels: On-Device LLM (iOS 26)
 
 Patterns for integrating Apple's on-device language model into apps using the FoundationModels framework. Covers text generation, structured output with `@Generable`, custom tool calling, and snapshot streaming — all running on-device for privacy and offline support.
@@ -135,7 +147,7 @@ struct RecipeSearchTool: Tool {
 ### 2. Create Session with Tools
 
 ```swift
-let session = LanguageModelSession(tools: [RecipeSearchTool()])
+let session = LanguageModelSession(tools: ["run_shell_command", "replace", "read_file", "grep_search", "glob", "list_directory", "write_file"])
 let response = try await session.respond(to: "Find me some pasta recipes")
 ```
 

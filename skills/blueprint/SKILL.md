@@ -11,7 +11,20 @@ description: >-
   DO NOT TRIGGER when: task is completable in a single PR or fewer
   than 3 tool calls, or user says "just do it".
 origin: community
+tools: ["run_shell_command", "replace", "read_file", "grep_search", "glob", "list_directory", "write_file"]
 ---
+
+
+**CRITICAL INSTRUCTION FOR GEMINI CLI:**
+When executing the logic of this skill, you MUST map the conceptual steps to your native toolset:
+- Use `read_file` to read file contents.
+- Use `replace` to edit files exactly (do not use sed or echo).
+- Use `write_file` to create new files.
+- Use `grep_search` and `glob` to search across the codebase.
+- Use `list_directory` to explore folders.
+- Use `run_shell_command` to execute tests, builds, or other terminal commands.
+Always verify the output of your tools before proceeding to the next logical step.
+
 
 # Blueprint — Construction Plan Generator
 
@@ -59,7 +72,7 @@ Produces `plans/myapp-migrate-database-to-postgresql.md` with steps like:
 /blueprint chatbot "extract LLM providers into a plugin system"
 ```
 
-Produces a plan with parallel steps where possible (e.g., "implement Anthropic plugin" and "implement OpenAI plugin" run in parallel after the plugin interface step is done), model tier assignments (strongest for the interface design step, default for implementation), and invariants verified after every step (e.g., "all existing tests pass", "no provider imports in core").
+Produces a plan with parallel steps where possible (e.g., "implement Google plugin" and "implement OpenAI plugin" run in parallel after the plugin interface step is done), model tier assignments (strongest for the interface design step, default for implementation), and invariants verified after every step (e.g., "all existing tests pass", "no provider imports in core").
 
 ## Key Features
 
@@ -68,11 +81,11 @@ Produces a plan with parallel steps where possible (e.g., "implement Anthropic p
 - **Branch/PR/CI workflow** — Built into every step. Degrades gracefully to direct mode when git/gh is absent.
 - **Parallel step detection** — Dependency graph identifies steps with no shared files or output dependencies.
 - **Plan mutation protocol** — Steps can be split, inserted, skipped, reordered, or abandoned with formal protocols and audit trail.
-- **Zero runtime risk** — Pure Markdown skill. The entire repository contains only `.md` files — no hooks, no shell scripts, no executable code, no `package.json`, no build step. Nothing runs on install or invocation beyond Claude Code's native Markdown skill loader.
+- **Zero runtime risk** — Pure Markdown skill. The entire repository contains only `.md` files — no hooks, no shell scripts, no executable code, no `package.json`, no build step. Nothing runs on install or invocation beyond Gemini CLI's native Markdown skill loader.
 
 ## Installation
 
-This skill ships with Everything Claude Code. No separate installation is needed when ECC is installed.
+This skill ships with Everything Gemini. No separate installation is needed when ECC is installed.
 
 ### Full ECC install
 
@@ -85,7 +98,7 @@ test -f skills/blueprint/SKILL.md
 To update later, review the ECC diff before updating:
 
 ```bash
-cd /path/to/everything-claude-code
+cd /path/to/everything-gemini
 git fetch origin main
 git log --oneline HEAD..origin/main       # review new commits before updating
 git checkout <reviewed-full-sha>          # pin to a specific reviewed commit
@@ -93,11 +106,11 @@ git checkout <reviewed-full-sha>          # pin to a specific reviewed commit
 
 ### Vendored standalone install
 
-If you are vendoring only this skill outside the full ECC install, copy the reviewed file from the ECC repository into `~/.claude/skills/blueprint/SKILL.md`. Vendored copies do not have a git remote, so update them by re-copying the file from a reviewed ECC commit rather than running `git pull`.
+If you are vendoring only this skill outside the full ECC install, copy the reviewed file from the ECC repository into `~/.gemini/skills/blueprint/SKILL.md`. Vendored copies do not have a git remote, so update them by re-copying the file from a reviewed ECC commit rather than running `git pull`.
 
 ## Requirements
 
-- Claude Code (for `/blueprint` slash command)
+- Gemini CLI (for `/blueprint` slash command)
 - Git + GitHub CLI (optional — enables full branch/PR/CI workflow; Blueprint detects absence and auto-switches to direct mode)
 
 ## Source

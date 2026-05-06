@@ -16,7 +16,7 @@
 set -e
 
 # NOTE: set -e is disabled inside the background subshell below
-# to prevent claude CLI failures from killing the observer loop.
+# to prevent gemini CLI failures from killing the observer loop.
 
 # ─────────────────────────────────────────────
 # Project detection
@@ -35,7 +35,7 @@ PYTHON_CMD="${CLV2_PYTHON_CMD:-}"
 # Configuration
 # ─────────────────────────────────────────────
 
-CONFIG_DIR="${HOME}/.claude/homunculus"
+CONFIG_DIR="${HOME}/.gemini/homunculus"
 if [ -n "${CLV2_CONFIG:-}" ]; then
   CONFIG_FILE="$CLV2_CONFIG"
 else

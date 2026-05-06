@@ -2,7 +2,20 @@
 name: browser-qa
 description: Use this skill to automate visual testing and UI interaction verification using browser automation after deploying features.
 origin: ECC
+tools: ["run_shell_command", "replace", "read_file", "grep_search", "glob", "list_directory", "write_file"]
 ---
+
+
+**CRITICAL INSTRUCTION FOR GEMINI CLI:**
+When executing the logic of this skill, you MUST map the conceptual steps to your native toolset:
+- Use `read_file` to read file contents.
+- Use `replace` to edit files exactly (do not use sed or echo).
+- Use `write_file` to create new files.
+- Use `grep_search` and `glob` to search across the codebase.
+- Use `list_directory` to explore folders.
+- Use `run_shell_command` to execute tests, builds, or other terminal commands.
+Always verify the output of your tools before proceeding to the next logical step.
+
 
 # Browser QA — Automated Visual Testing & Interaction
 
@@ -16,7 +29,7 @@ origin: ECC
 
 ## How It Works
 
-Uses the browser automation MCP (claude-in-chrome, Playwright, or Puppeteer) to interact with live pages like a real user.
+Uses the browser automation MCP (gemini-in-chrome, Playwright, or Puppeteer) to interact with live pages like a real user.
 
 ### Phase 1: Smoke Test
 ```
@@ -80,7 +93,7 @@ Uses the browser automation MCP (claude-in-chrome, Playwright, or Puppeteer) to 
 ## Integration
 
 Works with any browser MCP:
-- `mChild__claude-in-chrome__*` tools (preferred — uses your actual Chrome)
+- `mChild__gemini-in-chrome__*` tools (preferred — uses your actual Chrome)
 - Playwright via `mcp__browserbase__*`
 - Direct Puppeteer scripts
 

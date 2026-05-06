@@ -1,25 +1,38 @@
 ---
 name: configure-ecc
-description: Interactive installer for Everything Claude Code — guides users through selecting and installing skills and rules to user-level or project-level directories, verifies paths, and optionally optimizes installed files.
+description: Interactive installer for Everything Gemini — guides users through selecting and installing skills and rules to user-level or project-level directories, verifies paths, and optionally optimizes installed files.
 origin: ECC
+tools: ["run_shell_command", "replace", "read_file", "grep_search", "glob", "list_directory", "write_file"]
 ---
 
-# Configure Everything Claude Code (ECC)
 
-An interactive, step-by-step installation wizard for the Everything Claude Code project. Uses `AskUserQuestion` to guide users through selective installation of skills and rules, then verifies correctness and offers optimization.
+**CRITICAL INSTRUCTION FOR GEMINI CLI:**
+When executing the logic of this skill, you MUST map the conceptual steps to your native toolset:
+- Use `read_file` to read file contents.
+- Use `replace` to edit files exactly (do not use sed or echo).
+- Use `write_file` to create new files.
+- Use `grep_search` and `glob` to search across the codebase.
+- Use `list_directory` to explore folders.
+- Use `run_shell_command` to execute tests, builds, or other terminal commands.
+Always verify the output of your tools before proceeding to the next logical step.
+
+
+# Configure Everything Gemini (ECC)
+
+An interactive, step-by-step installation wizard for the Everything Gemini project. Uses `AskUserQuestion` to guide users through selective installation of skills and rules, then verifies correctness and offers optimization.
 
 ## When to Activate
 
-- User says "configure ecc", "install ecc", "setup everything claude code", or similar
+- User says "configure ecc", "install ecc", "setup everything gemini cli", or similar
 - User wants to selectively install skills or rules from this project
 - User wants to verify or fix an existing ECC installation
 - User wants to optimize installed skills or rules for their project
 
 ## Prerequisites
 
-This skill must be accessible to Claude Code before activation. Two ways to bootstrap:
-1. **Via Plugin**: `/plugin install everything-claude-code` — the plugin loads this skill automatically
-2. **Manual**: Copy only this skill to `~/.claude/skills/configure-ecc/SKILL.md`, then activate by saying "configure ecc"
+This skill must be accessible to Gemini CLI before activation. Two ways to bootstrap:
+1. **Via Plugin**: `/plugin install everything-gemini` — the plugin loads this skill automatically
+2. **Manual**: Copy only this skill to `~/.gemini/skills/configure-ecc/SKILL.md`, then activate by saying "configure ecc"
 
 ---
 
@@ -28,15 +41,27 @@ This skill must be accessible to Claude Code before activation. Two ways to boot
 Before any installation, clone the latest ECC source to `/tmp`:
 
 ```bash
-rm -rf /tmp/everything-claude-code
-git clone https://github.com/affaan-m/everything-claude-code.git /tmp/everything-claude-code
+rm -rf /tmp/everything-gemini
+git clone https://github.com/fmarzochi/everything-gemini.git /tmp/everything-gemini
 ```
 
-Set `ECC_ROOT=/tmp/everything-claude-code` as the source for all subsequent copy operations.
+Set `ECC_ROOT=/tmp/everything-gemini` as the source for all subsequent copy operations.
 
 If the clone fails (network issues, etc.), use `AskUserQuestion` to ask the user to provide a local path to an existing ECC clone.
 
 ---
+
+
+**CRITICAL INSTRUCTION FOR GEMINI CLI:**
+When executing the logic of this skill, you MUST map the conceptual steps to your native toolset:
+- Use `read_file` to read file contents.
+- Use `replace` to edit files exactly (do not use sed or echo).
+- Use `write_file` to create new files.
+- Use `grep_search` and `glob` to search across the codebase.
+- Use `list_directory` to explore folders.
+- Use `run_shell_command` to execute tests, builds, or other terminal commands.
+Always verify the output of your tools before proceeding to the next logical step.
+
 
 ## Step 1: Choose Installation Level
 
@@ -45,15 +70,15 @@ Use `AskUserQuestion` to ask the user where to install:
 ```
 Question: "Where should ECC components be installed?"
 Options:
-  - "User-level (~/.claude/)" — "Applies to all your Claude Code projects"
-  - "Project-level (.claude/)" — "Applies only to the current project"
+  - "User-level (~/.gemini/)" — "Applies to all your Gemini CLI projects"
+  - "Project-level (.gemini/)" — "Applies only to the current project"
   - "Both" — "Common/shared items user-level, project-specific items project-level"
 ```
 
 Store the choice as `INSTALL_LEVEL`. Set the target directory:
-- User-level: `TARGET=~/.claude`
-- Project-level: `TARGET=.claude` (relative to current project root)
-- Both: `TARGET_USER=~/.claude`, `TARGET_PROJECT=.claude`
+- User-level: `TARGET=~/.gemini`
+- Project-level: `TARGET=.gemini` (relative to current project root)
+- Both: `TARGET_USER=~/.gemini`, `TARGET_PROJECT=.gemini`
 
 Create the target directories if they don't exist:
 ```bash
@@ -66,13 +91,13 @@ mkdir -p $TARGET/skills $TARGET/rules
 
 ### 2a: Choose Scope (Core vs Niche)
 
-Default to **Core (recommended for new users)** — copy `.agents/skills/*` plus `skills/search-first/` for research-first workflows. This bundle covers engineering, evals, verification, security, strategic compaction, frontend design, and Anthropic cross-functional skills (article-writing, content-engine, market-research, frontend-slides).
+Default to **Core (recommended for new users)** — copy `.agents/skills/*` plus `skills/search-first/` for research-first workflows. This bundle covers engineering, evals, verification, security, strategic compaction, frontend design, and Google cross-functional skills (article-writing, content-engine, market-research, frontend-slides).
 
 Use `AskUserQuestion` (single select):
 ```
 Question: "Install core skills only, or include niche/framework packs?"
 Options:
-  - "Core only (recommended)" — "tdd, e2e, evals, verification, research-first, security, frontend patterns, compacting, cross-functional Anthropic skills"
+  - "Core only (recommended)" — "tdd, e2e, evals, verification, research-first, security, frontend patterns, compacting, cross-functional Google skills"
   - "Core + selected niche" — "Add framework/domain-specific skills after core"
   - "Niche only" — "Skip core, install specific framework/domain skills"
 Default: Core only
@@ -90,7 +115,7 @@ Options:
   - "Framework & Language" — "Django, Laravel, Spring Boot, Go, Python, Java, Frontend, Backend patterns"
   - "Database" — "PostgreSQL, ClickHouse, JPA/Hibernate patterns"
   - "Workflow & Quality" — "TDD, verification, learning, security review, compaction"
-  - "Research & APIs" — "Deep research, Exa search, Claude API patterns"
+  - "Research & APIs" — "Deep research, Exa search, Gemini API patterns"
   - "Social & Content Distribution" — "X/Twitter API, crossposting alongside content-engine"
   - "Media Generation" — "fal.ai image/video/audio alongside VideoDB"
   - "Orchestration" — "dmux multi-agent workflows"
@@ -165,7 +190,7 @@ For each selected category, print the full list of skills below and ask the user
 | `deep-research` | Multi-source deep research using firecrawl and exa MCPs with cited reports |
 | `exa-search` | Neural search via Exa MCP for web, code, company, and people research |
 
-`claude-api` is an Anthropic canonical skill. Install it from [`anthropics/skills`](https://github.com/anthropics/skills) when you want the official Claude API workflow instead of an ECC-bundled copy.
+`gemini-api` is an Google canonical skill. Install it from [`google-gemini/skills`](https://github.com/google-gemini/skills) when you want the official Gemini API workflow instead of an ECC-bundled copy.
 
 **Category: Social & Content Distribution (2 skills)**
 
@@ -215,6 +240,18 @@ Note: `continuous-learning` and `continuous-learning-v2` have extra files (confi
 
 ---
 
+
+**CRITICAL INSTRUCTION FOR GEMINI CLI:**
+When executing the logic of this skill, you MUST map the conceptual steps to your native toolset:
+- Use `read_file` to read file contents.
+- Use `replace` to edit files exactly (do not use sed or echo).
+- Use `write_file` to create new files.
+- Use `grep_search` and `glob` to search across the codebase.
+- Use `list_directory` to explore folders.
+- Use `run_shell_command` to execute tests, builds, or other terminal commands.
+Always verify the output of your tools before proceeding to the next logical step.
+
+
 ## Step 3: Select & Install Rules
 
 Use `AskUserQuestion` with `multiSelect: true`:
@@ -260,14 +297,14 @@ ls -la $TARGET/rules/
 
 Scan all installed `.md` files for path references:
 ```bash
-grep -rn "~/.claude/" $TARGET/skills/ $TARGET/rules/
+grep -rn "~/.gemini/" $TARGET/skills/ $TARGET/rules/
 grep -rn "../common/" $TARGET/rules/
 grep -rn "skills/" $TARGET/skills/
 ```
 
-**For project-level installs**, flag any references to `~/.claude/` paths:
-- If a skill references `~/.claude/settings.json` — this is usually fine (settings are always user-level)
-- If a skill references `~/.claude/skills/` or `~/.claude/rules/` — this may be broken if installed only at project level
+**For project-level installs**, flag any references to `~/.gemini/` paths:
+- If a skill references `~/.gemini/settings.json` — this is usually fine (settings are always user-level)
+- If a skill references `~/.gemini/skills/` or `~/.gemini/rules/` — this may be broken if installed only at project level
 - If a skill references another skill by name — check that the referenced skill was also installed
 
 ### 4c: Check Cross-References Between Skills
@@ -276,7 +313,7 @@ Some skills reference others. Verify these dependencies:
 - `django-tdd` may reference `django-patterns`
 - `laravel-tdd` may reference `laravel-patterns`
 - `springboot-tdd` may reference `springboot-patterns`
-- `continuous-learning-v2` references `~/.claude/homunculus/` directory
+- `continuous-learning-v2` references `~/.gemini/homunculus/` directory
 - `python-testing` may reference `python-patterns`
 - `golang-testing` may reference `golang-patterns`
 - `crosspost` references `content-engine` and `x-api`
@@ -290,10 +327,22 @@ Some skills reference others. Verify these dependencies:
 For each issue found, report:
 1. **File**: The file containing the problematic reference
 2. **Line**: The line number
-3. **Issue**: What's wrong (e.g., "references ~/.claude/skills/python-patterns but python-patterns was not installed")
-4. **Suggested fix**: What to do (e.g., "install python-patterns skill" or "update path to .claude/skills/")
+3. **Issue**: What's wrong (e.g., "references ~/.gemini/skills/python-patterns but python-patterns was not installed")
+4. **Suggested fix**: What to do (e.g., "install python-patterns skill" or "update path to .gemini/skills/")
 
 ---
+
+
+**CRITICAL INSTRUCTION FOR GEMINI CLI:**
+When executing the logic of this skill, you MUST map the conceptual steps to your native toolset:
+- Use `read_file` to read file contents.
+- Use `replace` to edit files exactly (do not use sed or echo).
+- Use `write_file` to create new files.
+- Use `grep_search` and `glob` to search across the codebase.
+- Use `list_directory` to explore folders.
+- Use `run_shell_command` to execute tests, builds, or other terminal commands.
+Always verify the output of your tools before proceeding to the next logical step.
+
 
 ## Step 5: Optimize Installed Files (Optional)
 
@@ -333,7 +382,7 @@ Options:
 Clean up the cloned repository from `/tmp`:
 
 ```bash
-rm -rf /tmp/everything-claude-code
+rm -rf /tmp/everything-gemini
 ```
 
 Then print a summary report:
@@ -363,17 +412,29 @@ Then print a summary report:
 
 ---
 
+
+**CRITICAL INSTRUCTION FOR GEMINI CLI:**
+When executing the logic of this skill, you MUST map the conceptual steps to your native toolset:
+- Use `read_file` to read file contents.
+- Use `replace` to edit files exactly (do not use sed or echo).
+- Use `write_file` to create new files.
+- Use `grep_search` and `glob` to search across the codebase.
+- Use `list_directory` to explore folders.
+- Use `run_shell_command` to execute tests, builds, or other terminal commands.
+Always verify the output of your tools before proceeding to the next logical step.
+
+
 ## Troubleshooting
 
-### "Skills not being picked up by Claude Code"
+### "Skills not being picked up by Gemini CLI"
 - Verify the skill directory contains a `SKILL.md` file (not just loose .md files)
-- For user-level: check `~/.claude/skills/<skill-name>/SKILL.md` exists
-- For project-level: check `.claude/skills/<skill-name>/SKILL.md` exists
+- For user-level: check `~/.gemini/skills/<skill-name>/SKILL.md` exists
+- For project-level: check `.gemini/skills/<skill-name>/SKILL.md` exists
 
 ### "Rules not working"
 - Rules are flat files, not in subdirectories: `$TARGET/rules/coding-style.md` (correct) vs `$TARGET/rules/common/coding-style.md` (incorrect for flat install)
-- Restart Claude Code after installing rules
+- Restart Gemini CLI after installing rules
 
 ### "Path reference errors after project-level install"
-- Some skills assume `~/.claude/` paths. Run Step 4 verification to find and fix these.
-- For `continuous-learning-v2`, the `~/.claude/homunculus/` directory is always user-level — this is expected and not an error.
+- Some skills assume `~/.gemini/` paths. Run Step 4 verification to find and fix these.
+- For `continuous-learning-v2`, the `~/.gemini/homunculus/` directory is always user-level — this is expected and not an error.

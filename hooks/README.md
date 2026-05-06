@@ -1,16 +1,16 @@
 # Hooks
 
-Hooks are event-driven automations that fire before or after Claude Code tool executions. They enforce code quality, catch mistakes early, and automate repetitive checks.
+Hooks are event-driven automations that fire before or after Gemini CLI tool executions. They enforce code quality, catch mistakes early, and automate repetitive checks.
 
 ## How Hooks Work
 
 ```
-User request → Claude picks a tool → PreToolUse hook runs → Tool executes → PostToolUse hook runs
+User request → Gemini picks a tool → PreToolUse hook runs → Tool executes → PostToolUse hook runs
 ```
 
 - **PreToolUse** hooks run before the tool executes. They can **block** (exit code 2) or **warn** (stderr without blocking).
 - **PostToolUse** hooks run after the tool completes. They can analyze output but cannot block.
-- **Stop** hooks run after each Claude response.
+- **Stop** hooks run after each Gemini response.
 - **SessionStart/SessionEnd** hooks run at session lifecycle boundaries.
 - **PreCompact** hooks run before context compaction, useful for saving state.
 
@@ -18,37 +18,37 @@ User request → Claude picks a tool → PreToolUse hook runs → Tool executes 
 
 ## Installing These Hooks Manually
 
-For Claude Code manual installs, do not paste the raw repo `hooks.json` into `~/.claude/settings.json` or copy it directly into `~/.claude/hooks/hooks.json`. The checked-in file is plugin/repo-oriented and is meant to be installed through the ECC installer or loaded as a plugin.
+For Gemini CLI manual installs, do not paste the raw repo `hooks.json` into `~/.gemini/settings.json` or copy it directly into `~/.gemini/hooks/hooks.json`. The checked-in file is plugin/repo-oriented and is meant to be installed through the ECC installer or loaded as a plugin.
 
-Use the installer instead so hook commands are rewritten against your actual Claude root:
+Use the installer instead so hook commands are rewritten against your actual Gemini root:
 
 ```bash
-bash ./install.sh --target claude --modules hooks-runtime
+bash ./install.sh --target gemini --modules hooks-runtime
 ```
 
 ```powershell
-pwsh -File .\install.ps1 --target claude --modules hooks-runtime
+pwsh -File .\install.ps1 --target gemini --modules hooks-runtime
 ```
 
-That installs resolved hooks to `~/.claude/hooks/hooks.json`. On Windows, the Claude config root is `%USERPROFILE%\\.claude`.
+That installs resolved hooks to `~/.gemini/hooks/hooks.json`. On Windows, the Gemini config root is `%USERPROFILE%\\.gemini`.
 
 ### PreToolUse Hooks
 
 | Hook | Matcher | Behavior | Exit Code |
 |------|---------|----------|-----------|
-| **Dev server blocker** | `Bash` | Blocks `npm run dev` etc. outside tmux — ensures log access | 2 (blocks) |
-| **Tmux reminder** | `Bash` | Suggests tmux for long-running commands (npm test, cargo build, docker) | 0 (warns) |
-| **Git push reminder** | `Bash` | Reminds to review changes before `git push` | 0 (warns) |
-| **Pre-commit quality check** | `Bash` | Runs quality checks before `git commit`: lints staged files, validates commit message format when provided via `-m/--message`, detects console.log/debugger/secrets | 2 (blocks critical) / 0 (warns) |
-| **Doc file warning** | `Write` | Warns about non-standard `.md`/`.txt` files (allows README, CLAUDE, CONTRIBUTING, CHANGELOG, LICENSE, SKILL, docs/, skills/); cross-platform path handling | 0 (warns) |
+| **Dev server blocker** | `run_shell_command` | Blocks `npm run dev` etc. outside tmux — ensures log access | 2 (blocks) |
+| **Tmux reminder** | `run_shell_command` | Suggests tmux for long-running commands (npm test, cargo build, docker) | 0 (warns) |
+| **Git push reminder** | `run_shell_command` | Reminds to review changes before `git push` | 0 (warns) |
+| **Pre-commit quality check** | `run_shell_command` | Runs quality checks before `git commit`: lints staged files, validates commit message format when provided via `-m/--message`, detects console.log/debugger/secrets | 2 (blocks critical) / 0 (warns) |
+| **Doc file warning** | `Write` | Warns about non-standard `.md`/`.txt` files (allows README, GEMINI, CONTRIBUTING, CHANGELOG, LICENSE, SKILL, docs/, skills/); cross-platform path handling | 0 (warns) |
 | **Strategic compact** | `Edit\|Write` | Suggests manual `/compact` at logical intervals (every ~50 tool calls) | 0 (warns) |
 
 ### PostToolUse Hooks
 
 | Hook | Matcher | What It Does |
 |------|---------|-------------|
-| **PR logger** | `Bash` | Logs PR URL and review command after `gh pr create` |
-| **Build analysis** | `Bash` | Background analysis after build commands (async, non-blocking) |
+| **PR logger** | `run_shell_command` | Logs PR URL and review command after `gh pr create` |
+| **Build analysis** | `run_shell_command` | Background analysis after build commands (async, non-blocking) |
 | **Quality gate** | `Edit\|Write\|MultiEdit` | Runs fast quality checks after edits |
 | **Design quality check** | `Edit\|Write\|MultiEdit` | Warns when frontend edits drift toward generic template-looking UI |
 | **Prettier format** | `Edit` | Auto-formats JS/TS files with Prettier after edits |
@@ -72,7 +72,7 @@ That installs resolved hooks to `~/.claude/hooks/hooks.json`. On Windows, the Cl
 
 ### Disabling a Hook
 
-Remove or comment out the hook entry in `hooks.json`. If installed as a plugin, override in your `~/.claude/settings.json`:
+Remove or comment out the hook entry in `hooks.json`. If installed as a plugin, override in your `~/.gemini/settings.json`:
 
 ```json
 {
@@ -133,7 +133,7 @@ process.stdin.on('end', () => {
   const toolOutput = input.tool_output;    // Only available in PostToolUse
 
   // Warn (non-blocking): write to stderr
-  console.error('[Hook] Warning message shown to Claude');
+  console.error('[Hook] Warning message shown to Gemini');
 
   // Block (PreToolUse only): exit with code 2
   // process.exit(2);

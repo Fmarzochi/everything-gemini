@@ -15,7 +15,7 @@ class Role(str, Enum):
 
 
 class ProviderType(str, Enum):
-    CLAUDE = "claude"
+    GEMINI = "gemini"
     OPENAI = "openai"
     OLLAMA = "ollama"
 

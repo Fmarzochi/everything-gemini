@@ -1,6 +1,6 @@
-# Contributing to Everything Claude Code
+# Contributing to Everything Gemini
 
-Thanks for wanting to contribute! This repo is a community resource for Claude Code users.
+Thanks for wanting to contribute! This repo is a community resource for Gemini CLI users.
 
 ## Table of Contents
 
@@ -52,8 +52,8 @@ Slash commands that invoke useful workflows:
 
 ```bash
 # 1. Fork and clone
-gh repo fork affaan-m/everything-claude-code --clone
-cd everything-claude-code
+gh repo fork fmarzochi/everything-gemini --clone
+cd everything-gemini
 
 # 2. Create a branch
 git checkout -b feat/my-contribution
@@ -61,8 +61,8 @@ git checkout -b feat/my-contribution
 # 3. Add your contribution (see sections below)
 
 # 4. Test locally
-cp -r skills/my-skill ~/.claude/skills/  # for skills
-# Then test with Claude Code
+cp -r skills/my-skill ~/.gemini/skills/  # for skills
+# Then test with Gemini CLI
 
 # 5. Submit PR
 git add . && git commit -m "feat: add my-skill" && git push -u origin feat/my-contribution
@@ -72,7 +72,7 @@ git add . && git commit -m "feat: add my-skill" && git push -u origin feat/my-co
 
 ## Contributing Skills
 
-Skills are knowledge modules that Claude Code loads based on context.
+Skills are knowledge modules that Gemini CLI loads based on context.
 
 > **Comprehensive Guide:** For detailed guidance on creating effective skills, see [Skill Development Guide](docs/SKILL-DEVELOPMENT-GUIDE.md). It covers:
 > - Skill architecture and categories
@@ -104,7 +104,7 @@ Brief overview of what this skill covers.
 
 ## When to Activate
 
-Describe scenarios where Claude should use this skill. This is critical for auto-activation.
+Describe scenarios where Gemini should use this skill. This is critical for auto-activation.
 
 ## Core Concepts
 
@@ -164,7 +164,7 @@ Short version:
 - [ ] Shows anti-patterns (what NOT to do)
 - [ ] Under 500 lines (800 max)
 - [ ] Uses clear section headers
-- [ ] Tested with Claude Code
+- [ ] Tested with Gemini CLI
 - [ ] Links to related skills
 - [ ] No sensitive data (API keys, tokens, paths)
 
@@ -196,8 +196,8 @@ agents/your-agent-name.md
 ```markdown
 ---
 name: your-agent-name
-description: What this agent does and when Claude should invoke it. Be specific!
-tools: ["Read", "Write", "Edit", "Bash", "Grep", "Glob"]
+description: What this agent does and when Gemini should invoke it. Be specific!
+tools: ["read_file", "Write", "replace", "run_shell_command", "grep_search", "glob"]
 model: sonnet
 ---
 
@@ -254,7 +254,7 @@ Output: [what you return]
 
 ## Contributing Hooks
 
-Hooks are automatic behaviors triggered by Claude Code events.
+Hooks are automatic behaviors triggered by Gemini CLI events.
 
 ### File Location
 
@@ -401,7 +401,7 @@ Skills and agents can use **MCP (Model Context Protocol)** tools to pull in up-t
 - **Context7** is an MCP server that exposes `resolve-library-id` and `query-docs`. Use it when the user asks about libraries, frameworks, or APIs so answers reflect current docs and code examples.
 - When contributing **skills** that depend on live docs (e.g. setup, API usage), describe how to use the relevant MCP tools (e.g. resolve the library ID, then query docs) and point to the `documentation-lookup` skill or Context7 as the pattern.
 - When contributing **agents** that answer docs/API questions, include the Context7 MCP tool names (e.g. `mcp__context7__resolve-library-id`, `mcp__context7__query-docs`) in the agent's tools and document the resolve → query workflow.
-- **mcp-configs/mcp-servers.json** includes a Context7 entry; users enable it in their harness (e.g. Claude Code, Cursor) to use the documentation-lookup skill (in `skills/documentation-lookup/`) and the `/docs` command.
+- **mcp-configs/mcp-servers.json** includes a Context7 entry; users enable it in their harness (e.g. Gemini CLI, Cursor) to use the documentation-lookup skill (in `skills/documentation-lookup/`) and the `/docs` command.
 
 ---
 
@@ -457,7 +457,7 @@ How you tested this.
 
 ## Checklist
 - [ ] Follows format guidelines
-- [ ] Tested with Claude Code
+- [ ] Tested with Gemini CLI
 - [ ] No sensitive info (API keys, paths)
 - [ ] Clear descriptions
 ```
@@ -497,8 +497,7 @@ How you tested this.
 
 ## Questions?
 
-- **Issues:** [github.com/affaan-m/everything-claude-code/issues](https://github.com/affaan-m/everything-claude-code/issues)
-- **X/Twitter:** [@affaanmustafa](https://x.com/affaanmustafa)
+- **Issues:** [github.com/fmarzochi/everything-gemini/issues](https://github.com/fmarzochi/everything-gemini/issues)
 
 ---
 

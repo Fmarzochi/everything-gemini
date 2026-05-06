@@ -1,13 +1,26 @@
 ---
 name: hookify-rules
 description: This skill should be used when the user asks to create a hookify rule, write a hook rule, configure hookify, add a hookify rule, or needs guidance on hookify rule syntax and patterns.
+tools: ["run_shell_command", "replace", "read_file", "grep_search", "glob", "list_directory", "write_file"]
 ---
+
+
+**CRITICAL INSTRUCTION FOR GEMINI CLI:**
+When executing the logic of this skill, you MUST map the conceptual steps to your native toolset:
+- Use `read_file` to read file contents.
+- Use `replace` to edit files exactly (do not use sed or echo).
+- Use `write_file` to create new files.
+- Use `grep_search` and `glob` to search across the codebase.
+- Use `list_directory` to explore folders.
+- Use `run_shell_command` to execute tests, builds, or other terminal commands.
+Always verify the output of your tools before proceeding to the next logical step.
+
 
 # Writing Hookify Rules
 
 ## Overview
 
-Hookify rules are markdown files with YAML frontmatter that define patterns to watch for and messages to show when those patterns match. Rules are stored in `.claude/hookify.{rule-name}.local.md` files.
+Hookify rules are markdown files with YAML frontmatter that define patterns to watch for and messages to show when those patterns match. Rules are stored in `.gemini/hookify.{rule-name}.local.md` files.
 
 ## Rule File Format
 
@@ -21,7 +34,19 @@ event: bash|file|stop|prompt|all
 pattern: regex-pattern-here
 ---
 
-Message to show Claude when this rule triggers.
+
+**CRITICAL INSTRUCTION FOR GEMINI CLI:**
+When executing the logic of this skill, you MUST map the conceptual steps to your native toolset:
+- Use `read_file` to read file contents.
+- Use `replace` to edit files exactly (do not use sed or echo).
+- Use `write_file` to create new files.
+- Use `grep_search` and `glob` to search across the codebase.
+- Use `list_directory` to explore folders.
+- Use `run_shell_command` to execute tests, builds, or other terminal commands.
+Always verify the output of your tools before proceeding to the next logical step.
+
+
+Message to show Gemini when this rule triggers.
 Can include markdown formatting, warnings, suggestions, etc.
 ```
 
@@ -51,6 +76,18 @@ conditions:
     pattern: API_KEY
 ---
 
+
+**CRITICAL INSTRUCTION FOR GEMINI CLI:**
+When executing the logic of this skill, you MUST map the conceptual steps to your native toolset:
+- Use `read_file` to read file contents.
+- Use `replace` to edit files exactly (do not use sed or echo).
+- Use `write_file` to create new files.
+- Use `grep_search` and `glob` to search across the codebase.
+- Use `list_directory` to explore folders.
+- Use `run_shell_command` to execute tests, builds, or other terminal commands.
+Always verify the output of your tools before proceeding to the next logical step.
+
+
 You're adding an API key to a .env file. Ensure this file is in .gitignore!
 ```
 
@@ -66,7 +103,7 @@ All conditions must match for rule to trigger.
 ## Event Type Guide
 
 ### bash Events
-Match Bash command patterns:
+Match run_shell_command command patterns:
 - Dangerous commands: `rm\s+-rf`, `dd\s+if=`, `mkfs`
 - Privilege escalation: `sudo\s+`, `su\s+`
 - Permission issues: `chmod\s+777`
@@ -103,9 +140,9 @@ python3 -c "import re; print(re.search(r'your_pattern', 'test text'))"
 
 ## File Organization
 
-- **Location**: `.claude/` directory in project root
-- **Naming**: `.claude/hookify.{descriptive-name}.local.md`
-- **Gitignore**: Add `.claude/*.local.md` to `.gitignore`
+- **Location**: `.gemini/` directory in project root
+- **Naming**: `.gemini/hookify.{descriptive-name}.local.md`
+- **Gitignore**: Add `.gemini/*.local.md` to `.gitignore`
 
 ## Commands
 
@@ -124,5 +161,17 @@ enabled: true
 event: bash
 pattern: dangerous_command
 ---
+
+
+**CRITICAL INSTRUCTION FOR GEMINI CLI:**
+When executing the logic of this skill, you MUST map the conceptual steps to your native toolset:
+- Use `read_file` to read file contents.
+- Use `replace` to edit files exactly (do not use sed or echo).
+- Use `write_file` to create new files.
+- Use `grep_search` and `glob` to search across the codebase.
+- Use `list_directory` to explore folders.
+- Use `run_shell_command` to execute tests, builds, or other terminal commands.
+Always verify the output of your tools before proceeding to the next logical step.
+
 Warning message here
 ```

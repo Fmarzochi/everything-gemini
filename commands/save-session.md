@@ -1,5 +1,5 @@
 ---
-description: Save current session state to a dated file in ~/.claude/session-data/ so work can be resumed in a future session with full context.
+description: Save current session state to a dated file in ~/.gemini/session-data/ so work can be resumed in a future session with full context.
 ---
 
 # Save Session Command
@@ -8,7 +8,7 @@ Capture everything that happened in this session — what was built, what worked
 
 ## When to Use
 
-- End of a work session before closing Claude Code
+- End of a work session before closing Gemini CLI
 - Before hitting context limits (run this first, then start a fresh session)
 - After solving a complex problem you want to remember
 - Any time you need to hand off context to a future session
@@ -19,22 +19,22 @@ Capture everything that happened in this session — what was built, what worked
 
 Before writing the file, collect:
 
-- Read all files modified during this session (use git diff or recall from conversation)
+- read_file all files modified during this session (use git diff or recall from conversation)
 - Review what was discussed, attempted, and decided
 - Note any errors encountered and how they were resolved (or not)
 - Check current test/build status if relevant
 
 ### Step 2: Create the sessions folder if it doesn't exist
 
-Create the canonical sessions folder in the user's Claude home directory:
+Create the canonical sessions folder in the user's Gemini home directory:
 
 ```bash
-mkdir -p ~/.claude/session-data
+mkdir -p ~/.gemini/session-data
 ```
 
 ### Step 3: Write the session file
 
-Create `~/.claude/session-data/YYYY-MM-DD-<short-id>-session.tmp`, using today's actual date and a short-id that satisfies the rules enforced by `SESSION_FILENAME_REGEX` in `session-manager.js`:
+Create `~/.gemini/session-data/YYYY-MM-DD-<short-id>-session.tmp`, using today's actual date and a short-id that satisfies the rules enforced by `SESSION_FILENAME_REGEX` in `session-manager.js`:
 
 - Compatibility characters: letters `a-z` / `A-Z`, digits `0-9`, hyphens `-`, underscores `_`
 - Compatibility minimum length: 1 character
@@ -270,6 +270,6 @@ Then test with Postman — the response should include a `Set-Cookie` header.
 - Each session gets its own file — never append to a previous session's file
 - The "What Did NOT Work" section is the most critical — future sessions will blindly retry failed approaches without it
 - If the user asks to save mid-session (not just at the end), save what's known so far and mark in-progress items clearly
-- The file is meant to be read by Claude at the start of the next session via `/resume-session`
-- Use the canonical global session store: `~/.claude/session-data/`
+- The file is meant to be read by Gemini at the start of the next session via `/resume-session`
+- Use the canonical global session store: `~/.gemini/session-data/`
 - Prefer the short-id filename form (`YYYY-MM-DD-<short-id>-session.tmp`) for any new session file

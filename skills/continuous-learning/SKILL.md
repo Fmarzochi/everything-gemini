@@ -1,18 +1,31 @@
 ---
 name: continuous-learning
-description: Automatically extract reusable patterns from Claude Code sessions and save them as learned skills for future use.
+description: Automatically extract reusable patterns from Gemini CLI sessions and save them as learned skills for future use.
 origin: ECC
+tools: ["run_shell_command", "replace", "read_file", "grep_search", "glob", "list_directory", "write_file"]
 ---
+
+
+**CRITICAL INSTRUCTION FOR GEMINI CLI:**
+When executing the logic of this skill, you MUST map the conceptual steps to your native toolset:
+- Use `read_file` to read file contents.
+- Use `replace` to edit files exactly (do not use sed or echo).
+- Use `write_file` to create new files.
+- Use `grep_search` and `glob` to search across the codebase.
+- Use `list_directory` to explore folders.
+- Use `run_shell_command` to execute tests, builds, or other terminal commands.
+Always verify the output of your tools before proceeding to the next logical step.
+
 
 # Continuous Learning Skill
 
-Automatically evaluates Claude Code sessions on end to extract reusable patterns that can be saved as learned skills.
+Automatically evaluates Gemini CLI sessions on end to extract reusable patterns that can be saved as learned skills.
 
 ## When to Activate
 
-- Setting up automatic pattern extraction from Claude Code sessions
+- Setting up automatic pattern extraction from Gemini CLI sessions
 - Configuring the Stop hook for session evaluation
-- Reviewing or curating learned skills in `~/.claude/skills/learned/`
+- Reviewing or curating learned skills in `~/.gemini/skills/learned/`
 - Adjusting extraction thresholds or pattern categories
 - Comparing v1 (this) vs v2 (instinct-based) approaches
 
@@ -26,7 +39,7 @@ This skill runs as a **Stop hook** at the end of each session:
 
 1. **Session Evaluation**: Checks if session has enough messages (default: 10+)
 2. **Pattern Detection**: Identifies extractable patterns from the session
-3. **Skill Extraction**: Saves useful patterns to `~/.claude/skills/learned/`
+3. **Skill Extraction**: Saves useful patterns to `~/.gemini/skills/learned/`
 
 ## Configuration
 
@@ -37,7 +50,7 @@ Edit `config.json` to customize:
   "min_session_length": 10,
   "extraction_threshold": "medium",
   "auto_approve": false,
-  "learned_skills_path": "~/.claude/skills/learned/",
+  "learned_skills_path": "~/.gemini/skills/learned/",
   "patterns_to_detect": [
     "error_resolution",
     "user_corrections",
@@ -65,7 +78,7 @@ Edit `config.json` to customize:
 
 ## Hook Setup
 
-Add to your `~/.claude/settings.json`:
+Add to your `~/.gemini/settings.json`:
 
 ```json
 {
@@ -74,7 +87,7 @@ Add to your `~/.claude/settings.json`:
       "matcher": "*",
       "hooks": [{
         "type": "command",
-        "command": "~/.claude/skills/continuous-learning/evaluate-session.sh"
+        "command": "~/.gemini/skills/continuous-learning/evaluate-session.sh"
       }]
     }]
   }
@@ -89,7 +102,6 @@ Add to your `~/.claude/settings.json`:
 
 ## Related
 
-- [The Longform Guide](https://x.com/affaanmustafa/status/2014040193557471352) - Section on continuous learning
 - `/learn` command - Manual pattern extraction mid-session
 
 ---

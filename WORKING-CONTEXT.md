@@ -11,7 +11,7 @@ Public ECC plugin repo for agents, skills, commands, hooks, rules, install surfa
 - Default branch: `main`
 - Public release surface is aligned at `v1.10.0`
 - Public catalog truth is `47` agents, `79` commands, and `181` skills
-- Public plugin slug is now `ecc`; legacy `everything-claude-code` install paths remain supported for compatibility
+- Public plugin slug is now `ecc`; legacy `everything-gemini` install paths remain supported for compatibility
 - Release discussion: `#1272`
 - ECC 2.0 exists in-tree and builds, but it is still alpha rather than GA
 - Main active operational work:
@@ -51,10 +51,10 @@ Public ECC plugin repo for agents, skills, commands, hooks, rules, install surfa
 ## Open PR Classification
 
 - Closed on 2026-04-01 under backlog hygiene / merge policy:
-  - `#1069` `feat: add everything-claude-code ECC bundle`
-  - `#1068` `feat: add everything-claude-code-conventions ECC bundle`
-  - `#1080` `feat: add everything-claude-code ECC bundle`
-  - `#1079` `feat: add everything-claude-code-conventions ECC bundle`
+  - `#1069` `feat: add everything-gemini ECC bundle`
+  - `#1068` `feat: add everything-gemini-conventions ECC bundle`
+  - `#1080` `feat: add everything-gemini ECC bundle`
+  - `#1079` `feat: add everything-gemini-conventions ECC bundle`
   - `#1064` `chore(deps-dev): bump @eslint/js from 9.39.2 to 10.0.1`
   - `#1063` `chore(deps-dev): bump eslint from 9.39.2 to 10.1.0`
 - Closed on 2026-04-01 because the content is sourced from external ecosystems and should only land via manual ECC-native re-port:
@@ -65,9 +65,9 @@ Public ECC plugin repo for agents, skills, commands, hooks, rules, install surfa
   - `#1055` Dart / Flutter support
   - `#1043` C# reviewer and .NET skills
 - Direct-port candidates landed after audit:
-  - `#1078` hook-id dedupe for managed Claude hook reinstalls
+  - `#1078` hook-id dedupe for managed Gemini hook reinstalls
   - `#844` ui-demo skill
-  - `#1110` install-time Claude hook root resolution
+  - `#1110` install-time Gemini hook root resolution
   - `#1106` portable Codex Context7 key extraction
   - `#1107` Codex baseline merge and sample agent-role sync
   - `#1119` stale CI/lint cleanup that still contained safe low-risk fixes
@@ -120,12 +120,12 @@ Keep this file detailed for only the current sprint, blockers, and next actions.
 - 2026-04-01: Content skill cleanup started with `content-engine`, `crosspost`, `article-writing`, and `investor-outreach`. The new direction is source-first voice capture, explicit anti-trope bans, and no forced platform persona shifts.
 - 2026-04-01: `node scripts/ci/check-unicode-safety.js --write` sanitized the remaining emoji-bearing Markdown files, including several `remotion-video-creation` rule docs and an old local plan note.
 - 2026-04-01: Core English repo surfaces were shifted to a skills-first posture. README, AGENTS, plugin metadata, and contributor instructions now treat `skills/` as canonical and `commands/` as legacy slash-entry compatibility during migration.
-- 2026-04-01: Follow-up bundle cleanup closed `#1080` and `#1079`, which were generated `.claude/` bundle PRs duplicating command-first scaffolding instead of shipping canonical ECC source changes.
+- 2026-04-01: Follow-up bundle cleanup closed `#1080` and `#1079`, which were generated `.gemini/` bundle PRs duplicating command-first scaffolding instead of shipping canonical ECC source changes.
 - 2026-04-01: Ported the useful core of `#1078` directly into `main`, but tightened the implementation so legacy no-id hook installs deduplicate cleanly on the first reinstall instead of the second. Added stable hook ids to `hooks/hooks.json`, semantic fallback aliases in `mergeHookEntries()`, and a regression test covering upgrade from pre-id settings.
 - 2026-04-01: Collapsed the obvious command/skill duplicates into thin legacy shims so `skills/` now hold the maintained bodies for NanoClaw, context-budget, DevFleet, docs lookup, E2E, evals, orchestration, prompt optimization, rules distillation, TDD, and verification.
 - 2026-04-01: Ported the self-contained core of `#844` directly into `main` as `skills/ui-demo/SKILL.md` and registered it under the `media-generation` install module instead of merging the PR wholesale.
 - 2026-04-01: Added the first connected-workflow operator lane as ECC-native skills instead of leaving the surface as raw plugins or APIs: `workspace-surface-audit`, `customer-billing-ops`, `project-flow-ops`, and `google-workspace-ops`. These are tracked under the new `operator-workflows` install module.
-- 2026-04-01: Direct-ported the real fix from the unresolved hook-path PR lane into the active installer. Claude installs now replace `${CLAUDE_PLUGIN_ROOT}` with the concrete install root in both `settings.json` and the copied `hooks/hooks.json`, which keeps PreToolUse/PostToolUse hooks working outside plugin-managed env injection.
+- 2026-04-01: Direct-ported the real fix from the unresolved hook-path PR lane into the active installer. Gemini installs now replace `${GEMINI_PLUGIN_ROOT}` with the concrete install root in both `settings.json` and the copied `hooks/hooks.json`, which keeps PreToolUse/PostToolUse hooks working outside plugin-managed env injection.
 - 2026-04-01: Replaced the GNU-only `grep -P` parser in `scripts/sync-ecc-to-codex.sh` with a portable Node parser for Context7 key extraction. Added source-level regression coverage so BSD/macOS syncs do not drift back to non-portable parsing.
 - 2026-04-01: Targeted regression suite after the direct ports is green: `tests/scripts/install-apply.test.js`, `tests/scripts/sync-ecc-to-codex.test.js`, and `tests/scripts/codex-hooks.test.js`.
 - 2026-04-01: Ported the useful core of `#1107` directly into `main` as an add-only Codex baseline merge. `scripts/sync-ecc-to-codex.sh` now fills missing non-MCP defaults from `.codex/config.toml`, syncs sample agent role files into `~/.codex/agents`, and preserves user config instead of replacing it. Added regression coverage for sparse configs and implicit parent tables.
@@ -134,12 +134,12 @@ Keep this file detailed for only the current sprint, blockers, and next actions.
 - 2026-04-01: Added `connections-optimizer` as the review-first social-graph reorganization workflow for X and LinkedIn, with explicit pruning modes, browser fallback expectations, and Apple Mail drafting guidance.
 - 2026-04-01: Added `manim-video` as the reusable technical explainer lane and seeded it with a starter network-graph scene so launch and systems animations do not depend on one-off scratch scripts.
 - 2026-04-02: Re-extracted `social-graph-ranker` as a standalone primitive because the weighted bridge-decay model is reusable outside the full lead workflow. `lead-intelligence` now points to it for canonical graph ranking instead of carrying the full algorithm explanation inline, while `connections-optimizer` stays the broader operator layer for pruning, adds, and outbound review packs.
-- 2026-04-02: Applied the same consolidation rule to the writing lane. `brand-voice` remains the canonical voice system, while `content-engine`, `crosspost`, `article-writing`, and `investor-outreach` now keep only workflow-specific guidance instead of duplicating a second Affaan/ECC voice model or repeating the full ban list in multiple places.
-- 2026-04-02: Closed fresh auto-generated bundle PRs `#1182` and `#1183` under the existing policy. Useful ideas from generator output must be ported manually into canonical repo surfaces instead of merging `.claude`/bundle PRs wholesale.
+- 2026-04-02: Applied the same consolidation rule to the writing lane. `brand-voice` remains the canonical voice system, while `content-engine`, `crosspost`, `article-writing`, and `investor-outreach` now keep only workflow-specific guidance instead of duplicating a second voice model or repeating the full ban list in multiple places.
+- 2026-04-02: Closed fresh auto-generated bundle PRs `#1182` and `#1183` under the existing policy. Useful ideas from generator output must be ported manually into canonical repo surfaces instead of merging `.gemini`/bundle PRs wholesale.
 - 2026-04-02: Ported the safe one-file macOS observer fix from `#1164` directly into `main` as a POSIX `mkdir` fallback for `continuous-learning-v2` lazy-start locking, then closed the PR as superseded by direct port.
 - 2026-04-02: Ported the safe core of `#1153` directly into `main`: markdownlint cleanup for orchestration/docs surfaces plus the Windows `USERPROFILE` and path-normalization fixes in `install-apply` / `repair` tests. Local validation after installing repo deps: `node tests/scripts/install-apply.test.js`, `node tests/scripts/repair.test.js`, and targeted `yarn markdownlint` all passed.
 - 2026-04-02: Direct-ported the safe web/frontend rules lane from `#1122` into `rules/web/`, but adapted `rules/web/hooks.md` to prefer project-local tooling and avoid remote one-off package execution examples.
-- 2026-04-02: Adapted the design-quality reminder from `#1127` into the current ECC hook architecture with a local `scripts/hooks/design-quality-check.js`, Claude `hooks/hooks.json` wiring, Cursor `after-file-edit.js` wiring, and dedicated hook coverage in `tests/hooks/design-quality-check.test.js`.
+- 2026-04-02: Adapted the design-quality reminder from `#1127` into the current ECC hook architecture with a local `scripts/hooks/design-quality-check.js`, Gemini `hooks/hooks.json` wiring, Cursor `after-file-edit.js` wiring, and dedicated hook coverage in `tests/hooks/design-quality-check.test.js`.
 - 2026-04-02: Fixed `#1141` on `main` in `16e9b17`. The observer lifecycle is now session-aware instead of purely detached: `SessionStart` writes a project-scoped lease, `SessionEnd` removes that lease and stops the observer when the final lease disappears, `observe.sh` records project activity, and `observer-loop.sh` now exits on idle when no leases remain. Targeted validation passed with `bash -n`, `node tests/hooks/observer-memory.test.js`, `node tests/integration/hooks.test.js`, `node scripts/ci/validate-hooks.js hooks/hooks.json`, and `node scripts/ci/check-unicode-safety.js`.
 - 2026-04-02: Fixed the remaining Windows-only hook regression behind `#1070` by making `scripts/lib/utils.js#getHomeDir()` honor explicit `HOME` / `USERPROFILE` overrides before falling back to `os.homedir()`. This restores test-isolated observer state paths for hook integration runs on Windows. Added regression coverage in `tests/lib/utils.test.js`. Targeted validation passed with `node tests/lib/utils.test.js`, `node tests/integration/hooks.test.js`, `node tests/hooks/observer-memory.test.js`, and `node scripts/ci/check-unicode-safety.js`.
 - 2026-04-02: Direct-ported NestJS support for `#1022` into `main` as `skills/nestjs-patterns/SKILL.md` and wired it into the `framework-language` install module. Synced the repo catalog afterward (`38` agents, `72` commands, `156` skills) and updated the docs so NestJS is no longer listed as an unfilled framework gap.
@@ -152,7 +152,7 @@ Keep this file detailed for only the current sprint, blockers, and next actions.
 - 2026-04-05: Salvaged the useful common-rule deltas from `#1214` directly into `rules/common/coding-style.md` and `rules/common/testing.md` (KISS/DRY/YAGNI reminders, naming conventions, code-smell guidance, and AAA-style test guidance), then closed the original mixed deletion PR. The broad skill removals in that PR were intentionally not replayed.
 - 2026-04-05: Fixed the stale-row bug in `.github/workflows/monthly-metrics.yml` with `bf5961e`. The workflow now refreshes the current month row in issue `#1087` instead of early-returning when the month already exists, and the dispatched run updated the April snapshot to the current star/fork/release counts.
 - 2026-04-05: Recovered the useful cost-control workflow from the divergent Hermes branch as a small ECC-native operator skill instead of replaying the branch. `skills/ecc-tools-cost-audit/SKILL.md` is now wired into `operator-workflows` and focused on webhook -> queue -> worker tracing, burn containment, quota bypass, premium-model leakage, and retry fanout in the sibling `ECC-Tools` repo.
-- 2026-04-05: Added `skills/council/SKILL.md` in `753da37` as an ECC-native four-voice decision workflow. The useful protocol from PR `#1254` was retained, but the shadow `~/.claude/notes` write path was explicitly removed in favor of `knowledge-ops`, `/save-session`, or direct GitHub/Linear updates when a decision delta matters.
+- 2026-04-05: Added `skills/council/SKILL.md` in `753da37` as an ECC-native four-voice decision workflow. The useful protocol from PR `#1254` was retained, but the shadow `~/.gemini/notes` write path was explicitly removed in favor of `knowledge-ops`, `/save-session`, or direct GitHub/Linear updates when a decision delta matters.
 - 2026-04-05: Direct-ported the safe `globals` bump from PR `#1243` into `main` as part of the council lane and closed the PR as superseded.
 - 2026-04-05: Closed PR `#1232` after full audit. The proposed `skill-scout` workflow overlaps current `search-first`, `/skill-create`, and `skill-stocktake`; if a dedicated marketplace-discovery layer returns later it should be rebuilt on top of the current install/catalog model rather than landing as a parallel discovery path.
 - 2026-04-05: Ported the safe localized README switcher fixes from PR `#1209` directly into `main` rather than merging the docs PR wholesale. The navigation now consistently includes `Português (Brasil)` and `Türkçe` across the localized README switchers, while newer localized body copy stays intact.

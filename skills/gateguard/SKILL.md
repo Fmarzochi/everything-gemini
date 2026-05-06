@@ -2,18 +2,31 @@
 name: gateguard
 description: Fact-forcing gate that blocks Edit/Write/Bash (including MultiEdit) and demands concrete investigation (importers, data schemas, user instruction) before allowing the action. Measurably improves output quality by +2.25 points vs ungated agents.
 origin: community
+tools: ["run_shell_command", "replace", "read_file", "grep_search", "glob", "list_directory", "write_file"]
 ---
+
+
+**CRITICAL INSTRUCTION FOR GEMINI CLI:**
+When executing the logic of this skill, you MUST map the conceptual steps to your native toolset:
+- Use `read_file` to read file contents.
+- Use `replace` to edit files exactly (do not use sed or echo).
+- Use `write_file` to create new files.
+- Use `grep_search` and `glob` to search across the codebase.
+- Use `list_directory` to explore folders.
+- Use `run_shell_command` to execute tests, builds, or other terminal commands.
+Always verify the output of your tools before proceeding to the next logical step.
+
 
 # GateGuard — Fact-Forcing Pre-Action Gate
 
-A PreToolUse hook that forces Claude to investigate before editing. Instead of self-evaluation ("are you sure?"), it demands concrete facts. The act of investigation creates awareness that self-evaluation never did.
+A PreToolUse hook that forces Gemini to investigate before editing. Instead of self-evaluation ("are you sure?"), it demands concrete facts. The act of investigation creates awareness that self-evaluation never did.
 
 ## When to Activate
 
 - Working on any codebase where file edits affect multiple modules
 - Projects with data files that have specific schemas or date formats
 - Teams where AI-generated code must match existing patterns
-- Any workflow where Claude tends to guess instead of investigating
+- Any workflow where Gemini tends to guess instead of investigating
 
 ## Core Concept
 
@@ -111,7 +124,7 @@ This adds `.gateguard.yml` for per-project configuration (custom messages, ignor
 
 - **Don't use self-evaluation instead.** "Are you sure?" always gets "yes." This is experimentally verified.
 - **Don't skip the data schema check.** Both A/B test agents assumed ISO-8601 dates when real data used `%Y/%m/%d %H:%M`. Checking data structure (with redacted values) prevents this entire class of bugs.
-- **Don't gate every single Bash command.** Routine bash gates once per session. Destructive bash gates every time. This balance avoids slowdown while catching real risks.
+- **Don't gate every single run_shell_command command.** Routine bash gates once per session. Destructive bash gates every time. This balance avoids slowdown while catching real risks.
 
 ## Best Practices
 

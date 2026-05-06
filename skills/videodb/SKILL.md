@@ -2,9 +2,21 @@
 name: videodb
 description: See, Understand, Act on video and audio. See- ingest from local files, URLs, RTSP/live feeds, or live record desktop; return realtime context and playable stream links. Understand- extract frames, build visual/semantic/temporal indexes, and search moments with timestamps and auto-clips. Act- transcode and normalize (codec, fps, resolution, aspect ratio), perform timeline edits (subtitles, text/image overlays, branding, audio overlays, dubbing, translation), generate media assets (image, audio, video), and create real time alerts for events from live streams or desktop capture.
 origin: ECC
-allowed-tools: Read Grep Glob Bash(python:*)
+allowed-tools: read_file grep_search glob run_shell_command(python:*)
 argument-hint: "[task description]"
 ---
+
+
+**CRITICAL INSTRUCTION FOR GEMINI CLI:**
+When executing the logic of this skill, you MUST map the conceptual steps to your native toolset:
+- Use `read_file` to read file contents.
+- Use `replace` to edit files exactly (do not use sed or echo).
+- Use `write_file` to create new files.
+- Use `grep_search` and `glob` to search across the codebase.
+- Use `list_directory` to explore folders.
+- Use `run_shell_command` to execute tests, builds, or other terminal commands.
+Always verify the output of your tools before proceeding to the next logical step.
+
 
 # VideoDB Skill
 
@@ -105,7 +117,7 @@ pip install videodb python-dotenv
 
 The user must set `VIDEO_DB_API_KEY` using **either** method:
 
-- **Export in terminal** (before starting Claude): `export VIDEO_DB_API_KEY=your-key`
+- **Export in terminal** (before starting Gemini): `export VIDEO_DB_API_KEY=your-key`
 - **Project `.env` file**: Save `VIDEO_DB_API_KEY=your-key` in the project's `.env` file
 
 Get a free API key at [console.videodb.io](https://console.videodb.io) (50 free uploads, no credit card).
@@ -341,7 +353,7 @@ recent_visual = [
 
 ## Additional docs
 
-Reference documentation is in the `reference/` directory adjacent to this SKILL.md file. Use the Glob tool to locate it if needed.
+Reference documentation is in the `reference/` directory adjacent to this SKILL.md file. Use the glob tool to locate it if needed.
 
 - [reference/api-reference.md](reference/api-reference.md) - Complete VideoDB Python SDK API reference
 - [reference/search.md](reference/search.md) - In-depth guide to video search (spoken word and scene-based)

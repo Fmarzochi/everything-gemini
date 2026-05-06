@@ -14,8 +14,8 @@ terminal:
 npx --package ecc-universal ecc loop-status --json
 ```
 
-The CLI scans local Claude transcript JSONL files under
-`~/.claude/projects/**` and reports stale `ScheduleWakeup` calls or `Bash`
+The CLI scans local Gemini transcript JSONL files under
+`~/.gemini/projects/**` and reports stale `ScheduleWakeup` calls or `run_shell_command`
 tool calls that have no matching `tool_result`.
 
 ## Usage
@@ -33,7 +33,7 @@ tool calls that have no matching `tool_result`.
 ## Cross-Session CLI
 
 - `ecc loop-status --json` emits machine-readable status for recent local
-  Claude transcripts.
+  Gemini transcripts.
 - `ecc loop-status --home <dir>` scans a different home directory when
   inspecting another local profile or mounted workspace.
 - `ecc loop-status --transcript <session.jsonl>` inspects one transcript
@@ -49,7 +49,7 @@ tool calls that have no matching `tool_result`.
   number of times, then exits with the highest status seen.
 - `ecc loop-status --watch --watch-count 3` emits a bounded watch stream for
   scripts and handoffs.
-- `ecc loop-status --watch --write-dir ~/.claude/loops` maintains
+- `ecc loop-status --watch --write-dir ~/.gemini/loops` maintains
   `index.json` and per-session JSON snapshots for sibling terminals or
   watchdog scripts.
 
@@ -62,14 +62,14 @@ consume the stream.
 ## Snapshot Files
 
 Use `--write-dir <dir>` when a separate process needs to inspect loop state
-without waiting for the current Claude session to dequeue `/loop-status`. The
+without waiting for the current Gemini session to dequeue `/loop-status`. The
 CLI writes:
 
 - `index.json` with one row per inspected session.
 - `<session-id>.json` with the full status payload for that session.
 
 These files are snapshots of local transcript analysis. They do not control or
-timeout Claude Code runtime tool calls.
+timeout Gemini CLI runtime tool calls.
 
 ## Arguments
 

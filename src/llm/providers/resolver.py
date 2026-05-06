@@ -6,13 +6,13 @@ import os
 
 from llm.core.interface import LLMProvider
 from llm.core.types import ProviderType
-from llm.providers.claude import ClaudeProvider
+from llm.providers.gemini import GeminiProvider
 from llm.providers.openai import OpenAIProvider
 from llm.providers.ollama import OllamaProvider
 
 
 _PROVIDER_MAP: dict[ProviderType, type[LLMProvider]] = {
-    ProviderType.CLAUDE: ClaudeProvider,
+    ProviderType.GEMINI: GeminiProvider,
     ProviderType.OPENAI: OpenAIProvider,
     ProviderType.OLLAMA: OllamaProvider,
 }
@@ -20,7 +20,7 @@ _PROVIDER_MAP: dict[ProviderType, type[LLMProvider]] = {
 
 def get_provider(provider_type: ProviderType | str | None = None, **kwargs: str) -> LLMProvider:
     if provider_type is None:
-        provider_type = os.environ.get("LLM_PROVIDER", "claude").lower()
+        provider_type = os.environ.get("LLM_PROVIDER", "gemini").lower()
 
     if isinstance(provider_type, str):
         try:

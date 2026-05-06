@@ -13,11 +13,11 @@ import { randomBytes } from 'crypto';
 
 // ─── Paths ────────────────────────────────────────────────────────────────────
 
-export const CK_HOME          = resolve(homedir(), '.claude', 'ck');
+export const CK_HOME          = resolve(homedir(), '.gemini', 'ck');
 export const CONTEXTS_DIR     = resolve(CK_HOME, 'contexts');
 export const PROJECTS_FILE    = resolve(CK_HOME, 'projects.json');
 export const CURRENT_SESSION  = resolve(CK_HOME, 'current-session.json');
-export const SKILL_FILE       = resolve(homedir(), '.claude', 'skills', 'ck', 'SKILL.md');
+export const SKILL_FILE       = resolve(homedir(), '.gemini', 'skills', 'ck', 'SKILL.md');
 
 // ─── JSON I/O ─────────────────────────────────────────────────────────────────
 
@@ -189,7 +189,7 @@ export function encodeProjectPath(absolutePath) {
 
 export function nativeMemoryDir(absolutePath) {
   const encoded = encodeProjectPath(absolutePath);
-  return resolve(homedir(), '.claude', 'projects', encoded, 'memory');
+  return resolve(homedir(), '.gemini', 'projects', encoded, 'memory');
 }
 
 // ─── Rendering ────────────────────────────────────────────────────────────────

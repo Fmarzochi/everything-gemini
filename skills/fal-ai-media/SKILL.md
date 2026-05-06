@@ -4,6 +4,18 @@ description: Unified media generation via fal.ai MCP — image, video, and audio
 origin: ECC
 ---
 
+
+**CRITICAL INSTRUCTION FOR GEMINI CLI:**
+When executing the logic of this skill, you MUST map the conceptual steps to your native toolset:
+- Use `read_file` to read file contents.
+- Use `replace` to edit files exactly (do not use sed or echo).
+- Use `write_file` to create new files.
+- Use `grep_search` and `glob` to search across the codebase.
+- Use `list_directory` to explore folders.
+- Use `run_shell_command` to execute tests, builds, or other terminal commands.
+Always verify the output of your tools before proceeding to the next logical step.
+
+
 # fal.ai Media Generation
 
 Generate images, videos, and audio using fal.ai models via MCP.
@@ -18,7 +30,7 @@ Generate images, videos, and audio using fal.ai models via MCP.
 
 ## MCP Requirement
 
-fal.ai MCP server must be configured. Add to `~/.claude.json`:
+fal.ai MCP server must be configured. Add to `~/.gemini.json`:
 
 ```json
 "fal-ai": {
@@ -106,6 +118,18 @@ generate(
 ```
 
 ---
+
+
+**CRITICAL INSTRUCTION FOR GEMINI CLI:**
+When executing the logic of this skill, you MUST map the conceptual steps to your native toolset:
+- Use `read_file` to read file contents.
+- Use `replace` to edit files exactly (do not use sed or echo).
+- Use `write_file` to create new files.
+- Use `grep_search` and `glob` to search across the codebase.
+- Use `list_directory` to explore folders.
+- Use `run_shell_command` to execute tests, builds, or other terminal commands.
+Always verify the output of your tools before proceeding to the next logical step.
+
 
 ## Video Generation
 
@@ -243,6 +267,18 @@ sfx = coll.generate_sound_effect(prompt="thunder crack followed by rain")
 ```
 
 ---
+
+
+**CRITICAL INSTRUCTION FOR GEMINI CLI:**
+When executing the logic of this skill, you MUST map the conceptual steps to your native toolset:
+- Use `read_file` to read file contents.
+- Use `replace` to edit files exactly (do not use sed or echo).
+- Use `write_file` to create new files.
+- Use `grep_search` and `glob` to search across the codebase.
+- Use `list_directory` to explore folders.
+- Use `run_shell_command` to execute tests, builds, or other terminal commands.
+Always verify the output of your tools before proceeding to the next logical step.
+
 
 ## Cost Estimation
 

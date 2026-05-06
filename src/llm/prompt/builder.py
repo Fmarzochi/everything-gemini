@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from llm.core.types import LLMInput, Message, Role, ToolDefinition
-from llm.providers.claude import ClaudeProvider
+from llm.providers.gemini import GeminiProvider
 from llm.providers.openai import OpenAIProvider
 from llm.providers.ollama import OllamaProvider
 
@@ -72,9 +72,9 @@ class PromptBuilder:
 
 
 _PROVIDER_TEMPLATE_MAP: dict[str, dict[str, Any]] = {
-    "claude": {
+    "gemini": {
         "include_tools_in_system": False,
-        "tool_format": "anthropic",
+        "tool_format": "google",
     },
     "openai": {
         "include_tools_in_system": False,

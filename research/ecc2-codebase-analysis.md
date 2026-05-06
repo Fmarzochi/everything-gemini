@@ -58,11 +58,11 @@ ECC2 is a Rust TUI application that orchestrates AI coding agent sessions. It us
 
 ### 3.3 Single Agent Support
 
-`session/manager.rs` — `agent_program()` only supports `"claude"`. The CLI accepts `--agent` but anything other than `"claude"` fails. No codex, opencode, or custom agent support.
+`session/manager.rs` — `agent_program()` only supports `"gemini"`. The CLI accepts `--agent` but anything other than `"gemini"` fails. No codex, opencode, or custom agent support.
 
 ### 3.4 Config — File-Only
 
-`Config::load()` reads `~/.claude/ecc2.toml` only. The implementation lacks environment variable overrides (e.g., `ECC_DB_PATH`, `ECC_WORKTREE_ROOT`) and CLI flags for configuration.
+`Config::load()` reads `~/.gemini/ecc2.toml` only. The implementation lacks environment variable overrides (e.g., `ECC_DB_PATH`, `ECC_WORKTREE_ROOT`) and CLI flags for configuration.
 
 ### 3.5 Legacy Dependency Candidate: `git2`
 
@@ -104,7 +104,7 @@ The core I/O-heavy paths are no longer completely untested: `manager.rs`, `runti
 - **No secrets in code.** Config reads from TOML file, no hardcoded credentials.
 - **Process spawning** uses `tokio::process::Command` with explicit `Stdio::piped()` — no shell injection vectors.
 - **Risk scoring** is a strong feature — catches `rm -rf`, `git push --force origin main`, file access to `.env`/secrets.
-- **No input sanitization on session task strings.** The task string is passed directly to `claude --print`. If the task contains shell metacharacters, it could be exploited depending on how `Command` handles argument quoting. Currently safe (arguments are not shell-interpreted), but worth auditing.
+- **No input sanitization on session task strings.** The task string is passed directly to `gemini --print`. If the task contains shell metacharacters, it could be exploited depending on how `Command` handles argument quoting. Currently safe (arguments are not shell-interpreted), but worth auditing.
 
 ## 6. Dependency Health
 
@@ -138,7 +138,7 @@ The core I/O-heavy paths are no longer completely untested: `manager.rs`, `runti
 5. **Expand integration coverage for `manager.rs`, `runtime.rs`, and `daemon.rs`** — the repo now has baseline tests here, but it still needs failure-path coverage around process crashes, timeouts, and cleanup edge cases.
 6. **Add first-party tests for `worktree/mod.rs` and `comms/mod.rs`** — these are still uncovered and back important orchestration features.
 7. **Add daemon health reporting** — PID file, structured logging, graceful shutdown via signal handler.
-8. **Task string security audit** — The session task uses `claude --print` via `tokio::process::Command`. Verify arguments are never shell-interpreted. Checklist: confirm `Command` arg usage, threat-model metacharacter injection, input validation/escaping strategy, logging of raw inputs, and automated tests. Re-audit if invocation code changes.
+8. **Task string security audit** — The session task uses `gemini --print` via `tokio::process::Command`. Verify arguments are never shell-interpreted. Checklist: confirm `Command` arg usage, threat-model metacharacter injection, input validation/escaping strategy, logging of raw inputs, and automated tests. Re-audit if invocation code changes.
 9. **Break up `dashboard.rs`** — extract SessionsPane, OutputPane, MetricsPane, LogPane into separate files under `tui/panes/`.
 
 ### P3 — Extensibility

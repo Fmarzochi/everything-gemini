@@ -1,4 +1,4 @@
-# SaaS Application — Project CLAUDE.md
+# SaaS Application — Project GEMINI.md
 
 > Real-world example for a Next.js + Supabase + Stripe SaaS application.
 > Copy this to your project root and customize for your stack.

@@ -2,7 +2,20 @@
 name: search-first
 description: Research-before-coding workflow. Search for existing tools, libraries, and patterns before writing custom code. Invokes the researcher agent.
 origin: ECC
+tools: ["run_shell_command", "replace", "read_file", "grep_search", "glob", "list_directory", "write_file"]
 ---
+
+
+**CRITICAL INSTRUCTION FOR GEMINI CLI:**
+When executing the logic of this skill, you MUST map the conceptual steps to your native toolset:
+- Use `read_file` to read file contents.
+- Use `replace` to edit files exactly (do not use sed or echo).
+- Use `write_file` to create new files.
+- Use `grep_search` and `glob` to search across the codebase.
+- Use `list_directory` to explore folders.
+- Use `run_shell_command` to execute tests, builds, or other terminal commands.
+Always verify the output of your tools before proceeding to the next logical step.
+
 
 # /search-first — Research Before You Code
 
@@ -63,8 +76,8 @@ Before writing a utility or adding functionality, mentally run through:
 
 0. Does this already exist in the repo? → `rg` through relevant modules/tests first
 1. Is this a common problem? → Search npm/PyPI
-2. Is there an MCP for this? → Check `~/.claude/settings.json` and search
-3. Is there a skill for this? → Check `~/.claude/skills/`
+2. Is there an MCP for this? → Check `~/.gemini/settings.json` and search
+3. Is there a skill for this? → Check `~/.gemini/skills/`
 4. Is there a GitHub implementation/template? → Run GitHub code search for maintained OSS before writing net-new code
 
 ### Full Mode (agent)
@@ -77,7 +90,7 @@ Task(subagent_type="general-purpose", prompt="
   Language/framework: [LANG]
   Constraints: [ANY]
 
-  Search: npm/PyPI, MCP servers, Claude Code skills, GitHub
+  Search: npm/PyPI, MCP servers, Gemini CLI skills, GitHub
   Return: Structured comparison with recommendation
 ")
 ```
@@ -91,7 +104,7 @@ Task(subagent_type="general-purpose", prompt="
 - Pre-commit → `husky`, `lint-staged`, `pre-commit`
 
 ### AI/LLM Integration
-- Claude SDK → Context7 for latest docs
+- Gemini SDK → Context7 for latest docs
 - Prompt management → Check MCP servers
 - Document processing → `unstructured`, `pdfplumber`, `mammoth`
 

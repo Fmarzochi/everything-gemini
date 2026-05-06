@@ -1,13 +1,13 @@
 spec_version: "0.1.0"
-name: everything-claude-code
+name: everything-gemini
 version: 2.0.0-rc.1
 description: "Initial gitagent export surface for ECC's shared skill catalog, governance, and identity. Native agents, commands, and hooks remain authoritative in the repository while manifest coverage expands."
-author: affaan-m
+author: fmarzochi
 license: MIT
 model:
-  preferred: claude-opus-4-6
+  preferred: gemini-opus-4-6
   fallback:
-    - claude-sonnet-4-6
+    - gemini-sonnet-4-6
 skills:
   - agent-eval
   - agent-harness-construction
@@ -28,7 +28,7 @@ skills:
   - canary-watch
   - carrier-relationship-management
   - ck
-  - claude-devfleet
+  - gemini-devfleet
   - click-path-audit
   - clickhouse-io
   - codebase-onboarding

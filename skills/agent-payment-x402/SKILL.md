@@ -2,7 +2,20 @@
 name: agent-payment-x402
 description: Add x402 payment execution to AI agents — per-task budgets, spending controls, and non-custodial wallets via MCP tools. Use when agents need to pay for APIs, services, or other agents.
 origin: community
+tools: ["run_shell_command", "replace", "read_file", "grep_search", "glob", "list_directory", "write_file"]
 ---
+
+
+**CRITICAL INSTRUCTION FOR GEMINI CLI:**
+When executing the logic of this skill, you MUST map the conceptual steps to your native toolset:
+- Use `read_file` to read file contents.
+- Use `replace` to edit files exactly (do not use sed or echo).
+- Use `write_file` to create new files.
+- Use `grep_search` and `glob` to search across the codebase.
+- Use `list_directory` to explore folders.
+- Use `run_shell_command` to execute tests, builds, or other terminal commands.
+Always verify the output of your tools before proceeding to the next logical step.
+
 
 # Agent Payment Execution (x402)
 
@@ -29,7 +42,7 @@ Agents hold their own keys via ERC-4337 smart accounts. The orchestrator sets po
 
 ## MCP Integration
 
-The payment layer exposes standard MCP tools that slot into any Claude Code or agent harness setup.
+The payment layer exposes standard MCP tools that slot into any Gemini CLI or agent harness setup.
 
 > **Security note**: Always pin the package version. This tool manages private keys — unpinned `npx` installs introduce supply-chain risk.
 

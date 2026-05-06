@@ -1,0 +1,10 @@
+{
+  "disabledMcpjsonServers": [
+    "github",
+    "context7",
+    "exa",
+    "memory",
+    "playwright",
+    "sequential-thinking"
+  ]
+}

@@ -84,7 +84,7 @@ Validate all user input.
 @pytest.fixture
 def project_tree(tmp_path):
     """Create a realistic project directory tree for testing."""
-    homunculus = tmp_path / ".claude" / "homunculus"
+    homunculus = tmp_path / ".gemini" / "homunculus"
     projects_dir = homunculus / "projects"
     global_personal = homunculus / "instincts" / "personal"
     global_inherited = homunculus / "instincts" / "inherited"
@@ -331,7 +331,7 @@ def test_validate_relative_path(tmp_path, monkeypatch):
 
 def test_detect_project_global_fallback(patch_globals, monkeypatch):
     """When no git and no env var, should return global project."""
-    monkeypatch.delenv("CLAUDE_PROJECT_DIR", raising=False)
+    monkeypatch.delenv("GEMINI_PROJECT_DIR", raising=False)
 
     # Mock subprocess.run to simulate git not available
     def mock_run(*args, **kwargs):
@@ -345,10 +345,10 @@ def test_detect_project_global_fallback(patch_globals, monkeypatch):
 
 
 def test_detect_project_from_env(patch_globals, monkeypatch, tmp_path):
-    """CLAUDE_PROJECT_DIR env var should be used as project root."""
+    """GEMINI_PROJECT_DIR env var should be used as project root."""
     fake_repo = tmp_path / "my-repo"
     fake_repo.mkdir()
-    monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(fake_repo))
+    monkeypatch.setenv("GEMINI_PROJECT_DIR", str(fake_repo))
 
     # Mock git remote to return a URL
     def mock_run(cmd, **kwargs):
@@ -367,7 +367,7 @@ def test_detect_project_from_env(patch_globals, monkeypatch, tmp_path):
 
 def test_detect_project_git_timeout(patch_globals, monkeypatch):
     """Git timeout should fall through to global."""
-    monkeypatch.delenv("CLAUDE_PROJECT_DIR", raising=False)
+    monkeypatch.delenv("GEMINI_PROJECT_DIR", raising=False)
     import subprocess as sp
 
     def mock_run(cmd, **kwargs):
@@ -383,7 +383,7 @@ def test_detect_project_creates_directories(patch_globals, monkeypatch, tmp_path
     """detect_project should create the project dir structure."""
     fake_repo = tmp_path / "structured-repo"
     fake_repo.mkdir()
-    monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(fake_repo))
+    monkeypatch.setenv("GEMINI_PROJECT_DIR", str(fake_repo))
 
     def mock_run(cmd, **kwargs):
         if "rev-parse" in cmd:

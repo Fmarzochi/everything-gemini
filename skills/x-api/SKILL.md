@@ -2,7 +2,20 @@
 name: x-api
 description: X/Twitter API integration for posting tweets, threads, reading timelines, search, and analytics. Covers OAuth auth patterns, rate limits, and platform-native content posting. Use when the user wants to interact with X programmatically.
 origin: ECC
+tools: ["run_shell_command", "replace", "read_file", "grep_search", "glob", "list_directory", "write_file"]
 ---
+
+
+**CRITICAL INSTRUCTION FOR GEMINI CLI:**
+When executing the logic of this skill, you MUST map the conceptual steps to your native toolset:
+- Use `read_file` to read file contents.
+- Use `replace` to edit files exactly (do not use sed or echo).
+- Use `write_file` to create new files.
+- Use `grep_search` and `glob` to search across the codebase.
+- Use `list_directory` to explore folders.
+- Use `run_shell_command` to execute tests, builds, or other terminal commands.
+Always verify the output of your tools before proceeding to the next logical step.
+
 
 # X API
 
@@ -39,7 +52,7 @@ headers = {"Authorization": f"Bearer {bearer}"}
 resp = requests.get(
     "https://api.x.com/2/tweets/search/recent",
     headers=headers,
-    params={"query": "claude code", "max_results": 10}
+    params={"query": "gemini cli", "max_results": 10}
 )
 tweets = resp.json()
 ```
@@ -77,7 +90,7 @@ oauth = OAuth1Session(
 ```python
 resp = oauth.post(
     "https://api.x.com/2/tweets",
-    json={"text": "Hello from Claude Code"}
+    json={"text": "Hello from Gemini CLI"}
 )
 resp.raise_for_status()
 tweet_id = resp.json()["data"]["id"]
@@ -120,7 +133,7 @@ resp = requests.get(
     "https://api.x.com/2/tweets/search/recent",
     headers=headers,
     params={
-        "query": "from:affaanmustafa -is:retweet",
+        "query": "from:fmarzochi -is:retweet",
         "max_results": 10,
         "tweet.fields": "public_metrics,created_at",
     }
@@ -134,7 +147,7 @@ resp = requests.get(
     "https://api.x.com/2/tweets/search/recent",
     headers=headers,
     params={
-        "query": "from:affaanmustafa -is:retweet -is:reply",
+        "query": "from:fmarzochi -is:retweet -is:reply",
         "max_results": 25,
         "tweet.fields": "created_at,public_metrics",
     }
@@ -146,7 +159,7 @@ voice_samples = resp.json()
 
 ```python
 resp = requests.get(
-    "https://api.x.com/2/users/by/username/affaanmustafa",
+    "https://api.x.com/2/users/by/username/fmarzochi",
     headers=headers,
     params={"user.fields": "public_metrics,description,created_at"}
 )
@@ -175,7 +188,7 @@ resp = oauth.post(
 
 X API rate limits vary by endpoint, auth method, and account tier, and they change over time. Always:
 - Check the current X developer docs before hardcoding assumptions
-- Read `x-rate-limit-remaining` and `x-rate-limit-reset` headers at runtime
+- read_file `x-rate-limit-remaining` and `x-rate-limit-reset` headers at runtime
 - Back off automatically instead of relying on static tables in code
 
 ```python

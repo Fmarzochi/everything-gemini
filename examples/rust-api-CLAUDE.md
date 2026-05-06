@@ -1,4 +1,4 @@
-# Rust API Service — Project CLAUDE.md
+# Rust API Service — Project GEMINI.md
 
 > Real-world example for a Rust API service with Axum, PostgreSQL, and Docker.
 > Copy this to your project root and customize for your service.

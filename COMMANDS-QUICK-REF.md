@@ -1,6 +1,6 @@
 # Commands Quick Reference
 
-> 59 slash commands installed globally. Type `/` in any Claude Code session to invoke.
+> 59 slash commands installed globally. Type `/` in any Gemini CLI session to invoke.
 
 ---
 
@@ -68,7 +68,7 @@
 | `/multi-frontend` | Frontend-focused multi-model development |
 | `/multi-execute` | Multi-model collaborative execution |
 | `/orchestrate` | Guide for tmux/worktree multi-agent orchestration |
-| `/devfleet` | Orchestrate parallel Claude Code agents via DevFleet |
+| `/devfleet` | Orchestrate parallel Gemini CLI agents via DevFleet |
 
 ---
 
@@ -76,9 +76,9 @@
 
 | Command | What it does |
 |---------|-------------|
-| `/save-session` | Save current session state to `~/.claude/session-data/` |
+| `/save-session` | Save current session state to `~/.gemini/session-data/` |
 | `/resume-session` | Load the most recent saved session from the canonical session store and resume from where you left off |
-| `/sessions` | Browse, search, and manage session history with aliases from `~/.claude/session-data/` (with legacy reads from `~/.claude/sessions/`) |
+| `/sessions` | Browse, search, and manage session history with aliases from `~/.gemini/session-data/` (with legacy reads from `~/.gemini/sessions/`) |
 | `/checkpoint` | Mark a checkpoint in the current session |
 | `/aside` | Answer a quick side question without losing current task context |
 | `/context-budget` | Analyse context window usage — find token overhead, optimise |

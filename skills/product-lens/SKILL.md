@@ -2,7 +2,20 @@
 name: product-lens
 description: Use this skill to validate the "why" before building, run product diagnostics, and pressure-test product direction before the request becomes an implementation contract.
 origin: ECC
+tools: ["run_shell_command", "replace", "read_file", "grep_search", "glob", "list_directory", "write_file"]
 ---
+
+
+**CRITICAL INSTRUCTION FOR GEMINI CLI:**
+When executing the logic of this skill, you MUST map the conceptual steps to your native toolset:
+- Use `read_file` to read file contents.
+- Use `replace` to edit files exactly (do not use sed or echo).
+- Use `write_file` to create new files.
+- Use `grep_search` and `glob` to search across the codebase.
+- Use `list_directory` to explore folders.
+- Use `run_shell_command` to execute tests, builds, or other terminal commands.
+Always verify the output of your tools before proceeding to the next logical step.
+
 
 # Product Lens — Think Before You Build
 
@@ -43,7 +56,7 @@ If the result is "yes, build this," the next lane is `product-capability`, not m
 Reviews your current project through a founder lens:
 
 ```
-1. Read README, CLAUDE.md, package.json, recent commits
+1. Read README, GEMINI.md, package.json, recent commits
 2. Infer: what is this trying to be?
 3. Score: product-market fit signals (0-10)
    - Usage growth trajectory

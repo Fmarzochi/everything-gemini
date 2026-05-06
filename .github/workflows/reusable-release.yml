@@ -107,7 +107,7 @@ jobs:
 
           ### Package Notes
           - npm package: \`ecc-universal\`
-          - Claude marketplace/plugin identifier: \`everything-claude-code@everything-claude-code\`
+          - Gemini marketplace/plugin identifier: \`everything-gemini@everything-gemini\`
           EOF
 
       - name: Create GitHub Release

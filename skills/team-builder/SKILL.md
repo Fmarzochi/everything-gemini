@@ -2,7 +2,20 @@
 name: team-builder
 description: Interactive agent picker for composing and dispatching parallel teams
 origin: community
+tools: ["run_shell_command", "replace", "read_file", "grep_search", "glob", "list_directory", "write_file"]
 ---
+
+
+**CRITICAL INSTRUCTION FOR GEMINI CLI:**
+When executing the logic of this skill, you MUST map the conceptual steps to your native toolset:
+- Use `read_file` to read file contents.
+- Use `replace` to edit files exactly (do not use sed or echo).
+- Use `write_file` to create new files.
+- Use `grep_search` and `glob` to search across the codebase.
+- Use `list_directory` to explore folders.
+- Use `run_shell_command` to execute tests, builds, or other terminal commands.
+Always verify the output of your tools before proceeding to the next logical step.
+
 
 # Team Builder
 
@@ -49,10 +62,10 @@ agents/
 
 Agents are discovered via two methods, merged and deduplicated by agent name:
 
-1. **`claude agents` command** (primary) — run `claude agents` to get all agents known to the CLI, including user agents, plugin agents (e.g. `everything-claude-code:architect`), and built-in agents. This automatically covers ECC marketplace installs without any path configuration.
+1. **`gemini agents` command** (primary) — run `gemini agents` to get all agents known to the CLI, including user agents, plugin agents (e.g. `everything-gemini:architect`), and built-in agents. This automatically covers ECC marketplace installs without any path configuration.
 2. **File glob** (fallback, for reading agent content) — agent markdown files are read from:
    - `./agents/**/*.md` + `./agents/*.md` — project-local agents
-   - `~/.claude/agents/**/*.md` + `~/.claude/agents/*.md` — global user agents
+   - `~/.gemini/agents/**/*.md` + `~/.gemini/agents/*.md` — global user agents
 
 Earlier sources take precedence when names collide: user agents > plugin agents > built-in agents. A custom path can be used instead if the user specifies one.
 
@@ -60,9 +73,9 @@ Earlier sources take precedence when names collide: user agents > plugin agents 
 
 ### Step 1: Discover Available Agents
 
-Run `claude agents` to get the full agent list. Parse each line:
-- **Plugin agents** are prefixed with `plugin-name:` (e.g., `everything-claude-code:security-reviewer`). Use the part after `:` as the agent name and the plugin name as the domain.
-- **User agents** have no prefix. Read the corresponding markdown file from `~/.claude/agents/` or `./agents/` to extract the name and description.
+Run `gemini agents` to get the full agent list. Parse each line:
+- **Plugin agents** are prefixed with `plugin-name:` (e.g., `everything-gemini:security-reviewer`). Use the part after `:` as the agent name and the plugin name as the domain.
+- **User agents** have no prefix. Read the corresponding markdown file from `~/.gemini/agents/` or `./agents/` to extract the name and description.
 - **Built-in agents** (e.g., `Explore`, `Plan`) are skipped unless the user explicitly asks to include them.
 
 For user agents loaded from markdown files:
@@ -71,7 +84,7 @@ For user agents loaded from markdown files:
 - Extract the agent name from the first `# Heading`. If no heading is found, derive the name from the filename (strip `.md`, replace hyphens with spaces, title-case)
 - Extract a one-line summary from the first paragraph after the heading
 
-If no agents are found after running `claude agents` and probing file locations, inform the user: "No agents found. Run `claude agents` to verify your setup." Then stop.
+If no agents are found after running `gemini agents` and probing file locations, inform the user: "No agents found. Run `gemini agents` to verify your setup." Then stop.
 
 ### Step 2: Present Domain Menu
 
@@ -128,14 +141,14 @@ If only 1 agent was selected, skip synthesis and present the output directly.
 - **Dynamic discovery only.** Never hardcode agent lists. New files in the directory auto-appear in the menu.
 - **Max 5 agents per team.** More than 5 produces diminishing returns and excessive token usage. Enforce at selection time.
 - **Parallel dispatch.** All agents run simultaneously — use the Agent tool's parallel invocation pattern.
-- **Parallel Agent calls, not TeamCreate.** This skill uses parallel Agent tool calls for independent work. TeamCreate (a Claude Code tool for multi-agent dialogue) is only needed when agents must debate or respond to each other.
+- **Parallel Agent calls, not TeamCreate.** This skill uses parallel Agent tool calls for independent work. TeamCreate (a Gemini CLI tool for multi-agent dialogue) is only needed when agents must debate or respond to each other.
 
 ## Examples
 
 ```
 User: team builder
 
-Claude:
+Gemini:
 Available agent domains:
 1. Engineering (2) — Software Architect, Security Engineer
 2. Marketing (1) — SEO Specialist
@@ -146,7 +159,7 @@ Pick domains or name specific agents:
 
 User: security + seo
 
-Claude:
+Gemini:
 Selected: Security Engineer + SEO Specialist
 What should they work on?
 
@@ -154,7 +167,7 @@ User: Review my Next.js e-commerce site before launch
 
 [Both agents spawn in parallel, each applying their specialty to the codebase]
 
-Claude:
+Gemini:
 ## Security Engineer Findings
 - [findings...]
 

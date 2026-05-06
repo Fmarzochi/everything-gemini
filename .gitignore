@@ -62,7 +62,7 @@ logs/
 __pycache__/
 *.pyc
 
-# Task files (Claude Code teams)
+# Task files (Gemini CLI teams)
 tasks/
 
 # Personal configs (if any)
@@ -76,8 +76,8 @@ examples/sessions/*.tmp
 marketing/
 .dmux/
 .dmux-hooks/
-.claude/worktrees/
-.claude/scheduled_tasks.lock
+.gemini/worktrees/
+.gemini/scheduled_tasks.lock
 
 # Temporary files
 tmp/

@@ -2,7 +2,7 @@
 name: outreach-drafter
 description: Generates personalized outreach messages for qualified leads. Creates warm intro requests, cold emails, X DMs, and follow-up sequences using enriched profile data.
 tools:
-  - Read
+  - read_file
   - Grep
 model: sonnet
 ---

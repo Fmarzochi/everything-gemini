@@ -3,10 +3,10 @@
 #
 # Fix for #521: Added re-entrancy guard, cooldown throttle, and
 # tail-based sampling to prevent memory explosion from runaway
-# parallel Claude analysis processes.
+# parallel Gemini analysis processes.
 
 set +e
-unset CLAUDECODE
+unset GEMINICODE
 
 SLEEP_PID=""
 USR1_FIRED=0
@@ -83,7 +83,7 @@ exit_if_idle_without_sessions() {
   fi
 }
 
-wait_for_claude_analysis() {
+wait_for_gemini_analysis() {
   local child_pid="$1"
   local wait_status=0
 
@@ -95,7 +95,7 @@ wait_for_claude_analysis() {
       return 0
     fi
 
-    # SIGUSR1 can interrupt wait while the Claude child is still running.
+    # SIGUSR1 can interrupt wait while the Gemini child is still running.
     # Re-wait in that case so a signal is not logged as a false child failure.
     if kill -0 "$child_pid" 2>/dev/null; then
       continue
@@ -118,12 +118,12 @@ analyze_observations() {
   echo "[$(date)] Analyzing $obs_count observations for project ${PROJECT_NAME}..." >> "$LOG_FILE"
 
   if [ "${CLV2_IS_WINDOWS:-false}" = "true" ] && [ "${ECC_OBSERVER_ALLOW_WINDOWS:-false}" != "true" ]; then
-    echo "[$(date)] Skipping claude analysis on Windows due to known non-interactive hang issue (#295). Set ECC_OBSERVER_ALLOW_WINDOWS=true to override." >> "$LOG_FILE"
+    echo "[$(date)] Skipping gemini analysis on Windows due to known non-interactive hang issue (#295). Set ECC_OBSERVER_ALLOW_WINDOWS=true to override." >> "$LOG_FILE"
     return
   fi
 
-  if ! command -v claude >/dev/null 2>&1; then
-    echo "[$(date)] claude CLI not found, skipping analysis" >> "$LOG_FILE"
+  if ! command -v gemini >/dev/null 2>&1; then
+    echo "[$(date)] gemini CLI not found, skipping analysis" >> "$LOG_FILE"
     return
   fi
 
@@ -145,7 +145,7 @@ analyze_observations() {
 
   # Use relative path from PROJECT_DIR for cross-platform compatibility (#842).
   # On Windows (Git Bash/MSYS2), absolute paths from mktemp may use MSYS-style
-  # prefixes (e.g. /c/Users/...) that the Claude subprocess cannot resolve.
+  # prefixes (e.g. /c/Users/...) that the Gemini subprocess cannot resolve.
   analysis_relpath=".observer-tmp/$(basename "$analysis_file")"
 
   prompt_file="$(mktemp "${observer_tmp_dir}/ecc-observer-prompt.XXXXXX")"
@@ -191,9 +191,9 @@ Rules:
 - Examples of project patterns: use React functional components, follow Django REST framework conventions
 PROMPT
 
-  # Read the prompt into memory before the Claude subprocess is spawned.
+  # Read the prompt into memory before the Gemini subprocess is spawned.
   # On Windows/MSYS2, the mktemp path can differ from the shell's later path
-  # resolution, so relying on cat "$prompt_file" inside the claude invocation
+  # resolution, so relying on cat "$prompt_file" inside the gemini invocation
   # can fail even though the file was created successfully.
   prompt_content="$(cat "$prompt_file" 2>/dev/null || true)"
   rm -f "$prompt_file"
@@ -225,27 +225,27 @@ PROMPT
   # Pass prompt via -p flag instead of stdin redirect for Windows compatibility (#842).
   # prompt_content is already loaded in-memory so this no longer depends on the
   # mktemp absolute path continuing to resolve after cwd changes (#1296).
-  ECC_SKIP_OBSERVE=1 ECC_HOOK_PROFILE=minimal claude --model haiku --max-turns "$max_turns" --print \
+  ECC_SKIP_OBSERVE=1 ECC_HOOK_PROFILE=minimal gemini --model haiku --max-turns "$max_turns" --print \
     --allowedTools "Read,Write" \
     -p "$prompt_content" >> "$LOG_FILE" 2>&1 &
-  claude_pid=$!
+  gemini_pid=$!
 
   (
     sleep "$timeout_seconds"
-    if kill -0 "$claude_pid" 2>/dev/null; then
-      echo "[$(date)] Claude analysis timed out after ${timeout_seconds}s; terminating process" >> "$LOG_FILE"
-      kill "$claude_pid" 2>/dev/null || true
+    if kill -0 "$gemini_pid" 2>/dev/null; then
+      echo "[$(date)] Gemini analysis timed out after ${timeout_seconds}s; terminating process" >> "$LOG_FILE"
+      kill "$gemini_pid" 2>/dev/null || true
     fi
   ) &
   watchdog_pid=$!
 
-  wait_for_claude_analysis "$claude_pid"
+  wait_for_gemini_analysis "$gemini_pid"
   exit_code=$?
   kill "$watchdog_pid" 2>/dev/null || true
   rm -f "$analysis_file"
 
   if [ "$exit_code" -ne 0 ]; then
-    echo "[$(date)] Claude analysis failed (exit $exit_code)" >> "$LOG_FILE"
+    echo "[$(date)] Gemini analysis failed (exit $exit_code)" >> "$LOG_FILE"
   fi
 
   if [ -f "$OBSERVATIONS_FILE" ]; then

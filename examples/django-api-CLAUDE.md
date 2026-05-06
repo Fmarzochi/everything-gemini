@@ -1,4 +1,4 @@
-# Django REST API — Project CLAUDE.md
+# Django REST API — Project GEMINI.md
 
 > Real-world example for a Django REST Framework API with PostgreSQL and Celery.
 > Copy this to your project root and customize for your service.

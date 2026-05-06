@@ -1,15 +1,12 @@
 **Language:** English | [Português (Brasil)](docs/pt-BR/README.md) | [简体中文](README.zh-CN.md) | [繁體中文](docs/zh-TW/README.md) | [日本語](docs/ja-JP/README.md) | [한국어](docs/ko-KR/README.md) | [Türkçe](docs/tr/README.md)
 
-# Everything Claude Code
+# Everything Gemini
 
-![Everything Claude Code — the performance system for AI agent harnesses](assets/hero.png)
+![Everything Gemini — the performance system for AI agent harnesses](assets/hero.png)
 
-[![Stars](https://img.shields.io/github/stars/affaan-m/everything-claude-code?style=flat)](https://github.com/affaan-m/everything-claude-code/stargazers)
-[![Forks](https://img.shields.io/github/forks/affaan-m/everything-claude-code?style=flat)](https://github.com/affaan-m/everything-claude-code/network/members)
-[![Contributors](https://img.shields.io/github/contributors/affaan-m/everything-claude-code?style=flat)](https://github.com/affaan-m/everything-claude-code/graphs/contributors)
-[![npm ecc-universal](https://img.shields.io/npm/dw/ecc-universal?label=ecc-universal%20weekly%20downloads&logo=npm)](https://www.npmjs.com/package/ecc-universal)
-[![npm ecc-agentshield](https://img.shields.io/npm/dw/ecc-agentshield?label=ecc-agentshield%20weekly%20downloads&logo=npm)](https://www.npmjs.com/package/ecc-agentshield)
-[![GitHub App Install](https://img.shields.io/badge/GitHub%20App-150%20installs-2ea44f?logo=github)](https://github.com/marketplace/ecc-tools)
+[![Stars](https://img.shields.io/github/stars/fmarzochi/everything-gemini?style=flat)](https://github.com/fmarzochi/everything-gemini/stargazers)
+[![Forks](https://img.shields.io/github/forks/fmarzochi/everything-gemini?style=flat)](https://github.com/fmarzochi/everything-gemini/network/members)
+[![Contributors](https://img.shields.io/github/contributors/fmarzochi/everything-gemini?style=flat)](https://github.com/fmarzochi/everything-gemini/graphs/contributors)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 ![Shell](https://img.shields.io/badge/-Shell-4EAA25?logo=gnu-bash&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/-TypeScript-3178C6?logo=typescript&logoColor=white)
@@ -19,7 +16,7 @@
 ![Perl](https://img.shields.io/badge/-Perl-39457E?logo=perl&logoColor=white)
 ![Markdown](https://img.shields.io/badge/-Markdown-000000?logo=markdown&logoColor=white)
 
-> **140K+ stars** | **21K+ forks** | **170+ contributors** | **12+ language ecosystems** | **Anthropic Hackathon Winner**
+> **100+ stars** | **20+ forks** | **10+ contributors** | **12+ language ecosystems**
 
 ---
 
@@ -34,11 +31,11 @@
 
 ---
 
-**The performance optimization system for AI agent harnesses. From an Anthropic hackathon winner.**
+**The performance optimization system for AI agent harnesses.**
 
 Not just configs. A complete system: skills, instincts, memory optimization, continuous learning, security scanning, and research-first development. Production-ready agents, skills, hooks, rules, MCP configurations, and legacy command shims evolved over 10+ months of intensive daily use building real products.
 
-Works across **Claude Code**, **Codex**, **Cursor**, **OpenCode**, **Gemini**, and other AI agent harnesses.
+Works across **Gemini CLI**, **Codex**, **Cursor**, **OpenCode**, **Gemini**, and other AI agent harnesses.
 
 ECC v2.0.0-rc.1 adds the public Hermes operator story on top of that reusable layer: start with the [Hermes setup guide](docs/HERMES-SETUP.md), then review the [rc.1 release notes](docs/releases/2.0.0-rc.1/release-notes.md) and [cross-harness architecture](docs/architecture/cross-harness.md).
 
@@ -51,17 +48,17 @@ This repo is the raw code only. The guides explain everything.
 <table>
 <tr>
 <td width="33%">
-<a href="https://x.com/affaanmustafa/status/2012378465664745795">
-<img src="./assets/images/guides/shorthand-guide.png" alt="The Shorthand Guide to Everything Claude Code" />
+<a href="./the-shortform-guide.md">
+<img src="./assets/images/guides/shorthand-guide.png" alt="The Shorthand Guide to Everything Gemini" />
 </a>
 </td>
 <td width="33%">
-<a href="https://x.com/affaanmustafa/status/2014040193557471352">
-<img src="./assets/images/guides/longform-guide.png" alt="The Longform Guide to Everything Claude Code" />
+<a href="./the-longform-guide.md">
+<img src="./assets/images/guides/longform-guide.png" alt="The Longform Guide to Everything Gemini" />
 </a>
 </td>
 <td width="33%">
-<a href="https://x.com/affaanmustafa/status/2033263813387223421">
+<a href="./the-security-guide.md">
 <img src="./assets/images/security/security-guide-header.png" alt="The Shorthand Guide to Everything Agentic Security" />
 </a>
 </td>
@@ -92,7 +89,7 @@ This repo is the raw code only. The guides explain everything.
 - **Public surface synced to the live repo** — metadata, catalog counts, plugin manifests, and install-facing docs now match the actual OSS surface: 48 agents, 182 skills, and 68 legacy command shims.
 - **Operator and outbound workflow expansion** — `brand-voice`, `social-graph-ranker`, `connections-optimizer`, `customer-billing-ops`, `ecc-tools-cost-audit`, `google-workspace-ops`, `project-flow-ops`, and `workspace-surface-audit` round out the operator lane.
 - **Media and launch tooling** — `manim-video`, `remotion-video-creation`, and upgraded social publishing surfaces make technical explainers and launch content part of the same system.
-- **Framework and product surface growth** — `nestjs-patterns`, richer Codex/OpenCode install surfaces, and expanded cross-harness packaging keep the repo usable beyond Claude Code alone.
+- **Framework and product surface growth** — `nestjs-patterns`, richer Codex/OpenCode install surfaces, and expanded cross-harness packaging keep the repo usable beyond Gemini CLI alone.
 - **ECC 2.0 alpha is in-tree** — the Rust control-plane prototype in `ecc2/` now builds locally and exposes `dashboard`, `start`, `sessions`, `status`, `stop`, `resume`, and `daemon` commands. It is usable as an alpha, not yet a general release.
 - **Ecosystem hardening** — AgentShield, ECC Tools cost controls, billing portal work, and website refreshes continue to ship around the core plugin instead of drifting into separate silos.
 
@@ -115,7 +112,7 @@ This repo is the raw code only. The guides explain everything.
 - **Hook runtime controls** — `ECC_HOOK_PROFILE=minimal|standard|strict` and `ECC_DISABLED_HOOKS=...` for runtime gating without editing hook files.
 - **New harness commands** — `/harness-audit`, `/loop-start`, `/loop-status`, `/quality-gate`, `/model-route`.
 - **NanoClaw v2** — model routing, skill hot-load, session branch/search/export/compact/metrics.
-- **Cross-harness parity** — behavior tightened across Claude Code, Cursor, OpenCode, and Codex app/CLI.
+- **Cross-harness parity** — behavior tightened across Gemini CLI, Cursor, OpenCode, and Codex app/CLI.
 - **997 internal tests passing** — full suite green after hook/runtime refactor and compatibility updates.
 
 ### v1.7.0 — Cross-Platform Expansion & Presentation Builder (Feb 2026)
@@ -130,14 +127,14 @@ This repo is the raw code only. The guides explain everything.
 
 - **Codex CLI support** — New `/codex-setup` command generates `codex.md` for OpenAI Codex CLI compatibility
 - **7 new skills** — `search-first`, `swift-actor-persistence`, `swift-protocol-di-testing`, `regex-vs-llm-structured-text`, `content-hash-cache-pattern`, `cost-aware-llm-pipeline`, `skill-stocktake`
-- **AgentShield integration** — `/security-scan` skill runs AgentShield directly from Claude Code; 1282 tests, 102 rules
+- **AgentShield integration** — `/security-scan` skill runs AgentShield directly from Gemini CLI; 1282 tests, 102 rules
 - **GitHub Marketplace** — ECC Tools GitHub App live at [github.com/marketplace/ecc-tools](https://github.com/marketplace/ecc-tools) with free/pro/enterprise tiers
 - **30+ community PRs merged** — Contributions from 30 contributors across 6 languages
 - **978 internal tests** — Expanded validation suite across agents, skills, commands, hooks, and rules
 
 ### v1.4.1 — Bug Fix (Feb 2026)
 
-- **Fixed instinct import content loss** — `parse_instinct_file()` was silently dropping all content after frontmatter (Action, Evidence, Examples sections) during `/instinct-import`. ([#148](https://github.com/affaan-m/everything-claude-code/issues/148), [#161](https://github.com/affaan-m/everything-claude-code/pull/161))
+- **Fixed instinct import content loss** — `parse_instinct_file()` was silently dropping all content after frontmatter (Action, Evidence, Examples sections) during `/instinct-import`. ([#148](https://github.com/fmarzochi/everything-gemini/issues/148), [#161](https://github.com/fmarzochi/everything-gemini/pull/161))
 
 ### v1.4.0 — Multi-Language Rules, Installation Wizard & PM2 (Feb 2026)
 
@@ -161,7 +158,7 @@ This repo is the raw code only. The guides explain everything.
 - **Session management** — `/sessions` command for session history
 - **Continuous learning v2** — Instinct-based learning with confidence scoring, import/export, evolution
 
-See the full changelog in [Releases](https://github.com/affaan-m/everything-claude-code/releases).
+See the full changelog in [Releases](https://github.com/fmarzochi/everything-gemini/releases).
 
 ---
 
@@ -171,10 +168,10 @@ Get up and running in under 2 minutes:
 
 ### Pick one path only
 
-Most Claude Code users should use exactly one install path:
+Most Gemini CLI users should use exactly one install path:
 
-- **Recommended default:** install the Claude Code plugin, then copy only the rule folders you actually want.
-- **Use the manual installer only if** you want finer-grained control, want to avoid the plugin path entirely, or your Claude Code build has trouble resolving the self-hosted marketplace entry.
+- **Recommended default:** install the Gemini CLI plugin, then copy only the rule folders you actually want.
+- **Use the manual installer only if** you want finer-grained control, want to avoid the plugin path entirely, or your Gemini CLI build has trouble resolving the self-hosted marketplace entry.
 - **Do not stack install methods.** The most common broken setup is: `/plugin install` first, then `install.sh --profile full` or `npx ecc-install --profile full` afterward.
 
 If you already layered multiple installs and things look duplicated, skip straight to [Reset / Uninstall ECC](#reset--uninstall-ecc).
@@ -184,13 +181,13 @@ If you already layered multiple installs and things look duplicated, skip straig
 If hooks feel too global or you only want ECC's rules, agents, commands, and core workflow skills, skip the plugin and use the minimal manual profile:
 
 ```bash
-./install.sh --profile minimal --target claude
+./install.sh --profile minimal --target gemini
 ```
 
 ```powershell
-.\install.ps1 --profile minimal --target claude
+.\install.ps1 --profile minimal --target gemini
 # or
-npx ecc-install --profile minimal --target claude
+npx ecc-install --profile minimal --target gemini
 ```
 
 This profile intentionally excludes `hooks-runtime`.
@@ -198,13 +195,13 @@ This profile intentionally excludes `hooks-runtime`.
 If you want the normal core profile but need hooks off, use:
 
 ```bash
-./install.sh --profile core --without baseline:hooks --target claude
+./install.sh --profile core --without baseline:hooks --target gemini
 ```
 
 Add hooks later only if you want runtime enforcement:
 
 ```bash
-./install.sh --target claude --modules hooks-runtime
+./install.sh --target gemini --modules hooks-runtime
 ```
 
 ### Find the right components first
@@ -212,57 +209,57 @@ Add hooks later only if you want runtime enforcement:
 If you are not sure which ECC profile or component to install, ask the packaged advisor from any project:
 
 ```bash
-npx ecc consult "security reviews" --target claude
+npx ecc consult "security reviews" --target gemini
 ```
 
 It returns matching components, related profiles, and preview/install commands. Use the preview command before installing if you want to inspect the exact file plan.
 
 ### Step 1: Install the Plugin (Recommended)
 
-> NOTE: The plugin is convenient, but the OSS installer below is still the most reliable path if your Claude Code build has trouble resolving self-hosted marketplace entries.
+> NOTE: The plugin is convenient, but the OSS installer below is still the most reliable path if your Gemini CLI build has trouble resolving self-hosted marketplace entries.
 
 ```bash
 # Add marketplace
-/plugin marketplace add https://github.com/affaan-m/everything-claude-code
+/plugin marketplace add https://github.com/fmarzochi/everything-gemini
 
 # Install plugin
-/plugin install everything-claude-code@everything-claude-code
+/plugin install everything-gemini@everything-gemini
 ```
 
 ### Naming + Migration Note
 
 ECC now has three public identifiers, and they are not interchangeable:
 
-- GitHub source repo: `affaan-m/everything-claude-code`
-- Claude marketplace/plugin identifier: `everything-claude-code@everything-claude-code`
+- GitHub source repo: `fmarzochi/everything-gemini`
+- Gemini marketplace/plugin identifier: `everything-gemini@everything-gemini`
 - npm package: `ecc-universal`
 
-This is intentional. Anthropic marketplace/plugin installs are keyed by a canonical plugin identifier, so ECC standardized on `everything-claude-code@everything-claude-code` to keep the listing name, `/plugin install`, `/plugin list`, and repo docs aligned to one public install surface. Older posts may still show the old short-form nickname; that shorthand is deprecated. Separately, the npm package stayed on `ecc-universal`, so npm installs and marketplace installs intentionally use different names.
+This is intentional. Google marketplace/plugin installs are keyed by a canonical plugin identifier, so ECC standardized on `everything-gemini@everything-gemini` to keep the listing name, `/plugin install`, `/plugin list`, and repo docs aligned to one public install surface. Older posts may still show the old short-form nickname; that shorthand is deprecated. Separately, the npm package stayed on `ecc-universal`, so npm installs and marketplace installs intentionally use different names.
 
 ### Step 2: Install Rules (Required)
 
-> WARNING: **Important:** Claude Code plugins cannot distribute `rules` automatically.
+> WARNING: **Important:** Gemini CLI plugins cannot distribute `rules` automatically.
 >
 > If you already installed ECC via `/plugin install`, **do not run `./install.sh --profile full`, `.\install.ps1 --profile full`, or `npx ecc-install --profile full` afterward**. The plugin already loads ECC skills, commands, and hooks. Running the full installer after a plugin install copies those same surfaces into your user directories and can create duplicate skills plus duplicate runtime behavior.
 >
-> For plugin installs, manually copy only the `rules/` directories you want under `~/.claude/rules/ecc/`. Start with `rules/common` plus one language or framework pack you actually use. Do not copy every rules directory unless you explicitly want all of that context in Claude.
+> For plugin installs, manually copy only the `rules/` directories you want under `~/.gemini/rules/ecc/`. Start with `rules/common` plus one language or framework pack you actually use. Do not copy every rules directory unless you explicitly want all of that context in Gemini.
 >
 > Use the full installer only when you are doing a fully manual ECC install instead of the plugin path.
 >
-> If your local Claude setup was wiped or reset, that does not mean you need to repurchase ECC. Start with `node scripts/ecc.js list-installed`, then run `node scripts/ecc.js doctor` and `node scripts/ecc.js repair` before reinstalling anything. That usually restores ECC-managed files without rebuilding your setup. If the problem is account or marketplace access for ECC Tools, handle billing/account recovery separately.
+> If your local Gemini setup was wiped or reset, that does not mean you need to repurchase ECC. Start with `node scripts/ecc.js list-installed`, then run `node scripts/ecc.js doctor` and `node scripts/ecc.js repair` before reinstalling anything. That usually restores ECC-managed files without rebuilding your setup. If the problem is account or marketplace access for ECC Tools, handle billing/account recovery separately.
 
 ```bash
 # Clone the repo first
-git clone https://github.com/affaan-m/everything-claude-code.git
-cd everything-claude-code
+git clone https://github.com/fmarzochi/everything-gemini.git
+cd everything-gemini
 
 # Install dependencies (pick your package manager)
 npm install        # or: pnpm install | yarn install | bun install
 
 # Plugin install path: copy only ECC rules into an ECC-owned namespace
-mkdir -p ~/.claude/rules/ecc
-cp -R rules/common ~/.claude/rules/ecc/
-cp -R rules/typescript ~/.claude/rules/ecc/
+mkdir -p ~/.gemini/rules/ecc
+cp -R rules/common ~/.gemini/rules/ecc/
+cp -R rules/typescript ~/.gemini/rules/ecc/
 
 # Fully manual ECC install path (use this instead of /plugin install)
 # ./install.sh --profile full
@@ -272,9 +269,9 @@ cp -R rules/typescript ~/.claude/rules/ecc/
 # Windows PowerShell
 
 # Plugin install path: copy only ECC rules into an ECC-owned namespace
-New-Item -ItemType Directory -Force -Path "$HOME/.claude/rules/ecc" | Out-Null
-Copy-Item -Recurse rules/common "$HOME/.claude/rules/ecc/"
-Copy-Item -Recurse rules/typescript "$HOME/.claude/rules/ecc/"
+New-Item -ItemType Directory -Force -Path "$HOME/.gemini/rules/ecc" | Out-Null
+Copy-Item -Recurse rules/common "$HOME/.gemini/rules/ecc/"
+Copy-Item -Recurse rules/typescript "$HOME/.gemini/rules/ecc/"
 
 # Fully manual ECC install path (use this instead of /plugin install)
 # .\install.ps1 --profile full
@@ -303,7 +300,7 @@ If you choose this path, stop there. Do not also run `/plugin install`.
 
 If ECC feels duplicated, intrusive, or broken, do not keep reinstalling it on top of itself.
 
-- **Plugin path:** remove the plugin from Claude Code, then delete the specific rule folders you manually copied under `~/.claude/rules/ecc/`.
+- **Plugin path:** remove the plugin from Gemini CLI, then delete the specific rule folders you manually copied under `~/.gemini/rules/ecc/`.
 - **Manual installer / CLI path:** from the repo root, preview removal first:
 
 ```bash
@@ -329,7 +326,7 @@ ECC only removes files recorded in its install-state. It will not delete unrelat
 
 If you stacked methods, clean up in this order:
 
-1. Remove the Claude Code plugin install.
+1. Remove the Gemini CLI plugin install.
 2. Run the ECC uninstall command from the repo root to remove install-state-managed files.
 3. Delete any extra rule folders you copied manually and no longer want.
 4. Reinstall once, using a single path.
@@ -341,13 +338,13 @@ If you stacked methods, clean up in this order:
 # Existing slash-style command names still work while ECC migrates off commands/.
 
 # Plugin install uses the canonical namespaced form
-/everything-claude-code:plan "Add user authentication"
+/everything-gemini:plan "Add user authentication"
 
 # Manual install keeps the shorter slash form:
 # /plan "Add user authentication"
 
 # Check available commands
-/plugin list everything-claude-code@everything-claude-code
+/plugin list everything-gemini@everything-gemini
 ```
 
 **That's it!** You now have access to 48 agents, 182 skills, and 68 legacy command shims.
@@ -378,8 +375,8 @@ python3 ./ecc_dashboard.py
 > Initialize it with `npx ccg-workflow`.
 >
 > That runtime provides the external dependencies these commands expect, including:
-> - `~/.claude/bin/codeagent-wrapper`
-> - `~/.claude/.ccg/prompts/*`
+> - `~/.gemini/bin/codeagent-wrapper`
+> - `~/.gemini/.ccg/prompts/*`
 >
 > Without `ccg-workflow`, these `multi-*` commands will not run correctly.
 
@@ -393,18 +390,18 @@ This plugin now fully supports **Windows, macOS, and Linux**, alongside tight in
 
 The plugin automatically detects your preferred package manager (npm, pnpm, yarn, or bun) with the following priority:
 
-1. **Environment variable**: `CLAUDE_PACKAGE_MANAGER`
-2. **Project config**: `.claude/package-manager.json`
+1. **Environment variable**: `GEMINI_PACKAGE_MANAGER`
+2. **Project config**: `.gemini/package-manager.json`
 3. **package.json**: `packageManager` field
 4. **Lock file**: Detection from package-lock.json, yarn.lock, pnpm-lock.yaml, or bun.lockb
-5. **Global config**: `~/.claude/package-manager.json`
+5. **Global config**: `~/.gemini/package-manager.json`
 6. **Fallback**: First available package manager
 
 To set your preferred package manager:
 
 ```bash
 # Via environment variable
-export CLAUDE_PACKAGE_MANAGER=pnpm
+export GEMINI_PACKAGE_MANAGER=pnpm
 
 # Via global config
 node scripts/setup-package-manager.js --global pnpm
@@ -416,7 +413,7 @@ node scripts/setup-package-manager.js --project bun
 node scripts/setup-package-manager.js --detect
 ```
 
-Or use the `/setup-pm` command in Claude Code.
+Or use the `/setup-pm` command in Gemini CLI.
 
 ### Hook Runtime Controls
 
@@ -440,11 +437,11 @@ export ECC_SESSION_START_CONTEXT=off
 
 ## What's Inside
 
-This repo is a **Claude Code plugin** - install it directly or copy components manually.
+This repo is a **Gemini CLI plugin** - install it directly or copy components manually.
 
 ```
-everything-claude-code/
-|-- .claude-plugin/   # Plugin and marketplace manifests
+everything-gemini/
+|-- .gemini-plugin/   # Plugin and marketplace manifests
 |   |-- plugin.json         # Plugin metadata and component paths
 |   |-- marketplace.json    # Marketplace catalog for /plugin marketplace add
 |
@@ -580,7 +577,7 @@ everything-claude-code/
 |   |-- verify.md           # /verify - Prefer the verification-loop skill
 |   |-- orchestrate.md      # /orchestrate - Prefer dmux-workflows or multi-workflow
 |
-|-- rules/            # Always-follow guidelines (copy to ~/.claude/rules/ecc/)
+|-- rules/            # Always-follow guidelines (copy to ~/.gemini/rules/ecc/)
 |   |-- README.md            # Structure overview and installation guide
 |   |-- common/              # Language-agnostic principles
 |   |   |-- coding-style.md    # Immutability, file organization
@@ -626,13 +623,13 @@ everything-claude-code/
 |   |-- research.md         # Research/exploration mode context
 |
 |-- examples/         # Example configurations and sessions
-|   |-- CLAUDE.md             # Example project-level config
-|   |-- user-CLAUDE.md        # Example user-level config
-|   |-- saas-nextjs-CLAUDE.md   # Real-world SaaS (Next.js + Supabase + Stripe)
-|   |-- go-microservice-CLAUDE.md # Real-world Go microservice (gRPC + PostgreSQL)
-|   |-- django-api-CLAUDE.md      # Real-world Django REST API (DRF + Celery)
-|   |-- laravel-api-CLAUDE.md     # Real-world Laravel API (PostgreSQL + Redis) (NEW)
-|   |-- rust-api-CLAUDE.md        # Real-world Rust API (Axum + SQLx + PostgreSQL) (NEW)
+|   |-- GEMINI.md             # Example project-level config
+|   |-- user-GEMINI.md        # Example user-level config
+|   |-- saas-nextjs-GEMINI.md   # Real-world SaaS (Next.js + Supabase + Stripe)
+|   |-- go-microservice-GEMINI.md # Real-world Go microservice (gRPC + PostgreSQL)
+|   |-- django-api-GEMINI.md      # Real-world Django REST API (DRF + Celery)
+|   |-- laravel-api-GEMINI.md     # Real-world Laravel API (PostgreSQL + Redis) (NEW)
+|   |-- rust-api-GEMINI.md        # Real-world Rust API (Axum + SQLx + PostgreSQL) (NEW)
 |
 |-- mcp-configs/      # MCP server configurations
 |   |-- mcp-servers.json    # GitHub, Supabase, Vercel, Railway, etc.
@@ -652,7 +649,7 @@ everything-claude-code/
 
 ### Skill Creator
 
-Two ways to generate Claude Code skills from your repository:
+Two ways to generate Gemini CLI skills from your repository:
 
 #### Option A: Local Analysis (Built-in)
 
@@ -679,15 +676,15 @@ For advanced features (10k+ commits, auto-PRs, team sharing):
 ```
 
 Both options create:
-- **SKILL.md files** - Ready-to-use skills for Claude Code
+- **SKILL.md files** - Ready-to-use skills for Gemini CLI
 - **Instinct collections** - For continuous-learning-v2
 - **Pattern extraction** - Learns from your commit history
 
 ### AgentShield — Security Auditor
 
-> Built at the Claude Code Hackathon (Cerebral Valley x Anthropic, Feb 2026). 1282 tests, 98% coverage, 102 static analysis rules.
+> Built at the Gemini CLI Hackathon (Google x Forum Ventures, Feb 2026). 1282 tests, 98% coverage, 102 static analysis rules.
 
-Scan your Claude Code configuration for vulnerabilities, misconfigurations, and injection risks.
+Scan your Gemini CLI configuration for vulnerabilities, misconfigurations, and injection risks.
 
 ```bash
 # Quick scan (no install needed)
@@ -696,22 +693,22 @@ npx ecc-agentshield scan
 # Auto-fix safe issues
 npx ecc-agentshield scan --fix
 
-# Deep analysis with three Opus 4.6 agents
-npx ecc-agentshield scan --opus --stream
+# Deep analysis with three Gemini 2.0 Flash agents
+npx ecc-agentshield scan --gemini --stream
 
 # Generate secure config from scratch
 npx ecc-agentshield init
 ```
 
-**What it scans:** CLAUDE.md, settings.json, MCP configs, hooks, agent definitions, and skills across 5 categories — secrets detection (14 patterns), permission auditing, hook injection analysis, MCP server risk profiling, and agent config review.
+**What it scans:** GEMINI.md, settings.json, MCP configs, hooks, agent definitions, and skills across 5 categories — secrets detection (14 patterns), permission auditing, hook injection analysis, MCP server risk profiling, and agent config review.
 
-**The `--opus` flag** runs three Claude Opus 4.6 agents in a red-team/blue-team/auditor pipeline. The attacker finds exploit chains, the defender evaluates protections, and the auditor synthesizes both into a prioritized risk assessment. Adversarial reasoning, not just pattern matching.
+**The `--gemini` flag** runs three Gemini agents in a red-team/blue-team/auditor pipeline. The attacker finds exploit chains, the defender evaluates protections, and the auditor synthesizes both into a prioritized risk assessment. Adversarial reasoning, not just pattern matching.
 
 **Output formats:** Terminal (color-graded A-F), JSON (CI pipelines), Markdown, HTML. Exit code 2 on critical findings for build gates.
 
-Use `/security-scan` in Claude Code to run it, or add to CI with the [GitHub Action](https://github.com/affaan-m/agentshield).
+Use `/security-scan` in Gemini CLI to run it, or add to CI with the [GitHub Action](https://github.com/fmarzochi/agentshield).
 
-[GitHub](https://github.com/affaan-m/agentshield) | [npm](https://www.npmjs.com/package/ecc-agentshield)
+[GitHub](https://github.com/fmarzochi/agentshield) | [npm](https://www.npmjs.com/package/ecc-agentshield)
 
 ### Continuous Learning v2
 
@@ -731,28 +728,28 @@ Keep `continuous-learning/` only when you explicitly want the legacy v1 Stop-hoo
 
 ## Requirements
 
-### Claude Code CLI Version
+### Gemini CLI CLI Version
 
 **Minimum version: v2.1.0 or later**
 
-This plugin requires Claude Code CLI v2.1.0+ due to changes in how the plugin system handles hooks.
+This plugin requires Gemini CLI CLI v2.1.0+ due to changes in how the plugin system handles hooks.
 
 Check your version:
 ```bash
-claude --version
+gemini --version
 ```
 
 ### Important: Hooks Auto-Loading Behavior
 
-> WARNING: **For Contributors:** Do NOT add a `"hooks"` field to `.claude-plugin/plugin.json`. This is enforced by a regression test.
+> WARNING: **For Contributors:** Do NOT add a `"hooks"` field to `.gemini-plugin/plugin.json`. This is enforced by a regression test.
 
-Claude Code v2.1+ **automatically loads** `hooks/hooks.json` from any installed plugin by convention. Explicitly declaring it in `plugin.json` causes a duplicate detection error:
+Gemini CLI v2.1+ **automatically loads** `hooks/hooks.json` from any installed plugin by convention. Explicitly declaring it in `plugin.json` causes a duplicate detection error:
 
 ```
 Duplicate hooks file detected: ./hooks/hooks.json resolves to already-loaded file
 ```
 
-**History:** This has caused repeated fix/revert cycles in this repo ([#29](https://github.com/affaan-m/everything-claude-code/issues/29), [#52](https://github.com/affaan-m/everything-claude-code/issues/52), [#103](https://github.com/affaan-m/everything-claude-code/issues/103)). The behavior changed between Claude Code versions, leading to confusion. We now have a regression test to prevent this from being reintroduced.
+**History:** This has caused repeated fix/revert cycles in this repo ([#29](https://github.com/fmarzochi/everything-gemini/issues/29), [#52](https://github.com/fmarzochi/everything-gemini/issues/52), [#103](https://github.com/fmarzochi/everything-gemini/issues/103)). The behavior changed between Gemini CLI versions, leading to confusion. We now have a regression test to prevent this from being reintroduced.
 
 ---
 
@@ -760,17 +757,17 @@ Duplicate hooks file detected: ./hooks/hooks.json resolves to already-loaded fil
 
 ### Option 1: Install as Plugin (Recommended)
 
-The easiest way to use this repo - install as a Claude Code plugin:
+The easiest way to use this repo - install as a Gemini CLI plugin:
 
 ```bash
 # Add this repo as a marketplace
-/plugin marketplace add https://github.com/affaan-m/everything-claude-code
+/plugin marketplace add https://github.com/fmarzochi/everything-gemini
 
 # Install the plugin
-/plugin install everything-claude-code@everything-claude-code
+/plugin install everything-gemini@everything-gemini
 ```
 
-Or add directly to your `~/.claude/settings.json`:
+Or add directly to your `~/.gemini/settings.json`:
 
 ```json
 {
@@ -778,36 +775,36 @@ Or add directly to your `~/.claude/settings.json`:
     "ecc": {
       "source": {
         "source": "github",
-        "repo": "affaan-m/everything-claude-code"
+        "repo": "fmarzochi/everything-gemini"
       }
     }
   },
   "enabledPlugins": {
-    "everything-claude-code@everything-claude-code": true
+    "everything-gemini@everything-gemini": true
   }
 }
 ```
 
 This gives you instant access to all commands, agents, skills, and hooks.
 
-> **Note:** The Claude Code plugin system does not support distributing `rules` via plugins ([upstream limitation](https://code.claude.com/docs/en/plugins-reference)). You need to install rules manually:
+> **Note:** The Gemini CLI plugin system does not support distributing `rules` via plugins ([upstream limitation](https://code.gemini.com/docs/en/plugins-reference)). You need to install rules manually:
 >
 > ```bash
 > # Clone the repo first
-> git clone https://github.com/affaan-m/everything-claude-code.git
+> git clone https://github.com/fmarzochi/everything-gemini.git
 >
 > # Option A: User-level rules (applies to all projects)
-> mkdir -p ~/.claude/rules/ecc
-> cp -r everything-claude-code/rules/common ~/.claude/rules/ecc/
-> cp -r everything-claude-code/rules/typescript ~/.claude/rules/ecc/   # pick your stack
-> cp -r everything-claude-code/rules/python ~/.claude/rules/ecc/
-> cp -r everything-claude-code/rules/golang ~/.claude/rules/ecc/
-> cp -r everything-claude-code/rules/php ~/.claude/rules/ecc/
+> mkdir -p ~/.gemini/rules/ecc
+> cp -r everything-gemini/rules/common ~/.gemini/rules/ecc/
+> cp -r everything-gemini/rules/typescript ~/.gemini/rules/ecc/   # pick your stack
+> cp -r everything-gemini/rules/python ~/.gemini/rules/ecc/
+> cp -r everything-gemini/rules/golang ~/.gemini/rules/ecc/
+> cp -r everything-gemini/rules/php ~/.gemini/rules/ecc/
 >
 > # Option B: Project-level rules (applies to current project only)
-> mkdir -p .claude/rules/ecc
-> cp -r everything-claude-code/rules/common .claude/rules/ecc/
-> cp -r everything-claude-code/rules/typescript .claude/rules/ecc/     # pick your stack
+> mkdir -p .gemini/rules/ecc
+> cp -r everything-gemini/rules/common .gemini/rules/ecc/
+> cp -r everything-gemini/rules/typescript .gemini/rules/ecc/     # pick your stack
 > ```
 
 ---
@@ -818,33 +815,33 @@ If you prefer manual control over what's installed:
 
 ```bash
 # Clone the repo
-git clone https://github.com/affaan-m/everything-claude-code.git
+git clone https://github.com/fmarzochi/everything-gemini.git
 
-# Copy agents to your Claude config
-cp everything-claude-code/agents/*.md ~/.claude/agents/
+# Copy agents to your Gemini config
+cp everything-gemini/agents/*.md ~/.gemini/agents/
 
 # Copy rules directories (common + language-specific)
-mkdir -p ~/.claude/rules/ecc
-cp -r everything-claude-code/rules/common ~/.claude/rules/ecc/
-cp -r everything-claude-code/rules/typescript ~/.claude/rules/ecc/   # pick your stack
-cp -r everything-claude-code/rules/python ~/.claude/rules/ecc/
-cp -r everything-claude-code/rules/golang ~/.claude/rules/ecc/
-cp -r everything-claude-code/rules/php ~/.claude/rules/ecc/
+mkdir -p ~/.gemini/rules/ecc
+cp -r everything-gemini/rules/common ~/.gemini/rules/ecc/
+cp -r everything-gemini/rules/typescript ~/.gemini/rules/ecc/   # pick your stack
+cp -r everything-gemini/rules/python ~/.gemini/rules/ecc/
+cp -r everything-gemini/rules/golang ~/.gemini/rules/ecc/
+cp -r everything-gemini/rules/php ~/.gemini/rules/ecc/
 
 # Copy skills first (primary workflow surface)
 # Recommended (new users): core/general skills only
-mkdir -p ~/.claude/skills/ecc
-cp -r everything-claude-code/.agents/skills/* ~/.claude/skills/ecc/
-cp -r everything-claude-code/skills/search-first ~/.claude/skills/ecc/
+mkdir -p ~/.gemini/skills/ecc
+cp -r everything-gemini/.agents/skills/* ~/.gemini/skills/ecc/
+cp -r everything-gemini/skills/search-first ~/.gemini/skills/ecc/
 
 # Optional: add niche/framework-specific skills only when needed
 # for s in django-patterns django-tdd laravel-patterns springboot-patterns; do
-# cp -r everything-claude-code/skills/$s ~/.claude/skills/ecc/
+# cp -r everything-gemini/skills/$s ~/.gemini/skills/ecc/
 # done
 
 # Optional: keep maintained slash-command compatibility during migration
-mkdir -p ~/.claude/commands
-cp everything-claude-code/commands/*.md ~/.claude/commands/
+mkdir -p ~/.gemini/commands
+cp everything-gemini/commands/*.md ~/.gemini/commands/
 
 # Retired shims live in legacy-command-shims/commands/.
 # Copy individual files from there only if you still need old names such as /tdd.
@@ -852,31 +849,31 @@ cp everything-claude-code/commands/*.md ~/.claude/commands/
 
 #### Install hooks
 
-Do not copy the raw repo `hooks/hooks.json` into `~/.claude/settings.json` or `~/.claude/hooks/hooks.json`. That file is plugin/repo-oriented and is meant to be installed through the ECC installer or loaded as a plugin, so raw copying is not a supported manual install path.
+Do not copy the raw repo `hooks/hooks.json` into `~/.gemini/settings.json` or `~/.gemini/hooks/hooks.json`. That file is plugin/repo-oriented and is meant to be installed through the ECC installer or loaded as a plugin, so raw copying is not a supported manual install path.
 
-Use the installer to install only the Claude hook runtime so command paths are rewritten correctly:
+Use the installer to install only the Gemini hook runtime so command paths are rewritten correctly:
 
 ```bash
 # macOS / Linux
-bash ./install.sh --target claude --modules hooks-runtime
+bash ./install.sh --target gemini --modules hooks-runtime
 ```
 
 ```powershell
 # Windows PowerShell
-pwsh -File .\install.ps1 --target claude --modules hooks-runtime
+pwsh -File .\install.ps1 --target gemini --modules hooks-runtime
 ```
 
-That writes resolved hooks to `~/.claude/hooks/hooks.json` and leaves any existing `~/.claude/settings.json` untouched.
+That writes resolved hooks to `~/.gemini/hooks/hooks.json` and leaves any existing `~/.gemini/settings.json` untouched.
 
-If you installed ECC via `/plugin install`, do not copy those hooks into `settings.json`. Claude Code v2.1+ already auto-loads plugin `hooks/hooks.json`, and duplicating them in `settings.json` causes duplicate execution and cross-platform hook conflicts.
+If you installed ECC via `/plugin install`, do not copy those hooks into `settings.json`. Gemini CLI v2.1+ already auto-loads plugin `hooks/hooks.json`, and duplicating them in `settings.json` causes duplicate execution and cross-platform hook conflicts.
 
-Windows note: the Claude config directory is `%USERPROFILE%\\.claude`, not `~/claude`.
+Windows note: the Gemini config directory is `%USERPROFILE%\\.gemini`, not `~/gemini`.
 
 #### Configure MCPs
 
-Claude plugin installs intentionally do not auto-enable ECC's bundled MCP server definitions. This avoids overlong plugin MCP tool names on strict third-party gateways while keeping manual MCP setup available.
+Gemini plugin installs intentionally do not auto-enable ECC's bundled MCP server definitions. This avoids overlong plugin MCP tool names on strict third-party gateways while keeping manual MCP setup available.
 
-Use Claude Code's `/mcp` command or CLI-managed MCP setup for live Claude Code server changes. Use `/mcp` for Claude Code runtime disables; Claude Code persists those choices in `~/.claude.json`.
+Use Gemini CLI's `/mcp` command or CLI-managed MCP setup for live Gemini CLI server changes. Use `/mcp` for Gemini CLI runtime disables; Gemini CLI persists those choices in `~/.gemini.json`.
 
 For repo-local MCP access, copy desired MCP server definitions from `mcp-configs/mcp-servers.json` into a project-scoped `.mcp.json`.
 
@@ -886,7 +883,7 @@ If you already run your own copies of ECC-bundled MCPs, set:
 export ECC_DISABLED_MCPS="github,context7,exa,playwright,sequential-thinking,memory"
 ```
 
-ECC-managed install and Codex sync flows will skip or remove those bundled servers instead of re-adding duplicates. `ECC_DISABLED_MCPS` is an ECC install/sync filter, not a live Claude Code toggle.
+ECC-managed install and Codex sync flows will skip or remove those bundled servers instead of re-adding duplicates. `ECC_DISABLED_MCPS` is an ECC install/sync filter, not a live Gemini CLI toggle.
 
 **Important:** Replace `YOUR_*_HERE` placeholders with your actual API keys.
 
@@ -902,7 +899,7 @@ Subagents handle delegated tasks with limited scope. Example:
 ---
 name: code-reviewer
 description: Reviews code for quality, security, and maintainability
-tools: ["Read", "Grep", "Glob", "Bash"]
+tools: ["read_file", "grep_search", "glob", "run_shell_command"]
 model: opus
 ---
 
@@ -961,8 +958,8 @@ Not sure where to start? Use this quick reference. Skills are the canonical work
 
 | I want to... | Use this surface | Agent used |
 |--------------|-----------------|------------|
-| Plan a new feature | `/everything-claude-code:plan "Add auth"` | planner |
-| Design system architecture | `/everything-claude-code:plan` + architect agent | architect |
+| Plan a new feature | `/everything-gemini:plan "Add auth"` | planner |
+| Design system architecture | `/everything-gemini:plan` + architect agent | architect |
 | Write code with tests first | `tdd-workflow` skill | tdd-guide |
 | Review code I just wrote | `/code-review` | code-reviewer |
 | Fix a failing build | `/build-fix` | build-error-resolver |
@@ -981,7 +978,7 @@ Slash forms below are shown where they remain part of the maintained command sur
 
 **Starting a new feature:**
 ```
-/everything-claude-code:plan "Add user authentication with OAuth"
+/everything-gemini:plan "Add user authentication with OAuth"
                                               → planner creates implementation blueprint
 tdd-workflow skill                            → tdd-guide enforces write-tests-first
 /code-review                                  → code-reviewer checks your work
@@ -1009,7 +1006,7 @@ e2e-testing skill                             → e2e-runner: critical user flow
 <summary><b>How do I check which agents/commands are installed?</b></summary>
 
 ```bash
-/plugin list everything-claude-code@everything-claude-code
+/plugin list everything-gemini@everything-gemini
 ```
 
 This shows all available agents, commands, and skills from the plugin.
@@ -1018,40 +1015,40 @@ This shows all available agents, commands, and skills from the plugin.
 <details>
 <summary><b>My hooks aren't working / I see "Duplicate hooks file" errors</b></summary>
 
-This is the most common issue. **Do NOT add a `"hooks"` field to `.claude-plugin/plugin.json`.** Claude Code v2.1+ automatically loads `hooks/hooks.json` from installed plugins. Explicitly declaring it causes duplicate detection errors. See [#29](https://github.com/affaan-m/everything-claude-code/issues/29), [#52](https://github.com/affaan-m/everything-claude-code/issues/52), [#103](https://github.com/affaan-m/everything-claude-code/issues/103).
+This is the most common issue. **Do NOT add a `"hooks"` field to `.gemini-plugin/plugin.json`.** Gemini CLI v2.1+ automatically loads `hooks/hooks.json` from installed plugins. Explicitly declaring it causes duplicate detection errors. See [#29](https://github.com/fmarzochi/everything-gemini/issues/29), [#52](https://github.com/fmarzochi/everything-gemini/issues/52), [#103](https://github.com/fmarzochi/everything-gemini/issues/103).
 </details>
 
 <details>
-<summary><b>Can I use ECC with Claude Code on a custom API endpoint or model gateway?</b></summary>
+<summary><b>Can I use ECC with Gemini CLI on a custom API endpoint or model gateway?</b></summary>
 
-Yes. ECC does not hardcode Anthropic-hosted transport settings. It runs locally through Claude Code's normal CLI/plugin surface, so it works with:
+Yes. ECC does not hardcode Google-hosted transport settings. It runs locally through Gemini CLI's normal CLI/plugin surface, so it works with:
 
-- Anthropic-hosted Claude Code
-- Official Claude Code gateway setups using `ANTHROPIC_BASE_URL` and `ANTHROPIC_AUTH_TOKEN`
-- Compatible custom endpoints that speak the Anthropic API Claude Code expects
+- Google-hosted Gemini CLI
+- Official Gemini CLI gateway setups using `GOOGLE_BASE_URL` and `GOOGLE_AUTH_TOKEN`
+- Compatible custom endpoints that speak the Google API Gemini CLI expects
 
 Minimal example:
 
 ```bash
-export ANTHROPIC_BASE_URL=https://your-gateway.example.com
-export ANTHROPIC_AUTH_TOKEN=your-token
-claude
+export GOOGLE_BASE_URL=https://your-gateway.example.com
+export GOOGLE_AUTH_TOKEN=your-token
+gemini
 ```
 
-If your gateway remaps model names, configure that in Claude Code rather than in ECC. ECC's hooks, skills, commands, and rules are model-provider agnostic once the `claude` CLI is already working.
+If your gateway remaps model names, configure that in Gemini CLI rather than in ECC. ECC's hooks, skills, commands, and rules are model-provider agnostic once the `gemini` CLI is already working.
 
 Official references:
-- [Claude Code LLM gateway docs](https://docs.anthropic.com/en/docs/claude-code/llm-gateway)
-- [Claude Code model configuration docs](https://docs.anthropic.com/en/docs/claude-code/model-config)
+- [Gemini CLI LLM gateway docs](https://ai.google.dev/en/docs/gemini-code/llm-gateway)
+- [Gemini CLI model configuration docs](https://ai.google.dev/en/docs/gemini-code/model-config)
 
 </details>
 
 <details>
-<summary><b>My context window is shrinking / Claude is running out of context</b></summary>
+<summary><b>My context window is shrinking / Gemini is running out of context</b></summary>
 
 Too many MCP servers eat your context. Each MCP tool description consumes tokens from your 200k window, potentially reducing it to ~70k. SessionStart context is capped at 8000 characters by default; lower it with `ECC_SESSION_START_MAX_CHARS=4000` or disable it with `ECC_SESSION_START_CONTEXT=off` for local-model or low-context setups.
 
-**Fix:** Disable unused MCPs from Claude Code with `/mcp`. Claude Code writes those runtime choices to `~/.claude.json`; `.claude/settings.json` and `.claude/settings.local.json` are not reliable toggles for already-loaded MCP servers.
+**Fix:** Disable unused MCPs from Gemini CLI with `/mcp`. Gemini CLI writes those runtime choices to `~/.gemini.json`; `.gemini/settings.json` and `.gemini/settings.local.json` are not reliable toggles for already-loaded MCP servers.
 
 Keep under 10 MCPs enabled and under 80 tools active.
 </details>
@@ -1063,11 +1060,11 @@ Yes. Use Option 2 (manual installation) and copy only what you need:
 
 ```bash
 # Just agents
-cp everything-claude-code/agents/*.md ~/.claude/agents/
+cp everything-gemini/agents/*.md ~/.gemini/agents/
 
 # Just rules
-mkdir -p ~/.claude/rules/ecc/
-cp -r everything-claude-code/rules/common ~/.claude/rules/ecc/
+mkdir -p ~/.gemini/rules/ecc/
+cp -r everything-gemini/rules/common ~/.gemini/rules/ecc/
 ```
 
 Each component is fully independent.
@@ -1080,10 +1077,10 @@ Yes. ECC is cross-platform:
 - **Cursor**: Pre-translated configs in `.cursor/`. See [Cursor IDE Support](#cursor-ide-support).
 - **Gemini CLI**: Experimental project-local support via `.gemini/GEMINI.md` and shared installer plumbing.
 - **OpenCode**: Full plugin support in `.opencode/`. See [OpenCode Support](#opencode-support).
-- **Codex**: First-class support for both macOS app and CLI, with adapter drift guards and SessionStart fallback. See PR [#257](https://github.com/affaan-m/everything-claude-code/pull/257).
+- **Codex**: First-class support for both macOS app and CLI, with adapter drift guards and SessionStart fallback. See PR [#257](https://github.com/fmarzochi/everything-gemini/pull/257).
 - **Antigravity**: Tightly integrated setup for workflows, skills, and flattened rules in `.agent/`. See [Antigravity Guide](docs/ANTIGRAVITY-GUIDE.md).
 - **Non-native harnesses**: Manual fallback path for Grok and similar interfaces. See [Manual Adaptation Guide](docs/MANUAL-ADAPTATION-GUIDE.md).
-- **Claude Code**: Native — this is the primary target.
+- **Gemini CLI**: Native — this is the primary target.
 </details>
 
 <details>
@@ -1136,11 +1133,11 @@ Please contribute! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ### Community Ecosystem Notes
 
-These are not bundled with ECC and are not audited by this repo, but they are worth knowing about if you are exploring the broader Claude Code skills ecosystem:
+These are not bundled with ECC and are not audited by this repo, but they are worth knowing about if you are exploring the broader Gemini CLI skills ecosystem:
 
-- [claude-seo](https://github.com/AgriciDaniel/claude-seo) — SEO-focused skill and agent collection
-- [claude-ads](https://github.com/AgriciDaniel/claude-ads) — Ad-audit and paid-growth workflow collection
-- [claude-cybersecurity](https://github.com/AgriciDaniel/claude-cybersecurity) — Security-oriented skill and agent collection
+- [gemini-seo](https://github.com/AgriciDaniel/gemini-seo) — SEO-focused skill and agent collection
+- [gemini-ads](https://github.com/AgriciDaniel/gemini-ads) — Ad-audit and paid-growth workflow collection
+- [gemini-cybersecurity](https://github.com/AgriciDaniel/gemini-cybersecurity) — Security-oriented skill and agent collection
 
 ---
 
@@ -1182,11 +1179,11 @@ Cursor-native loading behavior can vary by Cursor build. ECC installs agents as 
 
 ### Hook Architecture (DRY Adapter Pattern)
 
-Cursor has **more hook events than Claude Code** (20 vs 8). The `.cursor/hooks/adapter.js` module transforms Cursor's stdin JSON to Claude Code's format, allowing existing `scripts/hooks/*.js` to be reused without duplication.
+Cursor has **more hook events than Gemini CLI** (20 vs 8). The `.cursor/hooks/adapter.js` module transforms Cursor's stdin JSON to Gemini CLI's format, allowing existing `scripts/hooks/*.js` to be reused without duplication.
 
 ```
 Cursor stdin JSON → adapter.js → transforms → scripts/hooks/*.js
-                                              (shared with Claude Code)
+                                              (shared with Gemini CLI)
 ```
 
 Key hooks:
@@ -1256,7 +1253,7 @@ Codex macOS app:
 
 Skills at `.agents/skills/` are auto-loaded by Codex:
 
-Canonical Anthropic skills such as `claude-api`, `frontend-design`, and `skill-creator` are intentionally not re-bundled here. Install those from [`anthropics/skills`](https://github.com/anthropics/skills) when you want the official versions.
+Canonical Google skills such as `gemini-api`, `frontend-design`, and `skill-creator` are intentionally not re-bundled here. Install those from [`google-gemini/skills`](https://github.com/google-gemini/skills) when you want the official versions.
 
 | Skill | Description |
 |-------|-------------|
@@ -1275,7 +1272,7 @@ Canonical Anthropic skills such as `claude-api`, `frontend-design`, and `skill-c
 | documentation-lookup | Up-to-date library and framework docs via Context7 MCP |
 | e2e-testing | Playwright E2E tests |
 | eval-harness | Eval-driven development |
-| everything-claude-code | Development conventions and patterns for the project |
+| everything-gemini | Development conventions and patterns for the project |
 | exa-search | Neural search via Exa MCP for web, code, company research |
 | fal-ai-media | Unified media generation for images, video, and audio |
 | frontend-patterns | React/Next.js patterns |
@@ -1295,7 +1292,7 @@ Canonical Anthropic skills such as `claude-api`, `frontend-design`, and `skill-c
 
 ### Key Limitation
 
-Codex does **not yet provide Claude-style hook execution parity**. ECC enforcement there is instruction-based via `AGENTS.md`, optional `model_instructions_file` overrides, and sandbox/approval settings.
+Codex does **not yet provide Gemini-style hook execution parity**. ECC enforcement there is instruction-based via `AGENTS.md`, optional `model_instructions_file` overrides, and sandbox/approval settings.
 
 ### Multi-Agent Support
 
@@ -1334,21 +1331,21 @@ The configuration is automatically detected from `.opencode/opencode.json`.
 
 ### Feature Parity
 
-| Feature | Claude Code | OpenCode | Status |
+| Feature | Gemini CLI | OpenCode | Status |
 |---------|-------------|----------|--------|
-| Agents | PASS: 48 agents | PASS: 12 agents | **Claude Code leads** |
-| Commands | PASS: 68 commands | PASS: 31 commands | **Claude Code leads** |
-| Skills | PASS: 182 skills | PASS: 37 skills | **Claude Code leads** |
+| Agents | PASS: 48 agents | PASS: 12 agents | **Gemini CLI leads** |
+| Commands | PASS: 68 commands | PASS: 31 commands | **Gemini CLI leads** |
+| Skills | PASS: 182 skills | PASS: 37 skills | **Gemini CLI leads** |
 | Hooks | PASS: 8 event types | PASS: 11 events | **OpenCode has more!** |
-| Rules | PASS: 29 rules | PASS: 13 instructions | **Claude Code leads** |
+| Rules | PASS: 29 rules | PASS: 13 instructions | **Gemini CLI leads** |
 | MCP Servers | PASS: 14 servers | PASS: Full | **Full parity** |
 | Custom Tools | PASS: Via hooks | PASS: 6 native tools | **OpenCode is better** |
 
 ### Hook Support via Plugins
 
-OpenCode's plugin system is MORE sophisticated than Claude Code with 20+ event types:
+OpenCode's plugin system is MORE sophisticated than Gemini CLI with 20+ event types:
 
-| Claude Code Hook | OpenCode Plugin Event |
+| Gemini CLI Hook | OpenCode Plugin Event |
 |-----------------|----------------------|
 | PreToolUse | `tool.execute.before` |
 | PostToolUse | `tool.execute.after` |
@@ -1403,7 +1400,7 @@ OpenCode's plugin system is MORE sophisticated than Claude Code with 20+ event t
 
 **Option 1: Use directly**
 ```bash
-cd everything-claude-code
+cd everything-gemini
 opencode
 ```
 
@@ -1439,7 +1436,7 @@ For the full ECC OpenCode setup, either:
 
 ECC is the **first plugin to maximize every major AI coding tool**. Here's how each harness compares:
 
-| Feature | Claude Code | Cursor IDE | Codex CLI | OpenCode |
+| Feature | Gemini CLI | Cursor IDE | Codex CLI | OpenCode |
 |---------|------------|------------|-----------|----------|
 | **Agents** | 48 | Shared (AGENTS.md) | Shared (AGENTS.md) | 12 |
 | **Commands** | 68 | Shared | Instruction-based | 31 |
@@ -1450,41 +1447,39 @@ ECC is the **first plugin to maximize every major AI coding tool**. Here's how e
 | **Custom Tools** | Via hooks | Via hooks | N/A | 6 native tools |
 | **MCP Servers** | 14 | Shared (mcp.json) | 7 (auto-merged via TOML parser) | Full |
 | **Config Format** | settings.json | hooks.json + rules/ | config.toml | opencode.json |
-| **Context File** | CLAUDE.md + AGENTS.md | AGENTS.md | AGENTS.md | AGENTS.md |
+| **Context File** | GEMINI.md + AGENTS.md | AGENTS.md | AGENTS.md | AGENTS.md |
 | **Secret Detection** | Hook-based | beforeSubmitPrompt hook | Sandbox-based | Hook-based |
 | **Auto-Format** | PostToolUse hook | afterFileEdit hook | N/A | file.edited hook |
 | **Version** | Plugin | Plugin | Reference config | 2.0.0-rc.1 |
 
 **Key architectural decisions:**
 - **AGENTS.md** at root is the universal cross-tool file (read by all 4 tools)
-- **DRY adapter pattern** lets Cursor reuse Claude Code's hook scripts without duplication
-- **Skills format** (SKILL.md with YAML frontmatter) works across Claude Code, Codex, and OpenCode
+- **DRY adapter pattern** lets Cursor reuse Gemini CLI's hook scripts without duplication
+- **Skills format** (SKILL.md with YAML frontmatter) works across Gemini CLI, Codex, and OpenCode
 - Codex's lack of hooks is compensated by `AGENTS.md`, optional `model_instructions_file` overrides, and sandbox permissions
 
 ---
 
 ## Background
 
-I've been using Claude Code since the experimental rollout. Won the Anthropic x Forum Ventures hackathon in Sep 2025 with [@DRodriguezFX](https://x.com/DRodriguezFX) — built [zenith.chat](https://zenith.chat) entirely using Claude Code.
-
-These configs are battle-tested across multiple production applications.
+These configs are battle-tested across multiple production applications and evolved over 10+ months of intensive daily use.
 
 ---
 
 ## Token Optimization
 
-Claude Code usage can be expensive if you don't manage token consumption. These settings significantly reduce costs without sacrificing quality.
+Gemini CLI usage can be expensive if you don't manage token consumption. These settings significantly reduce costs without sacrificing quality.
 
 ### Recommended Settings
 
-Add to `~/.claude/settings.json`:
+Add to `~/.gemini/settings.json`:
 
 ```json
 {
   "model": "sonnet",
   "env": {
     "MAX_THINKING_TOKENS": "10000",
-    "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "50"
+    "GEMINI_AUTOCOMPACT_PCT_OVERRIDE": "50"
   }
 }
 ```
@@ -1493,7 +1488,7 @@ Add to `~/.claude/settings.json`:
 |---------|---------|-------------|--------|
 | `model` | opus | **sonnet** | ~60% cost reduction; handles 80%+ of coding tasks |
 | `MAX_THINKING_TOKENS` | 31,999 | **10,000** | ~70% reduction in hidden thinking cost per request |
-| `CLAUDE_AUTOCOMPACT_PCT_OVERRIDE` | 95 | **50** | Compacts earlier — better quality in long sessions |
+| `GEMINI_AUTOCOMPACT_PCT_OVERRIDE` | 95 | **50** | Compacts earlier — better quality in long sessions |
 
 Switch to Opus only when you need deep architectural reasoning:
 ```
@@ -1529,7 +1524,7 @@ The `strategic-compact` skill (included in this plugin) suggests `/compact` at l
 
 - Keep under 10 MCPs enabled per project
 - Keep under 80 tools active
-- Use `/mcp` to disable unused Claude Code MCP servers; those runtime choices persist in `~/.claude.json`
+- Use `/mcp` to disable unused Gemini CLI MCP servers; those runtime choices persist in `~/.gemini.json`
 - Use `ECC_DISABLED_MCPS` only to filter ECC-generated MCP configs during install/sync flows
 
 ### Agent Teams Cost Warning
@@ -1547,13 +1542,13 @@ Hitting daily limits? See the **[Token Optimization Guide](docs/token-optimizati
 Quick wins:
 
 ```json
-// ~/.claude/settings.json
+// ~/.gemini/settings.json
 {
   "model": "sonnet",
   "env": {
     "MAX_THINKING_TOKENS": "10000",
-    "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "50",
-    "CLAUDE_CODE_SUBAGENT_MODEL": "haiku"
+    "GEMINI_AUTOCOMPACT_PCT_OVERRIDE": "50",
+    "GEMINI_CODE_SUBAGENT_MODEL": "haiku"
   }
 }
 ```
@@ -1572,7 +1567,7 @@ These configs work for my workflow. You should:
 
 ## Community Projects
 
-Projects built on or inspired by Everything Claude Code:
+Projects built on or inspired by Everything Gemini:
 
 | Project | Description |
 |---------|-------------|
@@ -1586,22 +1581,21 @@ Built something with ECC? Open a PR to add it here.
 
 This project is free and open source. Sponsors help keep it maintained and growing.
 
-[**Become a Sponsor**](https://github.com/sponsors/affaan-m) | [Sponsor Tiers](SPONSORS.md) | [Sponsorship Program](SPONSORING.md)
+[**Become a Sponsor**](https://github.com/sponsors/fmarzochi) | [Sponsor Tiers](SPONSORS.md) | [Sponsorship Program](SPONSORING.md)
 
 ---
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=affaan-m/everything-claude-code&type=Date)](https://star-history.com/#affaan-m/everything-claude-code&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=fmarzochi/everything-gemini&type=Date)](https://star-history.com/#fmarzochi/everything-gemini&Date)
 
 ---
 
 ## Links
 
-- **Shorthand Guide (Start Here):** [The Shorthand Guide to Everything Claude Code](https://x.com/affaanmustafa/status/2012378465664745795)
-- **Longform Guide (Advanced):** [The Longform Guide to Everything Claude Code](https://x.com/affaanmustafa/status/2014040193557471352)
-- **Security Guide:** [Security Guide](./the-security-guide.md) | [Thread](https://x.com/affaanmustafa/status/2033263813387223421)
-- **Follow:** [@affaanmustafa](https://x.com/affaanmustafa)
+- **Shorthand Guide (Start Here):** [The Shorthand Guide to Everything Gemini](./the-shortform-guide.md)
+- **Longform Guide (Advanced):** [The Longform Guide to Everything Gemini](./the-longform-guide.md)
+- **Security Guide:** [Security Guide](./the-security-guide.md)
 
 ---
 
@@ -1612,3 +1606,11 @@ MIT - Use freely, modify as needed, contribute back if you can.
 ---
 
 **Star this repo if it helps. Read both guides. Build something great.**
+
+## Core Architecture
+
+This project is built explicitly for the **Gemini CLI**. It abandons the old "daemon hook" mechanisms of Claude Code in favor of a deterministic, fast, and token-efficient Skill Index.
+
+1. **The Core Index:** All skills are indexed inside `.gemini/GEMINI.md`.
+2. **Activation:** When you give Gemini CLI a task, it checks the index and uses the `activate_skill` tool to load only the specific workflow rules needed for that task.
+3. **Execution:** The agent executes your task using the standardized tools (e.g., `replace`, `read_file`, `grep_search`).

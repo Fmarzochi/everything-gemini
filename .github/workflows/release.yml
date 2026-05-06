@@ -78,7 +78,7 @@ jobs:
           ## ECC ${TAG_VERSION}
 
           ### What This Release Focuses On
-          - Harness reliability and hook stability across Claude Code, Cursor, OpenCode, and Codex
+          - Harness reliability and hook stability across Gemini CLI, Cursor, OpenCode, and Codex
           - Stronger eval-driven workflows and quality gates
           - Better operator UX for autonomous loop execution
 
@@ -89,7 +89,7 @@ jobs:
 
           ### Notes
           - npm package: \`ecc-universal\`
-          - Claude marketplace/plugin identifier: \`everything-claude-code@everything-claude-code\`
+          - Gemini marketplace/plugin identifier: \`everything-gemini@everything-gemini\`
           - For migration tips and compatibility notes, see README and CHANGELOG.
           EOF
 

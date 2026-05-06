@@ -1,20 +1,21 @@
 {
-  "name": "ecc-universal",
-  "version": "2.0.0-rc.1",
-  "description": "Complete collection of battle-tested Claude Code configs — agents, skills, hooks, rules, and legacy command shims evolved over 10+ months of intensive daily use by an Anthropic hackathon winner",
+  "name": "everything-gemini",
+  "version": "2.0.0",
+  "description": "Complete collection of battle-tested Gemini CLI configs — agents, skills, hooks, rules, and legacy command shims evolved by Felipe Marzochi",
+  "author": "Felipe Marzochi",
   "publishConfig": {
     "access": "public"
   },
   "keywords": [
-    "claude-code",
+    "gemini-code",
     "ai",
     "agents",
     "skills",
     "hooks",
     "mcp",
     "rules",
-    "claude",
-    "anthropic",
+    "gemini",
+    "google-gemini",
     "tdd",
     "code-review",
     "security",
@@ -28,21 +29,21 @@
     "slides"
   ],
   "author": {
-    "name": "Affaan Mustafa",
-    "url": "https://x.com/affaanmustafa"
+    "name": "Felipe Marzochi",
+    "url": "https://github.com/fmarzochi"
   },
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/affaan-m/everything-claude-code.git"
+    "url": "git+https://github.com/fmarzochi/everything-gemini.git"
   },
-  "homepage": "https://github.com/affaan-m/everything-claude-code#readme",
+  "homepage": "https://github.com/fmarzochi/everything-gemini#readme",
   "bugs": {
-    "url": "https://github.com/affaan-m/everything-claude-code/issues"
+    "url": "https://github.com/fmarzochi/everything-gemini/issues"
   },
   "files": [
     ".agents/",
-    ".claude-plugin/",
+    ".gemini-plugin/",
     ".codex/",
     ".codex-plugin/",
     ".cursor/",
@@ -103,7 +104,7 @@
     "skills/blueprint/",
     "skills/brand-voice/",
     "skills/carrier-relationship-management/",
-    "skills/claude-devfleet/",
+    "skills/gemini-devfleet/",
     "skills/clickhouse-io/",
     "skills/code-tour/",
     "skills/coding-standards/",
@@ -241,7 +242,7 @@
     "ecc-install": "scripts/install-apply.js"
   },
   "scripts": {
-    "postinstall": "echo '\\n  ecc-universal installed!\\n  Run: npx ecc typescript\\n  Compat: npx ecc-install typescript\\n  Docs: https://github.com/affaan-m/everything-claude-code\\n'",
+    "postinstall": "echo '\\n  ecc-universal installed!\\n  Run: npx ecc typescript\\n  Compat: npx ecc-install typescript\\n  Docs: https://github.com/fmarzochi/everything-gemini\\n'",
     "catalog:check": "node scripts/ci/catalog.js --text",
     "catalog:sync": "node scripts/ci/catalog.js --write --text",
     "lint": "eslint . && markdownlint '**/*.md' --ignore node_modules",

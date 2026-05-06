@@ -9,7 +9,7 @@
         "rules"
       ],
       "targets": [
-        "claude",
+        "gemini",
         "cursor",
         "antigravity",
         "codebuddy"
@@ -29,7 +29,7 @@
         "AGENTS.md"
       ],
       "targets": [
-        "claude",
+        "gemini",
         "cursor",
         "antigravity",
         "codex",
@@ -48,7 +48,7 @@
         "commands"
       ],
       "targets": [
-        "claude",
+        "gemini",
         "cursor",
         "antigravity",
         "opencode",
@@ -69,7 +69,7 @@
         "scripts/lib"
       ],
       "targets": [
-        "claude",
+        "gemini",
         "cursor",
         "opencode",
         "codebuddy"
@@ -84,7 +84,7 @@
       "kind": "platform",
       "description": "Baseline platform configs, package-manager setup, and MCP catalog.",
       "paths": [
-        ".claude-plugin",
+        ".gemini-plugin",
         ".codex",
         ".cursor",
         ".gemini",
@@ -94,7 +94,7 @@
         "scripts/setup-package-manager.js"
       ],
       "targets": [
-        "claude",
+        "gemini",
         "cursor",
         "antigravity",
         "codex",
@@ -152,7 +152,7 @@
         "skills/springboot-verification"
       ],
       "targets": [
-        "claude",
+        "gemini",
         "cursor",
         "antigravity",
         "codex",
@@ -180,7 +180,7 @@
         "skills/postgres-patterns"
       ],
       "targets": [
-        "claude",
+        "gemini",
         "cursor",
         "antigravity",
         "codex",
@@ -218,7 +218,7 @@
         "skills/verification-loop"
       ],
       "targets": [
-        "claude",
+        "gemini",
         "cursor",
         "antigravity",
         "codex",
@@ -253,7 +253,7 @@
         "the-security-guide.md"
       ],
       "targets": [
-        "claude",
+        "gemini",
         "cursor",
         "antigravity",
         "codex",
@@ -277,7 +277,7 @@
         "skills/research-ops"
       ],
       "targets": [
-        "claude",
+        "gemini",
         "cursor",
         "antigravity",
         "codex",
@@ -308,7 +308,7 @@
         "skills/market-research"
       ],
       "targets": [
-        "claude",
+        "gemini",
         "cursor",
         "antigravity",
         "codex",
@@ -346,7 +346,7 @@
         "skills/workspace-surface-audit"
       ],
       "targets": [
-        "claude",
+        "gemini",
         "cursor",
         "antigravity",
         "codex",
@@ -369,7 +369,7 @@
         "skills/x-api"
       ],
       "targets": [
-        "claude",
+        "gemini",
         "cursor",
         "antigravity",
         "codex",
@@ -396,7 +396,7 @@
         "skills/videodb"
       ],
       "targets": [
-        "claude",
+        "gemini",
         "cursor",
         "codex",
         "opencode",
@@ -424,7 +424,7 @@
         "skills/dmux-workflows"
       ],
       "targets": [
-        "claude",
+        "gemini",
         "codex",
         "opencode"
       ],
@@ -449,7 +449,7 @@
         "skills/swiftui-patterns"
       ],
       "targets": [
-        "claude",
+        "gemini",
         "cursor",
         "antigravity",
         "codex",
@@ -473,7 +473,7 @@
         "skills/ai-first-engineering",
         "skills/autonomous-loops",
         "skills/blueprint",
-        "skills/claude-devfleet",
+        "skills/gemini-devfleet",
         "skills/content-hash-cache-pattern",
         "skills/continuous-agent-loop",
         "skills/cost-aware-llm-pipeline",
@@ -488,7 +488,7 @@
         "skills/team-builder"
       ],
       "targets": [
-        "claude",
+        "gemini",
         "cursor",
         "antigravity",
         "codex",
@@ -511,7 +511,7 @@
         "skills/docker-patterns"
       ],
       "targets": [
-        "claude",
+        "gemini",
         "cursor",
         "antigravity",
         "codex",
@@ -540,7 +540,7 @@
         "skills/returns-reverse-logistics"
       ],
       "targets": [
-        "claude",
+        "gemini",
         "cursor",
         "antigravity",
         "codex",
@@ -563,7 +563,7 @@
         "skills/visa-doc-translate"
       ],
       "targets": [
-        "claude",
+        "gemini",
         "cursor",
         "antigravity",
         "codex",

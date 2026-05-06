@@ -18,7 +18,7 @@ Structured development workflow with quality gates, MCP services, and multi-mode
 
 - Task to develop: $ARGUMENTS
 - Structured 6-phase workflow with quality gates
-- Multi-model collaboration: Codex (backend) + Gemini (frontend) + Claude (orchestration)
+- Multi-model collaboration: Codex (backend) + Gemini (frontend) + Gemini (orchestration)
 - MCP service integration (ace-tool, optional) for enhanced capabilities
 
 ## Your Role
@@ -29,7 +29,7 @@ You are the **Orchestrator**, coordinating a multi-model collaborative system (R
 - **ace-tool MCP** (optional) – Code retrieval + Prompt enhancement
 - **Codex** – Backend logic, algorithms, debugging (**Backend authority, trustworthy**)
 - **Gemini** – Frontend UI/UX, visual design (**Frontend expert, backend opinions for reference only**)
-- **Claude (self)** – Orchestration, planning, execution, delivery
+- **Gemini (self)** – Orchestration, planning, execution, delivery
 
 ---
 
@@ -40,7 +40,7 @@ You are the **Orchestrator**, coordinating a multi-model collaborative system (R
 ```
 # New session call
 Bash({
-  command: "~/.claude/bin/codeagent-wrapper {{LITE_MODE_FLAG}}--backend <codex|gemini> {{GEMINI_MODEL_FLAG}}- \"$PWD\" <<'EOF'
+  command: "~/.gemini/bin/codeagent-wrapper {{LITE_MODE_FLAG}}--backend <codex|gemini> {{GEMINI_MODEL_FLAG}}- \"$PWD\" <<'EOF'
 ROLE_FILE: <role prompt path>
 <TASK>
 Requirement: <enhanced requirement (or $ARGUMENTS if not enhanced)>
@@ -55,7 +55,7 @@ EOF",
 
 # Resume session call
 Bash({
-  command: "~/.claude/bin/codeagent-wrapper {{LITE_MODE_FLAG}}--backend <codex|gemini> {{GEMINI_MODEL_FLAG}}resume <SESSION_ID> - \"$PWD\" <<'EOF'
+  command: "~/.gemini/bin/codeagent-wrapper {{LITE_MODE_FLAG}}--backend <codex|gemini> {{GEMINI_MODEL_FLAG}}resume <SESSION_ID> - \"$PWD\" <<'EOF'
 ROLE_FILE: <role prompt path>
 <TASK>
 Requirement: <enhanced requirement (or $ARGUMENTS if not enhanced)>
@@ -76,9 +76,9 @@ EOF",
 
 | Phase | Codex | Gemini |
 |-------|-------|--------|
-| Analysis | `~/.claude/.ccg/prompts/codex/analyzer.md` | `~/.claude/.ccg/prompts/gemini/analyzer.md` |
-| Planning | `~/.claude/.ccg/prompts/codex/architect.md` | `~/.claude/.ccg/prompts/gemini/architect.md` |
-| Review | `~/.claude/.ccg/prompts/codex/reviewer.md` | `~/.claude/.ccg/prompts/gemini/reviewer.md` |
+| Analysis | `~/.gemini/.ccg/prompts/codex/analyzer.md` | `~/.gemini/.ccg/prompts/gemini/analyzer.md` |
+| Planning | `~/.gemini/.ccg/prompts/codex/architect.md` | `~/.gemini/.ccg/prompts/gemini/architect.md` |
+| Review | `~/.gemini/.ccg/prompts/codex/reviewer.md` | `~/.gemini/.ccg/prompts/gemini/reviewer.md` |
 
 **Session Reuse**: Each call returns `SESSION_ID: xxx`, use `resume xxx` subcommand for subsequent phases (note: `resume`, not `--resume`).
 
@@ -110,7 +110,7 @@ TaskOutput({ task_id: "<task_id>", block: true, timeout: 600000 })
 Use external tmux/worktree orchestration when the work must be split across parallel workers that need isolated git state, independent terminals, or separate build/test execution. Use in-process subagents for lightweight analysis, planning, or review where the main session remains the only writer.
 
 ```bash
-node scripts/orchestrate-worktrees.js .claude/plan/workflow-e2e-test.json --execute
+node scripts/orchestrate-worktrees.js .gemini/plan/workflow-e2e-test.json --execute
 ```
 
 ---
@@ -124,7 +124,7 @@ node scripts/orchestrate-worktrees.js .claude/plan/workflow-e2e-test.json --exec
 `[Mode: Research]` - Understand requirements and gather context:
 
 1. **Prompt Enhancement** (if ace-tool MCP available): Call `mcp__ace-tool__enhance_prompt`, **replace original $ARGUMENTS with enhanced result for all subsequent Codex/Gemini calls**. If unavailable, use `$ARGUMENTS` as-is.
-2. **Context Retrieval** (if ace-tool MCP available): Call `mcp__ace-tool__search_context`. If unavailable, use built-in tools: `Glob` for file discovery, `Grep` for symbol search, `Read` for context gathering, `Task` (Explore agent) for deeper exploration.
+2. **Context Retrieval** (if ace-tool MCP available): Call `mcp__ace-tool__search_context`. If unavailable, use built-in tools: `glob` for file discovery, `grep_search` for symbol search, `read_file` for context gathering, `Task` (Explore agent) for deeper exploration.
 3. **Requirement Completeness Score** (0-10):
    - Goal clarity (0-3), Expected outcome (0-3), Scope boundaries (0-2), Constraints (0-2)
    - ≥7: Continue | <7: Stop, ask clarifying questions
@@ -155,7 +155,7 @@ Wait for results with `TaskOutput`.
 
 **Follow the `IMPORTANT` instructions in `Multi-Model Call Specification` above**
 
-**Claude Synthesis**: Adopt Codex backend plan + Gemini frontend plan, save to `.claude/plan/task-name.md` after user approval.
+**Gemini Synthesis**: Adopt Codex backend plan + Gemini frontend plan, save to `.gemini/plan/task-name.md` after user approval.
 
 ### Phase 4: Implementation
 
@@ -191,5 +191,5 @@ Wait for results with `TaskOutput`. Integrate review feedback, execute optimizat
 ## Key Rules
 
 1. Phase sequence cannot be skipped (unless user explicitly instructs)
-2. External models have **zero filesystem write access**, all modifications by Claude
+2. External models have **zero filesystem write access**, all modifications by Gemini
 3. **Force stop** when score < 7 or user does not approve

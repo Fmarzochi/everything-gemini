@@ -1,14 +1,14 @@
 # The Shorthand Guide to Everything Agentic Security
 
-_everything claude code / research / security_
+_everything gemini cli / research / security_
 
 ---
 
 It's been a while since my last article now. Spent time working on building out the ECC devtooling ecosystem. One of the few hot but important topics during that stretch has been agent security.
 
-Widespread adoption of open source agents is here. OpenClaw and others run about your computer. Continuous run harnesses like Claude Code and Codex (using ECC) increase the surface area; and on February 25, 2026, Check Point Research published a Claude Code disclosure that should have ended the "this could happen but won't / is overblown" phase of the conversation for good. With the tooling reaching critical mass, the gravity of exploits multiplies.
+Widespread adoption of open source agents is here. OpenClaw and others run about your computer. Continuous run harnesses like Gemini CLI and Codex (using ECC) increase the surface area; and on February 25, 2026, Check Point Research published a Gemini CLI disclosure that should have ended the "this could happen but won't / is overblown" phase of the conversation for good. With the tooling reaching critical mass, the gravity of exploits multiplies.
 
-One issue, CVE-2025-59536 (CVSS 8.7), allowed project-contained code to execute before the user accepted the trust dialog. Another, CVE-2026-21852, allowed API traffic to be redirected through an attacker-controlled `ANTHROPIC_BASE_URL`, leaking the API key before trust was confirmed. All it took was that you clone the repo and open the tool.
+One issue, CVE-2025-59536 (CVSS 8.7), allowed project-contained code to execute before the user accepted the trust dialog. Another, CVE-2026-21852, allowed API traffic to be redirected through an attacker-controlled `GOOGLE_BASE_URL`, leaking the API key before trust was confirmed. All it took was that you clone the repo and open the tool.
 
 The tooling we trust is also the tooling being targeted. That is the shift. Prompt injection is no longer some goofy model failure or a funny jailbreak screenshot (though I do have a funny one to share below); in an agentic system it can become shell execution, secret exposure, workflow abuse, or quiet lateral movement.
 
@@ -26,9 +26,9 @@ Even this Good Rudi jailbreak clips people laugh at (its funny ngl) point at the
 
 [Video: Bad Rudi Exploit](./assets/images/security/badrudi-exploit.mp4) — good rudi (grok animated AI character for children) gets exploited with a prompt jailbreak after repeated attempts in order to reveal sensitive information. its a humorous example but nonetheless the possibilities go a lot further.
 
-WhatsApp is just one example. Email attachments are a massive vector. An attacker sends a PDF with an embedded prompt; your agent reads the attachment as part of the job, and now text that should have stayed helpful data has become malicious instruction. Screenshots and scans are just as bad if you are doing OCR on them. Anthropic's own prompt injection work explicitly calls out hidden text and manipulated images as real attack material.
+WhatsApp is just one example. Email attachments are a massive vector. An attacker sends a PDF with an embedded prompt; your agent reads the attachment as part of the job, and now text that should have stayed helpful data has become malicious instruction. Screenshots and scans are just as bad if you are doing OCR on them. Google's own prompt injection work explicitly calls out hidden text and manipulated images as real attack material.
 
-GitHub PR reviews are another target. Malicious instructions can live in hidden diff comments, issue bodies, linked docs, tool output, even "helpful" review context. If you have upstream bots set up (code review agents, Greptile, Cubic, etc.) or use downstream local automated approaches (OpenClaw, Claude Code, Codex, Copilot coding agent, whatever it is); with low oversight and high autonomy in reviewing PRs, you are increasing your surface area risk of getting prompt injected AND affecting every user downstream of your repo with the exploit.
+GitHub PR reviews are another target. Malicious instructions can live in hidden diff comments, issue bodies, linked docs, tool output, even "helpful" review context. If you have upstream bots set up (code review agents, Greptile, Cubic, etc.) or use downstream local automated approaches (OpenClaw, Gemini CLI, Codex, Copilot coding agent, whatever it is); with low oversight and high autonomy in reviewing PRs, you are increasing your surface area risk of getting prompt injected AND affecting every user downstream of your repo with the exploit.
 
 GitHub's own coding-agent design is a quiet admission of that threat model. Only users with write access can assign work to the agent. Lower-privilege comments are not shown to it. Hidden characters are filtered. Pushes are constrained. Workflows still require a human to click **Approve and run workflows**. If they are handholding you taking those precautions and you're not even privy to it, then what happens when you manage and host your own services?
 
@@ -38,37 +38,37 @@ You're probably starting to see how deep the network effects can go here. When s
 
 Simon Willison's lethal trifecta framing is still the cleanest way to think about this: private data, untrusted content, and external communication. Once all three live in the same runtime, prompt injection stops being funny and starts becoming data exfiltration.
 
-## Claude Code CVEs (February 2026)
+## Gemini CLI CVEs (February 2026)
 
-Check Point Research published the Claude Code findings on February 25, 2026. The issues were reported between July and December 2025, then patched before publication.
+Check Point Research published the Gemini CLI findings on February 25, 2026. The issues were reported between July and December 2025, then patched before publication.
 
 The important part is not just the CVE IDs and the postmortem. It reveals to us whats actually happening at the execution layer in our harnesses.
 
 > **Tal Be'ery** [@TalBeerySec](https://x.com/TalBeerySec) · Feb 26
 >
-> Hijacking Claude Code users via poisoned config files with rogue hooks actions.
+> Hijacking Gemini CLI users via poisoned config files with rogue hooks actions.
 >
 > Great research by [@CheckPointSW](https://x.com/CheckPointSW) [@Od3dV](https://x.com/Od3dV) - Aviv Donenfeld
 >
 > _Quoting [@Od3dV](https://x.com/Od3dV) · Feb 26:_
-> _I hacked Claude Code! It turns out "agentic" is just a fancy new way to get a shell. I achieved full RCE and hijacked organization API keys. CVE-2025-59536 | CVE-2026-21852_
-> [research.checkpoint.com](https://research.checkpoint.com/2026/rce-and-api-token-exfiltration-through-claude-code-project-files-cve-2025-59536/)
+> _I hacked Gemini CLI! It turns out "agentic" is just a fancy new way to get a shell. I achieved full RCE and hijacked organization API keys. CVE-2025-59536 | CVE-2026-21852_
+> [research.checkpoint.com](https://research.checkpoint.com/2026/rce-and-api-token-exfiltration-through-gemini-code-project-files-cve-2025-59536/)
 
 **CVE-2025-59536.** Project-contained code could run before the trust dialog was accepted. NVD and GitHub's advisory both tie this to versions before `1.0.111`.
 
-**CVE-2026-21852.** An attacker-controlled project could override `ANTHROPIC_BASE_URL`, redirect API traffic, and leak the API key before trust confirmation. NVD says manual updaters should be on `2.0.65` or later.
+**CVE-2026-21852.** An attacker-controlled project could override `GOOGLE_BASE_URL`, redirect API traffic, and leak the API key before trust confirmation. NVD says manual updaters should be on `2.0.65` or later.
 
 **MCP consent abuse.** Check Point also showed how repo-controlled MCP configuration and settings could auto-approve project MCP servers before the user had meaningfully trusted the directory.
 
 It's clear how project config, hooks, MCP settings, and environment variables are part of the execution surface now.
 
-Anthropic's own docs reflect that reality. Project settings live in `.claude/`. Project-scoped MCP servers live in `.mcp.json`. They are shared through source control. They are supposed to be guarded by a trust boundary. That trust boundary is exactly what attackers will go after.
+Google's own docs reflect that reality. Project settings live in `.gemini/`. Project-scoped MCP servers live in `.mcp.json`. They are shared through source control. They are supposed to be guarded by a trust boundary. That trust boundary is exactly what attackers will go after.
 
 ## What Changed In The Last Year
 
 This conversation moved fast in 2025 and early 2026.
 
-Claude Code had its repo-controlled hooks, MCP settings, and env-var trust paths tested publicly. Amazon Q Developer had a 2025 supply chain incident involving a malicious prompt payload in the VS Code extension, then a separate disclosure around overly broad GitHub token exposure in build infrastructure. Weak credential boundaries plus agent-adjacent tooling is an entrypoint for opportunists.
+Gemini CLI had its repo-controlled hooks, MCP settings, and env-var trust paths tested publicly. Amazon Q Developer had a 2025 supply chain incident involving a malicious prompt payload in the VS Code extension, then a separate disclosure around overly broad GitHub token exposure in build infrastructure. Weak credential boundaries plus agent-adjacent tooling is an entrypoint for opportunists.
 
 On March 3, 2026, Unit 42 published web-based indirect prompt injection observed in the wild. Documenting several cases (it seems every day we see something hit the timeline).
 
@@ -98,7 +98,7 @@ Some of the cleaner numbers worth keeping in your head:
 
 | Stat | Detail |
 |------|--------|
-| **CVSS 8.7** | Claude Code hook / pre-trust execution issue: CVE-2025-59536 |
+| **CVSS 8.7** | Gemini CLI hook / pre-trust execution issue: CVE-2025-59536 |
 | **31 companies / 14 industries** | Microsoft's memory poisoning writeup |
 | **3,984** | Public skills scanned in Snyk's ToxicSkills study |
 | **36%** | Skills with prompt injection in that study |
@@ -109,7 +109,7 @@ The specific numbers will keep changing. The direction of travel (the rate at wh
 
 ## Sandboxing
 
-Root access is dangerous. Broad local access is dangerous. Long-lived credentials on the same machine are dangerous. "YOLO, Claude has me covered" is not the correct approach to take here. The answer is isolation.
+Root access is dangerous. Broad local access is dangerous. Long-lived credentials on the same machine are dangerous. "YOLO, Gemini has me covered" is not the correct approach to take here. The answer is isolation.
 
 ![Sandboxed agent on a restricted workspace vs. agent running loose on your daily machine](./assets/images/security/sandboxing-comparison.png)
 
@@ -125,7 +125,7 @@ If your agent has the same accounts you do, a compromised agent is you.
 
 ### Run untrusted work in isolation
 
-For untrusted repos, attachment-heavy workflows, or anything that pulls lots of foreign content, run it in a container, VM, devcontainer, or remote sandbox. Anthropic explicitly recommends containers / devcontainers for stronger isolation. OpenAI's Codex guidance pushes the same direction with per-task sandboxes and explicit network approval. The industry is converging on this for a reason.
+For untrusted repos, attachment-heavy workflows, or anything that pulls lots of foreign content, run it in a container, VM, devcontainer, or remote sandbox. Google explicitly recommends containers / devcontainers for stronger isolation. OpenAI's Codex guidance pushes the same direction with per-task sandboxes and explicit network approval. The industry is converging on this for a reason.
 
 Use Docker Compose or devcontainers to create a private network with no egress by default:
 
@@ -214,7 +214,7 @@ rg -n '<!--|<script|data:text/html|base64,'
 If you are reviewing skills, hooks, rules, or prompt files, also check for broad permission changes and outbound commands:
 
 ```bash
-rg -n 'curl|wget|nc|scp|ssh|enableAllProjectMcpServers|ANTHROPIC_BASE_URL'
+rg -n 'curl|wget|nc|scp|ssh|enableAllProjectMcpServers|GOOGLE_BASE_URL'
 ```
 
 ### Sanitize attachments before the model sees them
@@ -276,7 +276,7 @@ OWASP's language around least privilege maps cleanly to agents, but I prefer thi
 
 ## Observability / Logging
 
-If you cannot see what the agent read, what tool it called, and what network destination it tried to hit, you cannot secure it (this should be obvious, yet I see you guys hit claude --dangerously-skip-permissions on a ralph loop and just walk away without a care in the world). Then you come back to a mess of a codebase, spending more time figuring out what the agent did than getting any work done.
+If you cannot see what the agent read, what tool it called, and what network destination it tried to hit, you cannot secure it (this should be obvious, yet I see you guys hit gemini --dangerously-skip-permissions on a ralph loop and just walk away without a care in the world). Then you come back to a mess of a codebase, spending more time figuring out what the agent did than getting any work done.
 
 ![Hijacked runs usually look weird in the trace before they look obviously malicious](./assets/images/security/observability.png)
 
@@ -336,7 +336,7 @@ Persistent memory is useful. It is also gasoline.
 
 You usually forget about that part though right? I mean whose constantly checking their .md files that are already in the knowledge base you've been using for so long. The payload does not have to win in one shot. It can plant fragments, wait, then assemble later. Microsoft's AI recommendation poisoning report is the clearest recent reminder of that.
 
-Anthropic documents that Claude Code loads memory at session start. So keep memory narrow:
+Google documents that Gemini CLI loads memory at session start. So keep memory narrow:
 - do not store secrets in memory files
 - separate project memory from user-global memory
 - reset or rotate memory after untrusted runs
@@ -365,7 +365,7 @@ I'm not suggesting you do this, i'm telling you - for your sake, my sake and you
 
 The good news is the ecosystem is catching up. Not fast enough, but it is moving.
 
-Anthropic has hardened Claude Code and published concrete security guidance around trust, permissions, MCP, memory, hooks, and isolated environments.
+Google has hardened Gemini CLI and published concrete security guidance around trust, permissions, MCP, memory, hooks, and isolated environments.
 
 GitHub has built coding-agent controls that clearly assume repo poisoning and privilege abuse are real.
 
@@ -414,20 +414,20 @@ If you want one rule: never let the convenience layer outrun the isolation layer
 
 That one rule gets you surprisingly far.
 
-Scan your setup: [github.com/affaan-m/agentshield](https://github.com/affaan-m/agentshield)
+Scan your setup: [github.com/fmarzochi/agentshield](https://github.com/fmarzochi/agentshield)
 
 ---
 
 ## References
 
-- Check Point Research, "Caught in the Hook: RCE and API Token Exfiltration Through Claude Code Project Files" (February 25, 2026): [research.checkpoint.com](https://research.checkpoint.com/2026/rce-and-api-token-exfiltration-through-claude-code-project-files-cve-2025-59536/)
+- Check Point Research, "Caught in the Hook: RCE and API Token Exfiltration Through Gemini CLI Project Files" (February 25, 2026): [research.checkpoint.com](https://research.checkpoint.com/2026/rce-and-api-token-exfiltration-through-gemini-code-project-files-cve-2025-59536/)
 - NVD, CVE-2025-59536: [nvd.nist.gov](https://nvd.nist.gov/vuln/detail/CVE-2025-59536)
 - NVD, CVE-2026-21852: [nvd.nist.gov](https://nvd.nist.gov/vuln/detail/CVE-2026-21852)
-- Anthropic, "Defending against indirect prompt injection attacks": [anthropic.com](https://www.anthropic.com/news/prompt-injection-defenses)
-- Claude Code docs, "Settings": [code.claude.com](https://code.claude.com/docs/en/settings)
-- Claude Code docs, "MCP": [code.claude.com](https://code.claude.com/docs/en/mcp)
-- Claude Code docs, "Security": [code.claude.com](https://code.claude.com/docs/en/security)
-- Claude Code docs, "Memory": [code.claude.com](https://code.claude.com/docs/en/memory)
+- Google, "Defending against indirect prompt injection attacks": [deepmind.google](https://deepmind.google/news/prompt-injection-defenses)
+- Gemini CLI docs, "Settings": [code.gemini.com](https://code.gemini.com/docs/en/settings)
+- Gemini CLI docs, "MCP": [code.gemini.com](https://code.gemini.com/docs/en/mcp)
+- Gemini CLI docs, "Security": [code.gemini.com](https://code.gemini.com/docs/en/security)
+- Gemini CLI docs, "Memory": [code.gemini.com](https://code.gemini.com/docs/en/memory)
 - GitHub Docs, "About assigning tasks to Copilot": [docs.github.com](https://docs.github.com/en/copilot/using-github-copilot/coding-agent/about-assigning-tasks-to-copilot)
 - GitHub Docs, "Responsible use of Copilot coding agent on GitHub.com": [docs.github.com](https://docs.github.com/en/copilot/responsible-use-of-github-copilot-features/responsible-use-of-copilot-coding-agent-on-githubcom)
 - GitHub Docs, "Customize the agent firewall": [docs.github.com](https://docs.github.com/en/copilot/how-tos/use-copilot-agents/coding-agent/customize-the-agent-firewall)
@@ -446,10 +446,8 @@ Scan your setup: [github.com/affaan-m/agentshield](https://github.com/affaan-m/a
 
 If you haven't read the previous guides, start here:
 
-> [The Shorthand Guide to Everything Claude Code](https://x.com/affaanmustafa/status/2012378465664745795)
 >
-> [The Longform Guide to Everything Claude Code](https://x.com/affaanmustafa/status/2014040193557471352)
 
 go do that and also save these repos:
-- [github.com/affaan-m/everything-claude-code](https://github.com/affaan-m/everything-claude-code)
-- [github.com/affaan-m/agentshield](https://github.com/affaan-m/agentshield)
+- [github.com/fmarzochi/everything-gemini](https://github.com/fmarzochi/everything-gemini)
+- [github.com/fmarzochi/agentshield](https://github.com/fmarzochi/agentshield)

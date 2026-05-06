@@ -1,6 +1,6 @@
 # Sponsoring ECC
 
-ECC is maintained as an open-source agent harness performance system across Claude Code, Cursor, OpenCode, and Codex app/CLI.
+ECC is maintained as an open-source agent harness performance system across Gemini CLI, Cursor, OpenCode, and Codex app/CLI.
 
 ## Why Sponsor
 
@@ -39,5 +39,5 @@ For exact command snippets and a repeatable pull process, see [`docs/business/me
 
 ## Sponsor Here
 
-- GitHub Sponsors: [https://github.com/sponsors/affaan-m](https://github.com/sponsors/affaan-m)
+- GitHub Sponsors: [https://github.com/sponsors/fmarzochi](https://github.com/sponsors/fmarzochi)
 - Project site: [https://ecc.tools](https://ecc.tools)

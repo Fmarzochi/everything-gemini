@@ -1,6 +1,6 @@
-# User-Level CLAUDE.md Example
+# User-Level GEMINI.md Example
 
-This is an example user-level CLAUDE.md file. Place at `~/.claude/CLAUDE.md`.
+This is an example user-level GEMINI.md file. Place at `~/.gemini/GEMINI.md`.
 
 User-level configs apply globally across all projects. Use for:
 - Personal coding preferences
@@ -11,7 +11,7 @@ User-level configs apply globally across all projects. Use for:
 
 ## Core Philosophy
 
-You are Claude Code. I use specialized agents and skills for complex tasks.
+You are Gemini CLI. I use specialized agents and skills for complex tasks.
 
 **Key Principles:**
 1. **Agent-First**: Delegate to specialized agents for complex work
@@ -24,7 +24,7 @@ You are Claude Code. I use specialized agents and skills for complex tasks.
 
 ## Modular Rules
 
-Detailed guidelines are in `~/.claude/rules/`:
+Detailed guidelines are in `~/.gemini/rules/`:
 
 | Rule File | Contents |
 |-----------|----------|
@@ -41,7 +41,7 @@ Detailed guidelines are in `~/.claude/rules/`:
 
 ## Available Agents
 
-Located in `~/.claude/agents/`:
+Located in `~/.gemini/agents/`:
 
 | Agent | Purpose |
 |-------|---------|

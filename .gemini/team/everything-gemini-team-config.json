@@ -1,0 +1,15 @@
+{
+  "version": "1.0",
+  "generatedBy": "ecc-tools",
+  "profile": "full",
+  "sharedSkills": [
+    ".gemini/skills/everything-gemini/SKILL.md",
+    ".agents/skills/everything-gemini/SKILL.md"
+  ],
+  "commandFiles": [
+    ".gemini/commands/database-migration.md",
+    ".gemini/commands/feature-development.md",
+    ".gemini/commands/add-language-rules.md"
+  ],
+  "updatedAt": "2026-03-20T12:07:36.496Z"
+}

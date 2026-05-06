@@ -39,7 +39,7 @@ Sort findings into safety tiers:
 For each SAFE item:
 
 1. **Run full test suite** — Establish baseline (all green)
-2. **Delete the dead code** — Use Edit tool for surgical removal
+2. **Delete the dead code** — Use replace tool for surgical removal
 3. **Re-run test suite** — Verify nothing broke
 4. **If tests fail** — Immediately revert with `git checkout -- <file>` and skip this item
 5. **If tests pass** — Move to next item

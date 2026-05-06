@@ -5,7 +5,7 @@
 ### Highlights
 
 - Adds the public ECC 2.0 release-candidate surface for the Hermes operator story.
-- Documents ECC as the reusable cross-harness substrate across Claude Code, Codex, Cursor, OpenCode, and Gemini.
+- Documents ECC as the reusable cross-harness substrate across Gemini CLI, Codex, Cursor, OpenCode, and Gemini.
 - Adds a sanitized Hermes import skill surface instead of publishing private operator state.
 
 ### Release Surface
@@ -51,7 +51,7 @@
 
 ### Notes
 
-- The Claude plugin remains limited by platform-level rules distribution constraints; the selective install / OSS path is still the most reliable full install.
+- The Gemini plugin remains limited by platform-level rules distribution constraints; the selective install / OSS path is still the most reliable full install.
 - This release is a repo-surface correction and ecosystem sync, not a claim that the full ECC 2.0 roadmap is complete.
 
 ## 1.9.0 - 2026-03-20
@@ -85,9 +85,9 @@
 - `data-scraper-agent` — AI-powered public data collection (#503)
 - `team-builder` — Team composition skill (#501)
 - `ai-regression-testing` — AI regression test workflows (#433)
-- `claude-devfleet` — Multi-agent orchestration (#505)
+- `gemini-devfleet` — Multi-agent orchestration (#505)
 - `blueprint` — Multi-session construction planning
-- `everything-claude-code` — Self-referential ECC skill (#335)
+- `everything-gemini` — Self-referential ECC skill (#335)
 - `prompt-optimizer` — Prompt optimization skill (#418)
 - 8 Evos operational domain skills (#290)
 - 3 Laravel skills (#420)

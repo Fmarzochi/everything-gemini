@@ -2,15 +2,27 @@
 name: skill-comply
 description: Visualize whether skills, rules, and agent definitions are actually followed — auto-generates scenarios at 3 prompt strictness levels, runs agents, classifies behavioral sequences, and reports compliance rates with full tool call timelines
 origin: ECC
-tools: Read, Bash
+tools: read_file, run_shell_command
 ---
+
+
+**CRITICAL INSTRUCTION FOR GEMINI CLI:**
+When executing the logic of this skill, you MUST map the conceptual steps to your native toolset:
+- Use `read_file` to read file contents.
+- Use `replace` to edit files exactly (do not use sed or echo).
+- Use `write_file` to create new files.
+- Use `grep_search` and `glob` to search across the codebase.
+- Use `list_directory` to explore folders.
+- Use `run_shell_command` to execute tests, builds, or other terminal commands.
+Always verify the output of your tools before proceeding to the next logical step.
+
 
 # skill-comply: Automated Compliance Measurement
 
 Measures whether coding agents actually follow skills, rules, or agent definitions by:
 1. Auto-generating expected behavioral sequences (specs) from any .md file
 2. Auto-generating scenarios with decreasing prompt strictness (supportive → neutral → competing)
-3. Running `claude -p` and capturing tool call traces via stream-json
+3. Running `gemini -p` and capturing tool call traces via stream-json
 4. Classifying tool calls against spec steps using LLM (not regex)
 5. Checking temporal ordering deterministically
 6. Generating self-contained reports with spec, prompts, and timelines
@@ -32,10 +44,10 @@ Measures whether coding agents actually follow skills, rules, or agent definitio
 
 ```bash
 # Full run
-uv run python -m scripts.run ~/.claude/rules/common/testing.md
+uv run python -m scripts.run ~/.gemini/rules/common/testing.md
 
 # Dry run (no cost, spec + scenarios only)
-uv run python -m scripts.run --dry-run ~/.claude/skills/search-first/SKILL.md
+uv run python -m scripts.run --dry-run ~/.gemini/skills/search-first/SKILL.md
 
 # Custom models
 uv run python -m scripts.run --gen-model haiku --model sonnet <path>

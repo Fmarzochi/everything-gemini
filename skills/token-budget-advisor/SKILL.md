@@ -14,11 +14,24 @@ description: >-
   session (maintain it), the request is clearly a one-word answer, or
   "token" refers to auth/session/payment tokens rather than response size.
 origin: community
+tools: ["run_shell_command", "replace", "read_file", "grep_search", "glob", "list_directory", "write_file"]
 ---
+
+
+**CRITICAL INSTRUCTION FOR GEMINI CLI:**
+When executing the logic of this skill, you MUST map the conceptual steps to your native toolset:
+- Use `read_file` to read file contents.
+- Use `replace` to edit files exactly (do not use sed or echo).
+- Use `write_file` to create new files.
+- Use `grep_search` and `glob` to search across the codebase.
+- Use `list_directory` to explore folders.
+- Use `run_shell_command` to execute tests, builds, or other terminal commands.
+Always verify the output of your tools before proceeding to the next logical step.
+
 
 # Token Budget Advisor (TBA)
 
-Intercept the response flow to offer the user a choice about response depth **before** Claude answers.
+Intercept the response flow to offer the user a choice about response depth **before** Gemini answers.
 
 ## When to Use
 
@@ -129,5 +142,5 @@ This skill uses heuristic estimation — no real tokenizer. Accuracy ~85-90%, va
 
 ## Source
 
-Standalone skill from [TBA — Token Budget Advisor for Claude Code](https://github.com/Xabilimon1/Token-Budget-Advisor-Claude-Code-).
+Standalone skill from [TBA — Token Budget Advisor for Gemini CLI](https://github.com/Xabilimon1/Token-Budget-Advisor-Gemini-Code-).
 Original project also ships a Python estimator script, but this repository keeps the skill self-contained and heuristic-only.

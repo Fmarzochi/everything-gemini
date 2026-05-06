@@ -1,5 +1,5 @@
 ---
-description: Load the most recent session file from ~/.claude/session-data/ and resume work with full context from where the last session ended.
+description: Load the most recent session file from ~/.gemini/session-data/ and resume work with full context from where the last session ended.
 ---
 
 # Resume Session Command
@@ -12,15 +12,15 @@ This command is the counterpart to `/save-session`.
 - Starting a new session to continue work from a previous day
 - After starting a fresh session due to context limits
 - When handing off a session file from another source (just provide the file path)
-- Any time you have a session file and want Claude to fully absorb it before proceeding
+- Any time you have a session file and want Gemini to fully absorb it before proceeding
 
 ## Usage
 
 ```
-/resume-session                                                      # loads most recent file in ~/.claude/session-data/
+/resume-session                                                      # loads most recent file in ~/.gemini/session-data/
 /resume-session 2024-01-15                                           # loads most recent session for that date
-/resume-session ~/.claude/session-data/2024-01-15-abc123de-session.tmp  # loads a current short-id session file
-/resume-session ~/.claude/sessions/2024-01-15-session.tmp               # loads a specific legacy-format file
+/resume-session ~/.gemini/session-data/2024-01-15-abc123de-session.tmp  # loads a current short-id session file
+/resume-session ~/.gemini/sessions/2024-01-15-session.tmp               # loads a specific legacy-format file
 ```
 
 ## Process
@@ -29,19 +29,19 @@ This command is the counterpart to `/save-session`.
 
 If no argument provided:
 
-1. Check `~/.claude/session-data/`
+1. Check `~/.gemini/session-data/`
 2. Pick the most recently modified `*-session.tmp` file
 3. If the folder does not exist or has no matching files, tell the user:
    ```
-   No session files found in ~/.claude/session-data/
+   No session files found in ~/.gemini/session-data/
    Run /save-session at the end of a session to create one.
    ```
    Then stop.
 
 If an argument is provided:
 
-- If it looks like a date (`YYYY-MM-DD`), search `~/.claude/session-data/` first, then the legacy
-  `~/.claude/sessions/`, for files matching `YYYY-MM-DD-session.tmp` (legacy format) or
+- If it looks like a date (`YYYY-MM-DD`), search `~/.gemini/session-data/` first, then the legacy
+  `~/.gemini/sessions/`, for files matching `YYYY-MM-DD-session.tmp` (legacy format) or
   `YYYY-MM-DD-<shortid>-session.tmp` (current format)
   and load the most recently modified variant for that date
 - If it looks like a file path, read that file directly
@@ -115,7 +115,7 @@ Report: "Session file found but appears empty or unreadable. You may need to cre
 ## Example Output
 
 ```
-SESSION LOADED: /Users/you/.claude/session-data/2024-01-15-abc123de-session.tmp
+SESSION LOADED: /Users/you/.gemini/session-data/2024-01-15-abc123de-session.tmp
 ════════════════════════════════════════════════
 
 PROJECT: my-app — JWT Authentication

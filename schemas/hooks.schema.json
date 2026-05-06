@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Claude Code Hooks Configuration",
-  "description": "Configuration for Claude Code hooks. Supports current Claude Code hook events and hook action types.",
+  "title": "Gemini CLI Hooks Configuration",
+  "description": "Configuration for Gemini CLI hooks. Supports current Gemini CLI hook events and hook action types.",
   "$defs": {
     "stringArray": {
       "type": "array",

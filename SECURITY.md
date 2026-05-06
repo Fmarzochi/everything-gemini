@@ -43,7 +43,7 @@ This policy covers:
 - Hook scripts that execute on your machine
 - Install/uninstall/repair lifecycle scripts
 - MCP configurations shipped with ECC
-- The AgentShield security scanner ([github.com/affaan-m/agentshield](https://github.com/affaan-m/agentshield))
+- The AgentShield security scanner ([github.com/fmarzochi/agentshield](https://github.com/fmarzochi/agentshield))
 
 ## Security Resources
 

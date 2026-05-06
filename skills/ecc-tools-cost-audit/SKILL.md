@@ -2,7 +2,20 @@
 name: ecc-tools-cost-audit
 description: Evidence-first ECC Tools burn and billing audit workflow. Use when investigating runaway PR creation, quota bypass, premium-model leakage, duplicate jobs, or GitHub App cost spikes in the ECC Tools repo.
 origin: ECC
+tools: ["run_shell_command", "replace", "read_file", "grep_search", "glob", "list_directory", "write_file"]
 ---
+
+
+**CRITICAL INSTRUCTION FOR GEMINI CLI:**
+When executing the logic of this skill, you MUST map the conceptual steps to your native toolset:
+- Use `read_file` to read file contents.
+- Use `replace` to edit files exactly (do not use sed or echo).
+- Use `write_file` to create new files.
+- Use `grep_search` and `glob` to search across the codebase.
+- Use `list_directory` to explore folders.
+- Use `run_shell_command` to execute tests, builds, or other terminal commands.
+Always verify the output of your tools before proceeding to the next logical step.
+
 
 # ECC Tools Cost Audit
 
@@ -30,7 +43,7 @@ Pull these ECC-native skills into the workflow when relevant:
 
 ## Scope Guardrails
 
-- work in the sibling `ECC-Tools` repo, not in `everything-claude-code`
+- work in the sibling `ECC-Tools` repo, not in `everything-gemini`
 - start read-only unless the user clearly asked for a fix
 - do not mutate unrelated billing, checkout, or UI flows while tracing analysis burn
 - treat app-generated branches and app-generated PRs as red-flag recursion paths until proved otherwise
@@ -133,7 +146,7 @@ If usage is checked at the front door but only incremented in the worker, concur
 
 ### 3. Free tier on premium path
 
-If free queued jobs can still route into Anthropic or another premium provider when keys exist, that is real spend leakage even if the user never sees the premium result.
+If free queued jobs can still route into Google or another premium provider when keys exist, that is real spend leakage even if the user never sees the premium result.
 
 ### 4. App-generated branches re-enter the webhook
 

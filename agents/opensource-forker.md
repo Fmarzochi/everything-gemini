@@ -1,9 +1,21 @@
 ---
 name: opensource-forker
 description: Fork any project for open-sourcing. Copies files, strips secrets and credentials (20+ patterns), replaces internal references with placeholders, generates .env.example, and cleans git history. First stage of the opensource-pipeline skill.
-tools: ["Read", "Write", "Edit", "Bash", "Grep", "Glob"]
+tools: ["run_shell_command", "replace", "read_file", "grep_search", "glob", "list_directory", "write_file"]
 model: sonnet
 ---
+
+
+**CRITICAL INSTRUCTION FOR GEMINI CLI:**
+When executing the logic of this skill, you MUST map the conceptual steps to your native toolset:
+- Use `read_file` to read file contents.
+- Use `replace` to edit files exactly (do not use sed or echo).
+- Use `write_file` to create new files.
+- Use `grep_search` and `glob` to search across the codebase.
+- Use `list_directory` to explore folders.
+- Use `run_shell_command` to execute tests, builds, or other terminal commands.
+Always verify the output of your tools before proceeding to the next logical step.
+
 
 # Open-Source Forker
 
@@ -26,7 +38,7 @@ Read the project to understand stack and sensitive surface area:
 - Tech stack: `package.json`, `requirements.txt`, `Cargo.toml`, `go.mod`
 - Config files: `.env`, `config/`, `docker-compose.yml`
 - CI/CD: `.github/`, `.gitlab-ci.yml`
-- Docs: `README.md`, `CLAUDE.md`
+- Docs: `README.md`, `GEMINI.md`
 
 ```bash
 find SOURCE_DIR -type f | grep -v node_modules | grep -v .git | grep -v __pycache__
@@ -38,7 +50,7 @@ find SOURCE_DIR -type f | grep -v node_modules | grep -v .git | grep -v __pycach
 mkdir -p TARGET_DIR
 rsync -av --exclude='.git' --exclude='node_modules' --exclude='__pycache__' \
   --exclude='.env*' --exclude='*.pyc' --exclude='.venv' --exclude='venv' \
-  --exclude='.claude/' --exclude='.secrets/' --exclude='secrets/' \
+  --exclude='.gemini/' --exclude='.secrets/' --exclude='secrets/' \
   SOURCE_DIR/ TARGET_DIR/
 ```
 
@@ -87,7 +99,7 @@ key-[A-Za-z0-9]{32}
 - `*.pem`, `*.key`, `*.p12`, `*.pfx` (private keys)
 - `credentials.json`, `service-account.json`
 - `.secrets/`, `secrets/`
-- `.claude/settings.json`
+- `.gemini/settings.json`
 - `sessions/`
 - `*.map` (source maps expose original source structure and file paths)
 

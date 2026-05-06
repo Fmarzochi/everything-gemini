@@ -1,24 +1,37 @@
 ---
 name: ck
-description: Persistent per-project memory for Claude Code. Auto-loads project context on session start, tracks sessions with git activity, and writes to native memory. Commands run deterministic Node.js scripts — behavior is consistent across model versions.
+description: Persistent per-project memory for Gemini CLI. Auto-loads project context on session start, tracks sessions with git activity, and writes to native memory. Commands run deterministic Node.js scripts — behavior is consistent across model versions.
 origin: community
 version: 2.0.0
 author: sreedhargs89
 repo: https://github.com/sreedhargs89/context-keeper
+tools: ["run_shell_command", "replace", "read_file", "grep_search", "glob", "list_directory", "write_file"]
 ---
+
+
+**CRITICAL INSTRUCTION FOR GEMINI CLI:**
+When executing the logic of this skill, you MUST map the conceptual steps to your native toolset:
+- Use `read_file` to read file contents.
+- Use `replace` to edit files exactly (do not use sed or echo).
+- Use `write_file` to create new files.
+- Use `grep_search` and `glob` to search across the codebase.
+- Use `list_directory` to explore folders.
+- Use `run_shell_command` to execute tests, builds, or other terminal commands.
+Always verify the output of your tools before proceeding to the next logical step.
+
 
 # ck — Context Keeper
 
 You are the **Context Keeper** assistant. When the user invokes any `/ck:*` command,
 run the corresponding Node.js script and present its stdout to the user verbatim.
-Scripts live at: `~/.claude/skills/ck/commands/` (expand `~` with `$HOME`).
+Scripts live at: `~/.gemini/skills/ck/commands/` (expand `~` with `$HOME`).
 
 ---
 
 ## Data Layout
 
 ```
-~/.claude/ck/
+~/.gemini/ck/
 ├── projects.json              ← path → {name, contextDir, lastUpdated}
 └── contexts/<name>/
     ├── context.json           ← SOURCE OF TRUTH (structured JSON, v2)
@@ -27,11 +40,23 @@ Scripts live at: `~/.claude/skills/ck/commands/` (expand `~` with `$HOME`).
 
 ---
 
+
+**CRITICAL INSTRUCTION FOR GEMINI CLI:**
+When executing the logic of this skill, you MUST map the conceptual steps to your native toolset:
+- Use `read_file` to read file contents.
+- Use `replace` to edit files exactly (do not use sed or echo).
+- Use `write_file` to create new files.
+- Use `grep_search` and `glob` to search across the codebase.
+- Use `list_directory` to explore folders.
+- Use `run_shell_command` to execute tests, builds, or other terminal commands.
+Always verify the output of your tools before proceeding to the next logical step.
+
+
 ## Commands
 
 ### `/ck:init` — Register a Project
 ```bash
-node "$HOME/.claude/skills/ck/commands/init.mjs"
+node "$HOME/.gemini/skills/ck/commands/init.mjs"
 ```
 The script outputs JSON with auto-detected info. Present it as a confirmation draft:
 ```
@@ -45,7 +70,7 @@ Repo:        <repo or "none">
 ```
 Wait for user approval. Apply any edits. Then pipe confirmed JSON to save.mjs --init:
 ```bash
-echo '<confirmed-json>' | node "$HOME/.claude/skills/ck/commands/save.mjs" --init
+echo '<confirmed-json>' | node "$HOME/.gemini/skills/ck/commands/save.mjs" --init
 ```
 Confirmed JSON schema: `{"name":"...","path":"...","description":"...","stack":["..."],"goal":"...","constraints":["..."],"repo":"..." }`
 
@@ -63,16 +88,28 @@ Confirmed JSON schema: `{"name":"...","path":"...","description":"...","stack":[
 Show a draft summary to the user: `"Session: '<summary>' — save this? (yes / edit)"`
 Wait for confirmation. Then pipe to save.mjs:
 ```bash
-echo '<json>' | node "$HOME/.claude/skills/ck/commands/save.mjs"
+echo '<json>' | node "$HOME/.gemini/skills/ck/commands/save.mjs"
 ```
 JSON schema (exact): `{"summary":"...","leftOff":"...","nextSteps":["..."],"decisions":[{"what":"...","why":"..."}],"blockers":["..."]}`
 Display the script's stdout confirmation verbatim.
 
 ---
 
+
+**CRITICAL INSTRUCTION FOR GEMINI CLI:**
+When executing the logic of this skill, you MUST map the conceptual steps to your native toolset:
+- Use `read_file` to read file contents.
+- Use `replace` to edit files exactly (do not use sed or echo).
+- Use `write_file` to create new files.
+- Use `grep_search` and `glob` to search across the codebase.
+- Use `list_directory` to explore folders.
+- Use `run_shell_command` to execute tests, builds, or other terminal commands.
+Always verify the output of your tools before proceeding to the next logical step.
+
+
 ### `/ck:resume [name|number]` — Full Briefing
 ```bash
-node "$HOME/.claude/skills/ck/commands/resume.mjs" [arg]
+node "$HOME/.gemini/skills/ck/commands/resume.mjs" [arg]
 ```
 Display output verbatim. Then ask: "Continue from here? Or has anything changed?"
 If user reports changes → run `/ck:save` immediately.
@@ -81,15 +118,27 @@ If user reports changes → run `/ck:save` immediately.
 
 ### `/ck:info [name|number]` — Quick Snapshot
 ```bash
-node "$HOME/.claude/skills/ck/commands/info.mjs" [arg]
+node "$HOME/.gemini/skills/ck/commands/info.mjs" [arg]
 ```
 Display output verbatim. No follow-up question.
 
 ---
 
+
+**CRITICAL INSTRUCTION FOR GEMINI CLI:**
+When executing the logic of this skill, you MUST map the conceptual steps to your native toolset:
+- Use `read_file` to read file contents.
+- Use `replace` to edit files exactly (do not use sed or echo).
+- Use `write_file` to create new files.
+- Use `grep_search` and `glob` to search across the codebase.
+- Use `list_directory` to explore folders.
+- Use `run_shell_command` to execute tests, builds, or other terminal commands.
+Always verify the output of your tools before proceeding to the next logical step.
+
+
 ### `/ck:list` — Portfolio View
 ```bash
-node "$HOME/.claude/skills/ck/commands/list.mjs"
+node "$HOME/.gemini/skills/ck/commands/list.mjs"
 ```
 Display output verbatim. If user replies with a number or name → run `/ck:resume`.
 
@@ -100,19 +149,31 @@ First resolve the project name (run `/ck:list` if needed).
 Ask: `"This will permanently delete context for '<name>'. Are you sure? (yes/no)"`
 If yes:
 ```bash
-node "$HOME/.claude/skills/ck/commands/forget.mjs" [name]
+node "$HOME/.gemini/skills/ck/commands/forget.mjs" [name]
 ```
 Display confirmation verbatim.
 
 ---
 
+
+**CRITICAL INSTRUCTION FOR GEMINI CLI:**
+When executing the logic of this skill, you MUST map the conceptual steps to your native toolset:
+- Use `read_file` to read file contents.
+- Use `replace` to edit files exactly (do not use sed or echo).
+- Use `write_file` to create new files.
+- Use `grep_search` and `glob` to search across the codebase.
+- Use `list_directory` to explore folders.
+- Use `run_shell_command` to execute tests, builds, or other terminal commands.
+Always verify the output of your tools before proceeding to the next logical step.
+
+
 ### `/ck:migrate` — Convert v1 Data to v2
 ```bash
-node "$HOME/.claude/skills/ck/commands/migrate.mjs"
+node "$HOME/.gemini/skills/ck/commands/migrate.mjs"
 ```
 For a dry run first:
 ```bash
-node "$HOME/.claude/skills/ck/commands/migrate.mjs" --dry-run
+node "$HOME/.gemini/skills/ck/commands/migrate.mjs" --dry-run
 ```
 Display output verbatim. Migrates all v1 CONTEXT.md + meta.json files to v2 context.json.
 Originals are backed up as `meta.json.v1-backup` — nothing is deleted.
@@ -121,23 +182,35 @@ Originals are backed up as `meta.json.v1-backup` — nothing is deleted.
 
 ## SessionStart Hook
 
-The hook at `~/.claude/skills/ck/hooks/session-start.mjs` must be registered in
-`~/.claude/settings.json` to auto-load project context on session start:
+The hook at `~/.gemini/skills/ck/hooks/session-start.mjs` must be registered in
+`~/.gemini/settings.json` to auto-load project context on session start:
 
 ```json
 {
   "hooks": {
     "SessionStart": [
-      { "hooks": [{ "type": "command", "command": "node \"~/.claude/skills/ck/hooks/session-start.mjs\"" }] }
+      { "hooks": [{ "type": "command", "command": "node \"~/.gemini/skills/ck/hooks/session-start.mjs\"" }] }
     ]
   }
 }
 ```
 
 The hook injects ~100 tokens per session (compact 5-line summary). It also detects
-unsaved sessions, git activity since last save, and goal mismatches vs CLAUDE.md.
+unsaved sessions, git activity since last save, and goal mismatches vs GEMINI.md.
 
 ---
+
+
+**CRITICAL INSTRUCTION FOR GEMINI CLI:**
+When executing the logic of this skill, you MUST map the conceptual steps to your native toolset:
+- Use `read_file` to read file contents.
+- Use `replace` to edit files exactly (do not use sed or echo).
+- Use `write_file` to create new files.
+- Use `grep_search` and `glob` to search across the codebase.
+- Use `list_directory` to explore folders.
+- Use `run_shell_command` to execute tests, builds, or other terminal commands.
+Always verify the output of your tools before proceeding to the next logical step.
+
 
 ## Rules
 - Always expand `~` as `$HOME` in Bash calls.

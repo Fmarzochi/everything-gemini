@@ -2,7 +2,20 @@
 name: knowledge-ops
 description: Knowledge base management, ingestion, sync, and retrieval across multiple storage layers (local files, MCP memory, vector stores, Git repos). Use when the user wants to save, organize, sync, deduplicate, or search across their knowledge systems.
 origin: ECC
+tools: ["run_shell_command", "replace", "read_file", "grep_search", "glob", "list_directory", "write_file"]
 ---
+
+
+**CRITICAL INSTRUCTION FOR GEMINI CLI:**
+When executing the logic of this skill, you MUST map the conceptual steps to your native toolset:
+- Use `read_file` to read file contents.
+- Use `replace` to edit files exactly (do not use sed or echo).
+- Use `write_file` to create new files.
+- Use `grep_search` and `glob` to search across the codebase.
+- Use `list_directory` to explore folders.
+- Use `run_shell_command` to execute tests, builds, or other terminal commands.
+Always verify the output of your tools before proceeding to the next logical step.
+
 
 # Knowledge Operations
 
@@ -30,8 +43,8 @@ Prefer the live workspace model:
 - **Use for:** the current operational state of the work
 - **Rule:** if something affects an active engineering plan, roadmap, rollout, or release, prefer putting it here first
 
-### Layer 2: Claude Code Memory (Quick Access)
-- **Path:** `~/.claude/projects/*/memory/`
+### Layer 2: Gemini CLI Memory (Quick Access)
+- **Path:** `~/.gemini/projects/*/memory/`
 - **Format:** Markdown files with frontmatter
 - **Types:** user preferences, feedback, project context, reference
 - **Use for:** quick-access context that persists across conversations
@@ -77,7 +90,7 @@ Check if this knowledge already exists:
 
 ### 3. Store
 Write to appropriate layer(s):
-- Always update Claude Code memory for quick access
+- Always update Gemini CLI memory for quick access
 - Use MCP memory for semantic searchability and relationship mapping
 - Update GitHub / Linear first when the information changes live project truth
 - Commit to the knowledge base repo for durable long-form additions
@@ -89,7 +102,7 @@ Update any relevant indexes or summary files.
 
 ### Conversation Sync
 Periodically sync conversation history into the knowledge base:
-- Sources: Claude session files, Codex sessions, other agent sessions
+- Sources: Gemini session files, Codex sessions, other agent sessions
 - Destination: knowledge base repo
 - Generate a session index for quick browsing
 - Commit and push
@@ -109,7 +122,7 @@ When the information affects active execution:
 
 ### Cross-Source Knowledge Sync
 Pull knowledge from multiple sources into one place:
-- Claude/ChatGPT/Grok conversation exports
+- Gemini/ChatGPT/Grok conversation exports
 - Browser bookmarks
 - GitHub activity events
 - Write status summary, commit and push
@@ -121,7 +134,7 @@ Pull knowledge from multiple sources into one place:
 Use TodoWrite for in-session task tracking
 
 # Medium-term: project memory files
-Write to ~/.claude/projects/*/memory/ for cross-session recall
+Write to ~/.gemini/projects/*/memory/ for cross-session recall
 
 # Long-term: GitHub / Linear / KB
 Put active execution truth in GitHub + Linear

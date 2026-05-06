@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-ECC Dashboard - Everything Claude Code GUI
+ECC Dashboard - Everything Gemini GUI
 Cross-platform TkInter application for managing ECC components
 """
 
@@ -259,7 +259,7 @@ class ECCDashboard(tk.Tk):
         super().__init__()
         
         self.project_path = get_project_path()
-        self.title("ECC Dashboard - Everything Claude Code")
+        self.title("ECC Dashboard - Everything Gemini")
         
         maximize_window(self)
         
@@ -458,7 +458,7 @@ Purpose: {agent['purpose']}
 When to Use: {agent['when_to_use']}
 
 ---
-Usage in Claude Code:
+Usage in Gemini CLI:
 Use the /{agent['name']} command or invoke via agent delegation."""
             self.agent_details.delete('1.0', tk.END)
             self.agent_details.insert('1.0', details)
@@ -598,9 +598,9 @@ Usage: This skill is automatically activated when working with related technolog
         info_frame = ttk.Frame(frame)
         info_frame.pack(fill=tk.X, padx=10, pady=10)
         
-        ttk.Label(info_frame, text="Slash Commands for Claude Code:", 
+        ttk.Label(info_frame, text="Slash Commands for Gemini CLI:", 
                   font=('Arial', 10, 'bold')).pack(anchor=tk.W)
-        ttk.Label(info_frame, text="Use these commands in Claude Code by typing /command_name", 
+        ttk.Label(info_frame, text="Use these commands in Gemini CLI by typing /command_name", 
                   foreground='gray').pack(anchor=tk.W)
         
         # Commands list
@@ -643,7 +643,7 @@ Usage: This skill is automatically activated when working with related technolog
         
         ttk.Label(info_frame, text="Coding Rules by Language:", 
                   font=('Arial', 10, 'bold')).pack(anchor=tk.W)
-        ttk.Label(info_frame, text="These rules are automatically applied in Claude Code", 
+        ttk.Label(info_frame, text="These rules are automatically applied in Gemini CLI", 
                   foreground='gray').pack(anchor=tk.W)
         
         # Filter
@@ -773,13 +773,13 @@ Usage: This skill is automatically activated when working with related technolog
         about_frame.pack(fill=tk.X, padx=10, pady=10)
         
         about_text = """ECC Dashboard v1.0.0
-Everything Claude Code GUI
+Everything Gemini GUI
 
 A cross-platform desktop application for 
 managing and exploring ECC components.
 
 Version: 1.10.0
-Project: github.com/affaan-m/everything-claude-code"""
+Project: github.com/fmarzochi/everything-gemini"""
         
         ttk.Label(about_frame, text=about_text, justify=tk.LEFT).pack(anchor=tk.W)
     

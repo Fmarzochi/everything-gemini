@@ -1,9 +1,21 @@
 ---
 name: agent-eval
-description: Head-to-head comparison of coding agents (Claude Code, Aider, Codex, etc.) on custom tasks with pass rate, cost, time, and consistency metrics
+description: Head-to-head comparison of coding agents (Gemini CLI, Aider, Codex, etc.) on custom tasks with pass rate, cost, time, and consistency metrics
 origin: ECC
-tools: Read, Write, Edit, Bash, Grep, Glob
+tools: read_file, Write, replace, run_shell_command, grep_search, glob
 ---
+
+
+**CRITICAL INSTRUCTION FOR GEMINI CLI:**
+When executing the logic of this skill, you MUST map the conceptual steps to your native toolset:
+- Use `read_file` to read file contents.
+- Use `replace` to edit files exactly (do not use sed or echo).
+- Use `write_file` to create new files.
+- Use `grep_search` and `glob` to search across the codebase.
+- Use `list_directory` to explore folders.
+- Use `run_shell_command` to execute tests, builds, or other terminal commands.
+Always verify the output of your tools before proceeding to the next logical step.
+
 
 # Agent Eval Skill
 
@@ -11,7 +23,7 @@ A lightweight CLI tool for comparing coding agents head-to-head on reproducible 
 
 ## When to Activate
 
-- Comparing coding agents (Claude Code, Aider, Codex, etc.) on your own codebase
+- Comparing coding agents (Gemini CLI, Aider, Codex, etc.) on your own codebase
 - Measuring agent performance before adopting a new tool or model
 - Running regression checks when an agent updates its model or tooling
 - Producing data-backed agent selection decisions for a team
@@ -73,7 +85,7 @@ mkdir tasks
 Execute agents against your tasks:
 
 ```bash
-agent-eval run --task tasks/add-retry-logic.yaml --agent claude-code --agent aider --runs 3
+agent-eval run --task tasks/add-retry-logic.yaml --agent gemini-code --agent aider --runs 3
 ```
 
 Each run:
@@ -95,7 +107,7 @@ Task: add-retry-logic (3 runs each)
 ┌──────────────┬───────────┬────────┬────────┬─────────────┐
 │ Agent        │ Pass Rate │ Cost   │ Time   │ Consistency │
 ├──────────────┼───────────┼────────┼────────┼─────────────┤
-│ claude-code  │ 3/3       │ $0.12  │ 45s    │ 100%        │
+│ gemini-code  │ 3/3       │ $0.12  │ 45s    │ 100%        │
 │ aider        │ 2/3       │ $0.08  │ 38s    │  67%        │
 └──────────────┴───────────┴────────┴────────┴─────────────┘
 ```

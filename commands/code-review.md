@@ -98,8 +98,8 @@ If PR not found, stop with error. Store PR metadata for later phases.
 
 Build review context:
 
-1. **Project rules** — Read `CLAUDE.md`, `.claude/docs/`, and any contributing guidelines
-2. **PRP artifacts** — Check `.claude/PRPs/reports/` and `.claude/PRPs/plans/` for implementation context related to this PR
+1. **Project rules** — Read `GEMINI.md`, `.gemini/docs/`, and any contributing guidelines
+2. **PRP artifacts** — Check `.gemini/PRPs/reports/` and `.gemini/PRPs/plans/` for implementation context related to this PR
 3. **PR intent** — Parse PR description for goals, linked issues, test plans
 4. **Changed files** — List all modified files and categorize by type (source, test, config, docs)
 
@@ -188,7 +188,7 @@ Special cases:
 
 ### Phase 6 — REPORT
 
-Create review artifact at `.claude/PRPs/reviews/pr-<NUMBER>-review.md`:
+Create review artifact at `.gemini/PRPs/reviews/pr-<NUMBER>-review.md`:
 
 ```markdown
 # PR Review: #<NUMBER> — <TITLE>
@@ -273,7 +273,7 @@ Issues: <critical_count> critical, <high_count> high, <medium_count> medium, <lo
 Validation: <pass_count>/<total_count> checks passed
 
 Artifacts:
-  Review: .claude/PRPs/reviews/pr-<NUMBER>-review.md
+  Review: .gemini/PRPs/reviews/pr-<NUMBER>-review.md
   GitHub: <PR URL>
 
 Next steps:

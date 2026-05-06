@@ -2,7 +2,20 @@
 name: repo-scan
 description: Cross-stack source code asset audit — classifies every file, detects embedded third-party libraries, and delivers actionable four-level verdicts per module with interactive HTML reports.
 origin: community
+tools: ["run_shell_command", "replace", "read_file", "grep_search", "glob", "list_directory", "write_file"]
 ---
+
+
+**CRITICAL INSTRUCTION FOR GEMINI CLI:**
+When executing the logic of this skill, you MUST map the conceptual steps to your native toolset:
+- Use `read_file` to read file contents.
+- Use `replace` to edit files exactly (do not use sed or echo).
+- Use `write_file` to create new files.
+- Use `grep_search` and `glob` to search across the codebase.
+- Use `list_directory` to explore folders.
+- Use `run_shell_command` to execute tests, builds, or other terminal commands.
+Always verify the output of your tools before proceeding to the next logical step.
+
 
 # repo-scan
 
@@ -19,13 +32,13 @@ origin: community
 
 ```bash
 # Fetch only the pinned commit for reproducibility
-mkdir -p ~/.claude/skills/repo-scan
+mkdir -p ~/.gemini/skills/repo-scan
 git init repo-scan
 cd repo-scan
 git remote add origin https://github.com/haibindev/repo-scan.git
 git fetch --depth 1 origin 2742664
 git checkout --detach FETCH_HEAD
-cp -r . ~/.claude/skills/repo-scan
+cp -r . ~/.gemini/skills/repo-scan
 ```
 
 > Review the source before installing any agent skill.

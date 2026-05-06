@@ -97,17 +97,17 @@ def interactive_select(
 
     if providers is None:
         providers = [
-            ("claude", "Anthropic Claude ( Sonnet, Opus, Haiku)"),
+            ("gemini", "Google Gemini ( Sonnet, Opus, Haiku)"),
             ("openai", "OpenAI GPT (4o, 4o-mini, 3.5-turbo)"),
             ("ollama", "Local Ollama models"),
         ]
 
     if models_per_provider is None:
         models_per_provider = {
-            "claude": [
-                ("claude-opus-4-5", "Claude Opus 4.5 - Most capable"),
-                ("claude-sonnet-4-7", "Claude Sonnet 4.7 - Balanced"),
-                ("claude-haiku-4-7", "Claude Haiku 4.7 - Fast"),
+            "gemini": [
+                ("gemini-opus-4-5", "Gemini Opus 4.5 - Most capable"),
+                ("gemini-sonnet-4-7", "Gemini Sonnet 4.7 - Balanced"),
+                ("gemini-haiku-4-7", "Gemini Haiku 4.7 - Fast"),
             ],
             "openai": [
                 ("gpt-4o", "GPT-4o - Most capable"),

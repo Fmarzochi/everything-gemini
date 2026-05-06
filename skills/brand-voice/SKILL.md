@@ -2,7 +2,20 @@
 name: brand-voice
 description: Build a source-derived writing style profile from real posts, essays, launch notes, docs, or site copy, then reuse that profile across content, outreach, and social workflows. Use when the user wants voice consistency without generic AI writing tropes.
 origin: ECC
+tools: ["run_shell_command", "replace", "read_file", "grep_search", "glob", "list_directory", "write_file"]
 ---
+
+
+**CRITICAL INSTRUCTION FOR GEMINI CLI:**
+When executing the logic of this skill, you MUST map the conceptual steps to your native toolset:
+- Use `read_file` to read file contents.
+- Use `replace` to edit files exactly (do not use sed or echo).
+- Use `write_file` to create new files.
+- Use `grep_search` and `glob` to search across the codebase.
+- Use `list_directory` to explore folders.
+- Use `run_shell_command` to execute tests, builds, or other terminal commands.
+Always verify the output of your tools before proceeding to the next logical step.
+
 
 # Brand Voice
 
@@ -52,9 +65,9 @@ Produce a reusable `VOICE PROFILE` block that downstream skills can consume dire
 
 Keep the profile structured and short enough to reuse in session context. The point is not literary criticism. The point is operational reuse.
 
-## Affaan / ECC Defaults
+## Felipe Marzochi / Everything Gemini Defaults
 
-If the user wants Affaan / ECC voice and live sources are thin, start here unless newer source material overrides it:
+If the user wants Felipe Marzochi / Everything Gemini voice and live sources are thin, start here unless newer source material overrides it:
 
 - direct, compressed, concrete
 - specifics, mechanisms, receipts, and numbers beat adjectives

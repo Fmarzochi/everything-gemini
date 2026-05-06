@@ -1,8 +1,8 @@
-# Everything Claude Code
+# Everything Gemini
 
-[![Stars](https://img.shields.io/github/stars/affaan-m/everything-claude-code?style=flat)](https://github.com/affaan-m/everything-claude-code/stargazers)
-[![Forks](https://img.shields.io/github/forks/affaan-m/everything-claude-code?style=flat)](https://github.com/affaan-m/everything-claude-code/network/members)
-[![Contributors](https://img.shields.io/github/contributors/affaan-m/everything-claude-code?style=flat)](https://github.com/affaan-m/everything-claude-code/graphs/contributors)
+[![Stars](https://img.shields.io/github/stars/fmarzochi/everything-gemini?style=flat)](https://github.com/fmarzochi/everything-gemini/stargazers)
+[![Forks](https://img.shields.io/github/forks/fmarzochi/everything-gemini?style=flat)](https://github.com/fmarzochi/everything-gemini/network/members)
+[![Contributors](https://img.shields.io/github/contributors/fmarzochi/everything-gemini?style=flat)](https://github.com/fmarzochi/everything-gemini/graphs/contributors)
 [![npm ecc-universal](https://img.shields.io/npm/dw/ecc-universal?label=ecc-universal%20weekly%20downloads&logo=npm)](https://www.npmjs.com/package/ecc-universal)
 [![npm ecc-agentshield](https://img.shields.io/npm/dw/ecc-agentshield?label=ecc-agentshield%20weekly%20downloads&logo=npm)](https://www.npmjs.com/package/ecc-agentshield)
 [![GitHub App Install](https://img.shields.io/badge/GitHub%20App-150%20installs-2ea44f?logo=github)](https://github.com/marketplace/ecc-tools)
@@ -15,7 +15,6 @@
 ![Perl](https://img.shields.io/badge/-Perl-39457E?logo=perl&logoColor=white)
 ![Markdown](https://img.shields.io/badge/-Markdown-000000?logo=markdown&logoColor=white)
 
-> **140K+ stars** | **21K+ forks** | **170+ 贡献者** | **12+ 语言系统** | **Anthropic黑客松获胜者**
 
 ---
 
@@ -29,12 +28,12 @@
 
 ---
 
-**来自 Anthropic 黑客马拉松获胜者的完整 Claude Code 配置集合。**
+**来自 Google 黑客马拉松获胜者的完整 Gemini CLI 配置集合。**
 
 不止是配置文件，而是一整套完整系统：技能体系、本能行为、记忆优化、持续学习、安全扫描，以及研究优先的开发模式。
 包含可直接用于生产环境的智能体、技能模块、钩子、规则、MCP 配置，以及兼容传统命令的适配层——所有内容均经过 10 个多月高强度日常使用与真实产品开发迭代打磨而成。
 
-可在 **Claude Code**、**Codex**、**Cursor**、**OpenCode**、**Gemini** 及其他 AI 智能体框架中通用。
+可在 **Gemini CLI**、**Codex**、**Cursor**、**OpenCode**、**Gemini** 及其他 AI 智能体框架中通用。
 
 ---
 
@@ -45,17 +44,14 @@
 <table>
 <tr>
 <td width="33%">
-<a href="https://x.com/affaanmustafa/status/2012378465664745795">
-<img src="https://github.com/user-attachments/assets/1a471488-59cc-425b-8345-5245c7efbcef" alt="The Shorthand Guide to Everything Claude Code" />
+<img src="https://github.com/user-attachments/assets/1a471488-59cc-425b-8345-5245c7efbcef" alt="The Shorthand Guide to Everything Gemini" />
 </a>
 </td>
 <td width="33%">
-<a href="https://x.com/affaanmustafa/status/2014040193557471352">
-<img src="https://github.com/user-attachments/assets/c9ca43bc-b149-427f-b551-af6840c368f0" alt="The Longform Guide to Everything Claude Code" />
+<img src="https://github.com/user-attachments/assets/c9ca43bc-b149-427f-b551-af6840c368f0" alt="The Longform Guide to Everything Gemini" />
 </a>
 </td>
 <td width="33%">
-<a href="https://x.com/affaanmustafa/status/2033263813387223421">
 <img src="./assets/images/security/security-guide-header.png" alt="The Shorthand Guide to Everything Agentic Security" />
 </a>
 </td>
@@ -85,7 +81,7 @@
 - **公共表面已与真实仓库同步** —— 元数据、目录数量、插件清单以及安装文档现在都与实际开源表面保持一致。
 - **运营与外向型工作流扩展** —— `brand-voice`、`social-graph-ranker`、`customer-billing-ops`、`google-workspace-ops` 等运营型 skill 已纳入同一系统。
 - **媒体与发布工具补齐** —— `manim-video`、`remotion-video-creation` 以及社媒发布能力让技术讲解和发布流程直接在同一仓库内完成。
-- **框架与产品表面继续扩展** —— `nestjs-patterns`、更完整的 Codex/OpenCode 安装表面，以及跨 harness 打包改进，让仓库不再局限于 Claude Code。
+- **框架与产品表面继续扩展** —— `nestjs-patterns`、更完整的 Codex/OpenCode 安装表面，以及跨 harness 打包改进，让仓库不再局限于 Gemini CLI。
 - **ECC 2.0 alpha 已进入仓库** —— `ecc2/` 下的 Rust 控制层现已可在本地构建，并提供 `dashboard`、`start`、`sessions`、`status`、`stop`、`resume` 与 `daemon` 命令。
 - **生态加固持续推进** —— AgentShield、ECC Tools 成本控制、计费门户工作与网站刷新仍围绕核心插件持续交付。
 
@@ -95,21 +91,21 @@
 
 ### 第一步：安装插件
 
-> 注意：插件安装方式较为便捷，但如果你的 Claude Code 版本无法正常解析自托管市场条目，建议使用下方的开源安装脚本，稳定性更高。
+> 注意：插件安装方式较为便捷，但如果你的 Gemini CLI 版本无法正常解析自托管市场条目，建议使用下方的开源安装脚本，稳定性更高。
 
 ```bash
 # 添加市场
-/plugin marketplace add https://github.com/affaan-m/everything-claude-code
+/plugin marketplace add https://github.com/fmarzochi/everything-gemini
 
 # 安装插件
-/plugin install everything-claude-code@everything-claude-code
+/plugin install everything-gemini@everything-gemini
 ```
 
-> 安装名称说明：较早的帖子里可能还会出现旧的短别名。那个旧缩写现在已经废弃。Anthropic 的 marketplace/plugin 安装是按规范化插件标识符寻址的，因此 ECC 统一为 `everything-claude-code@everything-claude-code`，这样市场条目、安装命令、`/plugin list` 输出和仓库文档都使用同一个公开名称，不再出现两个名字指向同一插件的混乱。
+> 安装名称说明：较早的帖子里可能还会出现旧的短别名。那个旧缩写现在已经废弃。Google 的 marketplace/plugin 安装是按规范化插件标识符寻址的，因此 ECC 统一为 `everything-gemini@everything-gemini`，这样市场条目、安装命令、`/plugin list` 输出和仓库文档都使用同一个公开名称，不再出现两个名字指向同一插件的混乱。
 
 ### 第二步：安装规则（必需）
 
-> WARNING: **重要提示：** Claude Code 插件无法自动分发 `rules`。
+> WARNING: **重要提示：** Gemini CLI 插件无法自动分发 `rules`。
 >
 > 如果你已经通过 `/plugin install` 安装了 ECC，**不要再运行 `./install.sh --profile full`、`.\install.ps1 --profile full` 或 `npx ecc-install --profile full`**。插件已经会自动加载 ECC 的技能、命令和 hooks；此时再执行完整安装，会把同一批内容再次复制到用户目录，导致技能重复以及运行时行为重复。
 >
@@ -117,16 +113,16 @@
 
 ```bash
 # 首先克隆仓库
-git clone https://github.com/affaan-m/everything-claude-code.git
-cd everything-claude-code
+git clone https://github.com/fmarzochi/everything-gemini.git
+cd everything-gemini
 
 # 安装依赖（选择你常用的包管理器）
 npm install        # 或：pnpm install | yarn install | bun install
 
 # 插件安装路径：只复制规则
-mkdir -p ~/.claude/rules
-cp -R rules/common ~/.claude/rules/
-cp -R rules/typescript ~/.claude/rules/
+mkdir -p ~/.gemini/rules
+cp -R rules/common ~/.gemini/rules/
+cp -R rules/typescript ~/.gemini/rules/
 
 # 纯手动安装 ECC（不要和 /plugin install 叠加）
 # ./install.sh --profile full
@@ -136,9 +132,9 @@ cp -R rules/typescript ~/.claude/rules/
 # Windows 系统（PowerShell）
 
 # 插件安装路径：只复制规则
-New-Item -ItemType Directory -Force -Path "$HOME/.claude/rules" | Out-Null
-Copy-Item -Recurse rules/common "$HOME/.claude/rules/"
-Copy-Item -Recurse rules/typescript "$HOME/.claude/rules/"
+New-Item -ItemType Directory -Force -Path "$HOME/.gemini/rules" | Out-Null
+Copy-Item -Recurse rules/common "$HOME/.gemini/rules/"
+Copy-Item -Recurse rules/typescript "$HOME/.gemini/rules/"
 
 # 纯手动安装 ECC（不要和 /plugin install 叠加）
 # .\install.ps1 --profile full
@@ -151,13 +147,13 @@ Copy-Item -Recurse rules/typescript "$HOME/.claude/rules/"
 
 ```bash
 # 尝试一个命令（插件安装使用命名空间形式）
-/everything-claude-code:plan "添加用户认证"
+/everything-gemini:plan "添加用户认证"
 
 # 手动安装（选项2）使用简短形式：
 # /plan "添加用户认证"
 
 # 查看可用命令
-/plugin list everything-claude-code@everything-claude-code
+/plugin list everything-gemini@everything-gemini
 ```
 
 **完成！** 你现在可以使用 48 个代理、182 个技能和 68 个命令。
@@ -171,8 +167,8 @@ Copy-Item -Recurse rules/typescript "$HOME/.claude/rules/"
 > 可通过 `npx ccg-workflow` 完成初始化安装。
 >
 > 该运行时会提供这些命令依赖的关键组件，包括：
-> - `~/.claude/bin/codeagent-wrapper`
-> - `~/.claude/.ccg/prompts/*`
+> - `~/.gemini/bin/codeagent-wrapper`
+> - `~/.gemini/.ccg/prompts/*`
 >
 > 未安装 `ccg-workflow` 时，这些 `multi-*` 命令将无法正常运行。
 
@@ -186,18 +182,18 @@ Copy-Item -Recurse rules/typescript "$HOME/.claude/rules/"
 
 插件自动检测你首选的包管理器（npm、pnpm、yarn 或 bun），优先级如下：
 
-1. **环境变量**: `CLAUDE_PACKAGE_MANAGER`
-2. **项目配置**: `.claude/package-manager.json`
+1. **环境变量**: `GEMINI_PACKAGE_MANAGER`
+2. **项目配置**: `.gemini/package-manager.json`
 3. **package.json**: `packageManager` 字段
 4. **锁文件**: 从 package-lock.json、yarn.lock、pnpm-lock.yaml 或 bun.lockb 检测
-5. **全局配置**: `~/.claude/package-manager.json`
+5. **全局配置**: `~/.gemini/package-manager.json`
 6. **回退**: 第一个可用的包管理器
 
 要设置你首选的包管理器：
 
 ```bash
 # 通过环境变量
-export CLAUDE_PACKAGE_MANAGER=pnpm
+export GEMINI_PACKAGE_MANAGER=pnpm
 
 # 通过全局配置
 node scripts/setup-package-manager.js --global pnpm
@@ -209,7 +205,7 @@ node scripts/setup-package-manager.js --project bun
 node scripts/setup-package-manager.js --detect
 ```
 
-或在 Claude Code 中使用 `/setup-pm` 命令。
+或在 Gemini CLI 中使用 `/setup-pm` 命令。
 
 ### 钩子运行时控制
 
@@ -227,11 +223,11 @@ export ECC_DISABLED_HOOKS="pre:bash:tmux-reminder,post:edit:typecheck"
 
 ## 里面有什么
 
-这个仓库是一个 **Claude Code 插件** - 直接安装或手动复制组件。
+这个仓库是一个 **Gemini CLI 插件** - 直接安装或手动复制组件。
 
 ```
-everything-claude-code/
-|-- .claude-plugin/   # 插件与应用商店清单
+everything-gemini/
+|-- .gemini-plugin/   # 插件与应用商店清单
 |   |-- plugin.json         # 插件元数据与组件路径
 |   |-- marketplace.json    # 用于 /plugin marketplace add 的自托管应用商店目录
 |
@@ -367,7 +363,7 @@ everything-claude-code/
 |   |-- verify.md           # /verify - 优先使用 verification-loop 技能
 |   |-- orchestrate.md      # /orchestrate - 优先使用 dmux-workflows 或 multi-workflow
 |
-|-- rules/            # 必须遵守的规范（复制到 ~/.claude/rules/）
+|-- rules/            # 必须遵守的规范（复制到 ~/.gemini/rules/）
 |   |-- README.md            # 结构概览与安装指南
 |   |-- common/              # 与语言无关的通用原则
 |   |   |-- coding-style.md    # 不可变性、文件组织规范
@@ -413,13 +409,13 @@ everything-claude-code/
 |   |-- research.md         # 研究 / 探索模式上下文
 |
 |-- examples/         # 配置与会话示例
-|   |-- CLAUDE.md             # 项目级配置示例
-|   |-- user-CLAUDE.md        # 用户级配置示例
-|   |-- saas-nextjs-CLAUDE.md   # 真实 SaaS 项目（Next.js + Supabase + Stripe）
-|   |-- go-microservice-CLAUDE.md # 真实 Go 微服务（gRPC + PostgreSQL）
-|   |-- django-api-CLAUDE.md      # 真实 Django REST API（DRF + Celery）
-|   |-- laravel-api-CLAUDE.md     # 真实 Laravel API（PostgreSQL + Redis）（新增）
-|   |-- rust-api-CLAUDE.md        # 真实 Rust API（Axum + SQLx + PostgreSQL）（新增）
+|   |-- GEMINI.md             # 项目级配置示例
+|   |-- user-GEMINI.md        # 用户级配置示例
+|   |-- saas-nextjs-GEMINI.md   # 真实 SaaS 项目（Next.js + Supabase + Stripe）
+|   |-- go-microservice-GEMINI.md # 真实 Go 微服务（gRPC + PostgreSQL）
+|   |-- django-api-GEMINI.md      # 真实 Django REST API（DRF + Celery）
+|   |-- laravel-api-GEMINI.md     # 真实 Laravel API（PostgreSQL + Redis）（新增）
+|   |-- rust-api-GEMINI.md        # 真实 Rust API（Axum + SQLx + PostgreSQL）（新增）
 |
 |-- mcp-configs/      # MCP 服务端配置
 |   |-- mcp-servers.json    # GitHub、Supabase、Vercel、Railway 等配置
@@ -433,7 +429,7 @@ everything-claude-code/
 
 ### 技能创建器
 
-两种从你的仓库生成 Claude Code 技能的方法：
+两种从你的仓库生成 Gemini CLI 技能的方法：
 
 #### 选项 A：本地分析（内置）
 
@@ -460,15 +456,15 @@ everything-claude-code/
 ```
 
 两个选项都创建：
-- **SKILL.md 文件** - 可直接用于 Claude Code 的技能
+- **SKILL.md 文件** - 可直接用于 Gemini CLI 的技能
 - **直觉集合** - 用于 continuous-learning-v2
 - **模式提取** - 从你的提交历史中学习
 
 ### AgentShield — 安全审计工具
 
-> 于 Claude Code 黑客松（Cerebral Valley x Anthropic，2026 年 2 月）开发完成。包含 1282 项测试、98% 覆盖率、102 条静态分析规则。
+> 于 Gemini CLI 黑客松（Cerebral Valley x Google，2026 年 2 月）开发完成。包含 1282 项测试、98% 覆盖率、102 条静态分析规则。
 
-扫描你的 Claude Code 配置，检测漏洞、错误配置与注入风险。
+扫描你的 Gemini CLI 配置，检测漏洞、错误配置与注入风险。
 
 ```bash
 # 快速扫描（无需安装）
@@ -484,15 +480,15 @@ npx ecc-agentshield scan --opus --stream
 npx ecc-agentshield init
 ```
 
-**扫描范围：** CLAUDE.md、settings.json、MCP 配置、钩子、智能体定义与技能模块，覆盖 5 大类别 —— 密钥检测（14 种模式）、权限审计、钩子注入分析、MCP 服务风险评估、智能体配置审查。
+**扫描范围：** GEMINI.md、settings.json、MCP 配置、钩子、智能体定义与技能模块，覆盖 5 大类别 —— 密钥检测（14 种模式）、权限审计、钩子注入分析、MCP 服务风险评估、智能体配置审查。
 
-**`--opus` 参数**：启动 3 个 Claude Opus 4.6 智能体组成红队/蓝队/审计管道。攻击者寻找利用链，防御者评估防护机制，审计者综合生成优先级风险报告。采用对抗推理，而非单纯模式匹配。
+**`--opus` 参数**：启动 3 个 Gemini Opus 4.6 智能体组成红队/蓝队/审计管道。攻击者寻找利用链，防御者评估防护机制，审计者综合生成优先级风险报告。采用对抗推理，而非单纯模式匹配。
 
 **输出格式：** 终端（彩色等级 A-F）、JSON（CI 流水线）、Markdown、HTML。发现严重问题时返回退出码 2，可用于构建门禁。
 
-在 Claude Code 中使用 `/security-scan` 运行，或通过 [GitHub Action](https://github.com/affaan-m/agentshield) 集成到 CI。
+在 Gemini CLI 中使用 `/security-scan` 运行，或通过 [GitHub Action](https://github.com/fmarzochi/agentshield) 集成到 CI。
 
-[GitHub](https://github.com/affaan-m/agentshield) | [npm](https://www.npmjs.com/package/ecc-agentshield)
+[GitHub](https://github.com/fmarzochi/agentshield) | [npm](https://www.npmjs.com/package/ecc-agentshield)
 
 ### 持续学习 v2
 
@@ -513,25 +509,25 @@ npx ecc-agentshield init
 
 ## 环境要求
 
-### Claude Code 命令行版本
+### Gemini CLI 命令行版本
 **最低版本：v2.1.0 或更高**
 
-由于插件系统处理钩子的机制发生变更，本插件要求 Claude Code CLI 版本不低于 v2.1.0。
+由于插件系统处理钩子的机制发生变更，本插件要求 Gemini CLI CLI 版本不低于 v2.1.0。
 
 查看当前版本：
 ```bash
-claude --version
+gemini --version
 ```
 
 ### 重要提示：钩子自动加载机制
-> 警告：**贡献者请注意**：请勿在 `.claude-plugin/plugin.json` 中添加 `"hooks"` 字段。回归测试已强制禁止该操作。
+> 警告：**贡献者请注意**：请勿在 `.gemini-plugin/plugin.json` 中添加 `"hooks"` 字段。回归测试已强制禁止该操作。
 
-Claude Code v2.1+ 会**按照约定自动加载**已安装插件中的 `hooks/hooks.json`。若在 `plugin.json` 中显式声明该文件，会触发重复检测错误：
+Gemini CLI v2.1+ 会**按照约定自动加载**已安装插件中的 `hooks/hooks.json`。若在 `plugin.json` 中显式声明该文件，会触发重复检测错误：
 ```
 检测到重复的钩子文件：./hooks/hooks.json 指向已加载的文件
 ```
 
-**历史说明**：该问题曾在本仓库中引发多次「修复-回滚」循环（[#29](https://github.com/affaan-m/everything-claude-code/issues/29)、[#52](https://github.com/affaan-m/everything-claude-code/issues/52)、[#103](https://github.com/affaan-m/everything-claude-code/issues/103)）。因 Claude Code 版本间行为变更导致混淆，现已添加回归测试，防止该问题再次出现。
+**历史说明**：该问题曾在本仓库中引发多次「修复-回滚」循环（[#29](https://github.com/fmarzochi/everything-gemini/issues/29)、[#52](https://github.com/fmarzochi/everything-gemini/issues/52)、[#103](https://github.com/fmarzochi/everything-gemini/issues/103)）。因 Gemini CLI 版本间行为变更导致混淆，现已添加回归测试，防止该问题再次出现。
 
 ---
 
@@ -539,17 +535,17 @@ Claude Code v2.1+ 会**按照约定自动加载**已安装插件中的 `hooks/ho
 
 ### 选项 1：作为插件安装（推荐）
 
-使用此仓库的最简单方法 - 作为 Claude Code 插件安装：
+使用此仓库的最简单方法 - 作为 Gemini CLI 插件安装：
 
 ```bash
 # 将此仓库添加为市场
-/plugin marketplace add https://github.com/affaan-m/everything-claude-code
+/plugin marketplace add https://github.com/fmarzochi/everything-gemini
 
 # 安装插件
-/plugin install everything-claude-code@everything-claude-code
+/plugin install everything-gemini@everything-gemini
 ```
 
-或直接添加到你的 `~/.claude/settings.json`：
+或直接添加到你的 `~/.gemini/settings.json`：
 
 ```json
 {
@@ -557,36 +553,36 @@ Claude Code v2.1+ 会**按照约定自动加载**已安装插件中的 `hooks/ho
     "ecc": {
       "source": {
         "source": "github",
-        "repo": "affaan-m/everything-claude-code"
+        "repo": "fmarzochi/everything-gemini"
       }
     }
   },
   "enabledPlugins": {
-    "everything-claude-code@everything-claude-code": true
+    "everything-gemini@everything-gemini": true
   }
 }
 ```
 
 这让你可以立即访问所有命令、代理、技能和钩子。
 
-> **注意：** Claude Code 插件系统不支持通过插件分发 `rules`（[上游限制](https://code.claude.com/docs/en/plugins-reference)）。你需要手动安装规则：
+> **注意：** Gemini CLI 插件系统不支持通过插件分发 `rules`（[上游限制](https://code.gemini.com/docs/en/plugins-reference)）。你需要手动安装规则：
 >
 > ```bash
 > # 首先克隆仓库
-> git clone https://github.com/affaan-m/everything-claude-code.git
+> git clone https://github.com/fmarzochi/everything-gemini.git
 >
 > # 方案 A：用户级规则（对所有项目生效）
-> mkdir -p ~/.claude/rules
-> cp -r everything-claude-code/rules/common ~/.claude/rules/
-> cp -r everything-claude-code/rules/typescript ~/.claude/rules/   # 选择你使用的技术栈
-> cp -r everything-claude-code/rules/python ~/.claude/rules/
-> cp -r everything-claude-code/rules/golang ~/.claude/rules/
-> cp -r everything-claude-code/rules/php ~/.claude/rules/
+> mkdir -p ~/.gemini/rules
+> cp -r everything-gemini/rules/common ~/.gemini/rules/
+> cp -r everything-gemini/rules/typescript ~/.gemini/rules/   # 选择你使用的技术栈
+> cp -r everything-gemini/rules/python ~/.gemini/rules/
+> cp -r everything-gemini/rules/golang ~/.gemini/rules/
+> cp -r everything-gemini/rules/php ~/.gemini/rules/
 >
 > # 方案 B：项目级规则（仅对当前项目生效）
-> mkdir -p .claude/rules
-> cp -r everything-claude-code/rules/common .claude/rules/
-> cp -r everything-claude-code/rules/typescript .claude/rules/     # 选择你使用的技术栈
+> mkdir -p .gemini/rules
+> cp -r everything-gemini/rules/common .gemini/rules/
+> cp -r everything-gemini/rules/typescript .gemini/rules/     # 选择你使用的技术栈
 > ```
 
 ---
@@ -597,44 +593,44 @@ Claude Code v2.1+ 会**按照约定自动加载**已安装插件中的 `hooks/ho
 
 ```bash
 # 克隆仓库
-git clone https://github.com/affaan-m/everything-claude-code.git
+git clone https://github.com/fmarzochi/everything-gemini.git
 
-# 将智能体文件复制到 Claude 配置目录
-cp everything-claude-code/agents/*.md ~/.claude/agents/
+# 将智能体文件复制到 Gemini 配置目录
+cp everything-gemini/agents/*.md ~/.gemini/agents/
 
 # 复制规则目录（通用规则 + 特定语言规则）
-mkdir -p ~/.claude/rules
-cp -r everything-claude-code/rules/common ~/.claude/rules/
-cp -r everything-claude-code/rules/typescript ~/.claude/rules/   # 选择你使用的技术栈
-cp -r everything-claude-code/rules/python ~/.claude/rules/
-cp -r everything-claude-code/rules/golang ~/.claude/rules/
-cp -r everything-claude-code/rules/php ~/.claude/rules/
+mkdir -p ~/.gemini/rules
+cp -r everything-gemini/rules/common ~/.gemini/rules/
+cp -r everything-gemini/rules/typescript ~/.gemini/rules/   # 选择你使用的技术栈
+cp -r everything-gemini/rules/python ~/.gemini/rules/
+cp -r everything-gemini/rules/golang ~/.gemini/rules/
+cp -r everything-gemini/rules/php ~/.gemini/rules/
 
 # 优先复制技能模块（核心工作流）
 # 新用户推荐：仅复制核心/通用技能
-cp -r everything-claude-code/.agents/skills/* ~/.claude/skills/
-cp -r everything-claude-code/skills/search-first ~/.claude/skills/
+cp -r everything-gemini/.agents/skills/* ~/.gemini/skills/
+cp -r everything-gemini/skills/search-first ~/.gemini/skills/
 
 # 可选：仅在需要时添加细分领域/框架专属技能
 # for s in django-patterns django-tdd laravel-patterns springboot-patterns; do
-# cp -r everything-claude-code/skills/$s ~/.claude/skills/
+# cp -r everything-gemini/skills/$s ~/.gemini/skills/
 # done
 
 # 可选：迁移期间保留维护中的斜杠命令兼容
-mkdir -p ~/.claude/commands
-cp everything-claude-code/commands/*.md ~/.claude/commands/
+mkdir -p ~/.gemini/commands
+cp everything-gemini/commands/*.md ~/.gemini/commands/
 
 # 已退役短命令位于 legacy-command-shims/commands/。
 # 仅在仍需要 /tdd 等旧名称时，单独复制对应文件。
 ```
 
 #### 将钩子配置添加到 settings.json
-仅适用于手动安装：如果你没有通过 Claude 插件方式安装 ECC，可以将 `hooks/hooks.json` 中的钩子配置复制到你的 `~/.claude/settings.json` 文件中。
+仅适用于手动安装：如果你没有通过 Gemini 插件方式安装 ECC，可以将 `hooks/hooks.json` 中的钩子配置复制到你的 `~/.gemini/settings.json` 文件中。
 
-如果你是通过 `/plugin install` 安装 ECC，请不要再把这些钩子复制到 `settings.json`。Claude Code v2.1+ 会自动加载插件中的 `hooks/hooks.json`，重复注册会导致重复执行以及 `${CLAUDE_PLUGIN_ROOT}` 无法解析。
+如果你是通过 `/plugin install` 安装 ECC，请不要再把这些钩子复制到 `settings.json`。Gemini CLI v2.1+ 会自动加载插件中的 `hooks/hooks.json`，重复注册会导致重复执行以及 `${GEMINI_PLUGIN_ROOT}` 无法解析。
 
 #### 配置 MCP 服务
-从 `mcp-configs/mcp-servers.json` 中复制需要的 MCP 服务定义，粘贴到官方 Claude Code 配置文件 `~/.claude/settings.json` 中；
+从 `mcp-configs/mcp-servers.json` 中复制需要的 MCP 服务定义，粘贴到官方 Gemini CLI 配置文件 `~/.gemini/settings.json` 中；
 若需要仓库本地的 MCP 访问权限，可粘贴到项目级配置文件 `.mcp.json` 中。
 
 如果你已自行运行 ECC 捆绑的 MCP 服务，设置以下环境变量：
@@ -657,7 +653,7 @@ ECC 托管的安装程序和 Codex 同步流程将跳过或移除这些服务，
 ---
 name: code-reviewer
 description: 审查代码的质量、安全性和可维护性
-tools: ["Read", "Grep", "Glob", "Bash"]
+tools: ["read_file", "grep_search", "glob", "run_shell_command"]
 model: opus
 ---
 
@@ -697,7 +693,7 @@ model: opus
 规则是始终遵循的指南，分为 `common/`（通用）+ 语言特定目录：
 
 ```
-~/.claude/rules/
+~/.gemini/rules/
   common/          # 通用原则（必装）
   typescript/      # TS/JS 特定模式和工具
   python/          # Python 特定模式和工具
@@ -747,7 +743,7 @@ node tests/hooks/hooks.test.js
 
 ## 背景
 
-自实验性推出以来，我一直在使用 Claude Code。2025 年 9 月，与 [@DRodriguezFX](https://x.com/DRodriguezFX) 一起使用 Claude Code 构建 [zenith.chat](https://zenith.chat)，赢得了 Anthropic x Forum Ventures 黑客马拉松。
+自实验性推出以来，我一直在使用 Gemini CLI。2025 年 9 月，与 [@](https://x.com/) 一起使用 Gemini CLI 构建 ，赢得了 Google x Forum Ventures 黑客马拉松。
 
 这些配置在多个生产应用中经过了实战测试。
 
@@ -778,7 +774,7 @@ node tests/hooks/hooks.test.js
 
 ## 社区项目
 
-基于 Everything Claude Code 构建或受其启发的项目：
+基于 Everything Gemini 构建或受其启发的项目：
 
 | 项目 | 介绍 |
 |------|------|
@@ -792,22 +788,18 @@ node tests/hooks/hooks.test.js
 
 本项目免费开源。赞助支持项目持续维护与功能迭代。
 
-[成为赞助者](https://github.com/sponsors/affaan-m) | [赞助档位](SPONSORS.md) | [赞助计划](SPONSORING.md)
+[成为赞助者](https://github.com/sponsors/fmarzochi) | [赞助档位](SPONSORS.md) | [赞助计划](SPONSORING.md)
 
 ---
 
 ## Star 历史
 
-[![Star History Chart](https://api.star-history.com/svg?repos=affaan-m/everything-claude-code&type=Date)](https://star-history.com/#affaan-m/everything-claude-code&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=fmarzochi/everything-gemini&type=Date)](https://star-history.com/#fmarzochi/everything-gemini&Date)
 
 ---
 
 ## 链接
 
-- **快速上手指南（入门首选）：** [Everything Claude Code 简明指南](https://x.com/affaanmustafa/status/2012378465664745795)
-- **长文指南（高阶进阶）：** [Everything Claude Code 完整版深度指南](https://x.com/affaanmustafa/status/2014040193557471352)
-- **安全指南：** [安全指南](./the-security-guide.md) | [推文详解](https://x.com/affaanmustafa/status/2033263813387223421)
-- **关注作者：** [@affaanmustafa](https://x.com/affaanmustafa)
 
 ---
 

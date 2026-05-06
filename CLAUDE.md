@@ -1,10 +1,10 @@
-# CLAUDE.md
+# GEMINI.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Gemini CLI (gemini.ai/code) when working with code in this repository.
 
 ## Project Overview
 
-This is a **Claude Code plugin** - a collection of production-ready agents, skills, hooks, commands, rules, and MCP configurations. The project provides battle-tested workflows for software development using Claude Code.
+This is a **Gemini CLI plugin** - a collection of production-ready agents, skills, hooks, commands, rules, and MCP configurations. The project provides battle-tested workflows for software development using Gemini CLI.
 
 ## Running Tests
 
@@ -43,11 +43,11 @@ The project is organized into several core components:
 
 ## Development Notes
 
-- Package manager detection: npm, pnpm, yarn, bun (configurable via `CLAUDE_PACKAGE_MANAGER` env var or project config)
+- Package manager detection: npm, pnpm, yarn, bun (configurable via `GEMINI_PACKAGE_MANAGER` env var or project config)
 - Cross-platform: Windows, macOS, Linux support via Node.js scripts
 - Agent format: Markdown with YAML frontmatter (name, description, tools, model)
 - Skill format: Markdown with clear sections for when to use, how it works, examples
-- Skill placement: Curated in skills/; generated/imported under ~/.claude/skills/. See docs/SKILL-PLACEMENT-POLICY.md
+- Skill placement: Curated in skills/; generated/imported under ~/.gemini/skills/. See docs/SKILL-PLACEMENT-POLICY.md
 - Hook format: JSON with matcher conditions and command/notification hooks
 
 ## Contributing

@@ -2,7 +2,7 @@
 name: enrichment-agent
 description: Pulls detailed profile, company, and activity data for qualified leads. Enriches prospects with recent news, funding data, content interests, and mutual overlap.
 tools:
-  - Bash
+  - run_shell_command
   - Read
   - WebSearch
   - WebFetch

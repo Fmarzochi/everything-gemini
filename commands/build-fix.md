@@ -31,9 +31,9 @@ Identify the project's build tool and run the build:
 
 For each error:
 
-1. **Read the file** — Use Read tool to see error context (10 lines around the error)
+1. **Read the file** — Use read_file tool to see error context (10 lines around the error)
 2. **Diagnose** — Identify root cause (missing import, wrong type, syntax error)
-3. **Fix minimally** — Use Edit tool for the smallest change that resolves the error
+3. **Fix minimally** — Use replace tool for the smallest change that resolves the error
 4. **Re-run build** — Verify the error is gone and no new errors introduced
 5. **Move to next** — Continue with remaining errors
 

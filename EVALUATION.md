@@ -1,13 +1,13 @@
 # Repo Evaluation vs Current Setup
 
 **Date:** 2026-03-21
-**Branch:** `claude/evaluate-repo-comparison-ASZ9Y`
+**Branch:** `gemini/evaluate-repo-comparison-ASZ9Y`
 
 ---
 
-## Current Setup (`~/.claude/`)
+## Current Setup (`~/.gemini/`)
 
-The active Claude Code installation is near-minimal:
+The active Gemini CLI installation is near-minimal:
 
 | Component | Current |
 |-----------|---------|
@@ -28,7 +28,7 @@ The active Claude Code installation is near-minimal:
 
 ---
 
-## This Repo (`everything-claude-code` v1.9.0)
+## This Repo (`everything-gemini` v1.9.0)
 
 | Component | Repo |
 |-----------|------|
@@ -42,7 +42,7 @@ The active Claude Code installation is near-minimal:
 | Scripts/CLI | 46+ Node.js modules + multiple CLIs |
 | Tests | 58 test files |
 | Install profiles | core, developer, security, research, full |
-| Supported harnesses | Claude Code, Codex, Cursor, OpenCode |
+| Supported harnesses | Gemini CLI, Codex, Cursor, OpenCode |
 
 ---
 
@@ -70,7 +70,7 @@ Domain knowledge modules covering:
 - Language patterns (Python, Go, Kotlin, Rust, C++, Java, Swift, Perl, Laravel, Django)
 - Testing strategies (TDD, E2E, coverage)
 - Architecture patterns (backend, frontend, API design, database migrations)
-- AI/ML workflows (Claude API, eval harness, agent loops, cost-aware pipelines)
+- AI/ML workflows (Gemini API, eval harness, agent loops, cost-aware pipelines)
 - Business workflows (investor materials, market research, content engine)
 
 ### Commands (59 missing)

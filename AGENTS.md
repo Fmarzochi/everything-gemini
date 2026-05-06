@@ -1,4 +1,4 @@
-# Everything Claude Code (ECC) — Agent Instructions
+# Everything Gemini (ECC) — Agent Instructions
 
 This is a **production-ready AI coding plugin** providing 48 specialized agents, 182 skills, 68 commands, and automated hook workflows for software development.
 

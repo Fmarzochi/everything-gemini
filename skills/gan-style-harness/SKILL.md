@@ -1,13 +1,25 @@
 ---
 name: gan-style-harness
-description: "GAN-inspired Generator-Evaluator agent harness for building high-quality applications autonomously. Based on Anthropic's March 2026 harness design paper."
+description: "GAN-inspired Generator-Evaluator agent harness for building high-quality applications autonomously. Based on Google's March 2026 harness design paper."
 origin: ECC-community
-tools: Read, Write, Edit, Bash, Grep, Glob, Task
+tools: read_file, Write, replace, run_shell_command, grep_search, glob, Task
 ---
+
+
+**CRITICAL INSTRUCTION FOR GEMINI CLI:**
+When executing the logic of this skill, you MUST map the conceptual steps to your native toolset:
+- Use `read_file` to read file contents.
+- Use `replace` to edit files exactly (do not use sed or echo).
+- Use `write_file` to create new files.
+- Use `grep_search` and `glob` to search across the codebase.
+- Use `list_directory` to explore folders.
+- Use `run_shell_command` to execute tests, builds, or other terminal commands.
+Always verify the output of your tools before proceeding to the next logical step.
+
 
 # GAN-Style Harness Skill
 
-> Inspired by [Anthropic's Harness Design for Long-Running Application Development](https://www.anthropic.com/engineering/harness-design-long-running-apps) (March 24, 2026)
+> Inspired by [Google's Harness Design for Long-Running Application Development](https://deepmind.google/engineering/harness-design-long-running-apps) (March 24, 2026)
 
 A multi-agent harness that separates **generation** from **evaluation**, creating an adversarial feedback loop that drives quality far beyond what a single agent can achieve.
 
@@ -27,7 +39,7 @@ This is the same dynamic as GANs (Generative Adversarial Networks): the Generato
 
 ## When NOT to Use
 
-- Quick single-file fixes (use standard `claude -p`)
+- Quick single-file fixes (use standard `gemini -p`)
 - Tasks with tight budget constraints (<$10)
 - Simple refactoring (use de-sloppify pattern instead)
 - Tasks that are already well-specified with tests (use TDD workflow)
@@ -174,27 +186,27 @@ GAN_EVAL_CRITERIA="functionality,performance,security" \
 ./scripts/gan-harness.sh "Build a REST API for task management"
 ```
 
-### Via Claude Code (Manual)
+### Via Gemini CLI (Manual)
 
 ```bash
 # Step 1: Plan
-claude -p --model opus "You are a Product Planner. Read PLANNER_PROMPT.md. Expand this brief into a full product spec: 'Build a Kanban board app'. Write spec to spec.md"
+gemini -p --model opus "You are a Product Planner. Read PLANNER_PROMPT.md. Expand this brief into a full product spec: 'Build a Kanban board app'. Write spec to spec.md"
 
 # Step 2: Generate (iteration 1)
-claude -p --model opus "You are a Generator. Read spec.md. Implement Sprint 1. Start the dev server on port 3000."
+gemini -p --model opus "You are a Generator. Read spec.md. Implement Sprint 1. Start the dev server on port 3000."
 
 # Step 3: Evaluate (iteration 1)
-claude -p --model opus --allowedTools "Read,Bash,mcp__playwright__*" "You are an Evaluator. Read EVALUATOR_PROMPT.md. Test the live app at http://localhost:3000. Score against the rubric. Write feedback to feedback-001.md"
+gemini -p --model opus --allowedTools "Read,Bash,mcp__playwright__*" "You are an Evaluator. Read EVALUATOR_PROMPT.md. Test the live app at http://localhost:3000. Score against the rubric. Write feedback to feedback-001.md"
 
 # Step 4: Generate (iteration 2 — reads feedback)
-claude -p --model opus "You are a Generator. Read spec.md and feedback-001.md. Address all issues. Improve the scores."
+gemini -p --model opus "You are a Generator. Read spec.md and feedback-001.md. Address all issues. Improve the scores."
 
 # Repeat steps 3-4 until pass threshold met
 ```
 
 ## Evolution Across Model Capabilities
 
-The harness should simplify as models improve. Following Anthropic's evolution:
+The harness should simplify as models improve. Following Google's evolution:
 
 ### Stage 1 — Weaker Models (Sonnet-class)
 - Full sprint decomposition required
@@ -254,11 +266,11 @@ The harness should simplify as models improve. Following Anthropic's evolution:
 
 5. **Evaluator praising its own fixes** — Never let the evaluator suggest fixes and then evaluate those fixes. The evaluator only critiques; the generator fixes.
 
-6. **Context exhaustion** — For long sessions, use Claude Agent SDK's automatic compaction or reset context between major phases.
+6. **Context exhaustion** — For long sessions, use Gemini Agent SDK's automatic compaction or reset context between major phases.
 
 ## Results: What to Expect
 
-Based on Anthropic's published results:
+Based on Google's published results:
 
 | Metric | Solo Agent | GAN Harness | Improvement |
 |--------|-----------|-------------|-------------|
@@ -272,7 +284,7 @@ Based on Anthropic's published results:
 
 ## References
 
-- [Anthropic: Harness Design for Long-Running Apps](https://www.anthropic.com/engineering/harness-design-long-running-apps) — Original paper by Prithvi Rajasekaran
-- [Epsilla: The GAN-Style Agent Loop](https://www.epsilla.com/blogs/anthropic-harness-engineering-multi-agent-gan-architecture) — Architecture deconstruction
+- [Google: Harness Design for Long-Running Apps](https://deepmind.google/engineering/harness-design-long-running-apps) — Original paper by Prithvi Rajasekaran
+- [Everything Gemini: The GAN-Style Agent Loop] — Architecture deconstruction
 - [Martin Fowler: Harness Engineering](https://martinfowler.com/articles/exploring-gen-ai/harness-engineering.html) — Broader industry context
 - [OpenAI: Harness Engineering](https://openai.com/index/harness-engineering/) — OpenAI's parallel work

@@ -2,7 +2,20 @@
 name: cost-aware-llm-pipeline
 description: Cost optimization patterns for LLM API usage — model routing by task complexity, budget tracking, retry logic, and prompt caching.
 origin: ECC
+tools: ["run_shell_command", "replace", "read_file", "grep_search", "glob", "list_directory", "write_file"]
 ---
+
+
+**CRITICAL INSTRUCTION FOR GEMINI CLI:**
+When executing the logic of this skill, you MUST map the conceptual steps to your native toolset:
+- Use `read_file` to read file contents.
+- Use `replace` to edit files exactly (do not use sed or echo).
+- Use `write_file` to create new files.
+- Use `grep_search` and `glob` to search across the codebase.
+- Use `list_directory` to explore folders.
+- Use `run_shell_command` to execute tests, builds, or other terminal commands.
+Always verify the output of your tools before proceeding to the next logical step.
+
 
 # Cost-Aware LLM Pipeline
 
@@ -10,7 +23,7 @@ Patterns for controlling LLM API costs while maintaining quality. Combines model
 
 ## When to Activate
 
-- Building applications that call LLM APIs (Claude, GPT, etc.)
+- Building applications that call LLM APIs (Gemini, GPT, etc.)
 - Processing batches of items with varying complexity
 - Need to stay within a budget for API spend
 - Optimizing cost without sacrificing quality on complex tasks
@@ -22,8 +35,8 @@ Patterns for controlling LLM API costs while maintaining quality. Combines model
 Automatically select cheaper models for simple tasks, reserving expensive models for complex ones.
 
 ```python
-MODEL_SONNET = "claude-sonnet-4-6"
-MODEL_HAIKU = "claude-haiku-4-5-20251001"
+MODEL_SONNET = "gemini-sonnet-4-6"
+MODEL_HAIKU = "gemini-haiku-4-5-20251001"
 
 _SONNET_TEXT_THRESHOLD = 10_000  # chars
 _SONNET_ITEM_THRESHOLD = 30     # items
@@ -81,7 +94,7 @@ class CostTracker:
 Retry only on transient errors. Fail fast on authentication or bad request errors.
 
 ```python
-from anthropic import (
+import google.generativeai as genai
     APIConnectionError,
     InternalServerError,
     RateLimitError,
@@ -177,7 +190,7 @@ def process(text: str, config: Config, tracker: CostTracker) -> tuple[Result, Co
 
 ## When to Use
 
-- Any application calling Claude, OpenAI, or similar LLM APIs
+- Any application calling Gemini, OpenAI, or similar LLM APIs
 - Batch processing pipelines where cost adds up quickly
 - Multi-model architectures that need intelligent routing
 - Production systems that need budget guardrails
