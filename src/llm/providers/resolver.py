@@ -6,21 +6,36 @@ import os
 
 from llm.core.interface import LLMProvider
 from llm.core.types import ProviderType
-from llm.providers.claude import ClaudeProvider
-from llm.providers.openai import OpenAIProvider
-from llm.providers.ollama import OllamaProvider
 
+# Importações condicionais conforme __init__.py
+try:
+    from llm.providers.claude import ClaudeProvider
+except ImportError:
+    ClaudeProvider = None
+
+try:
+    from llm.providers.openai import OpenAIProvider
+except ImportError:
+    OpenAIProvider = None
+
+try:
+    from llm.providers.ollama import OllamaProvider
+except ImportError:
+    OllamaProvider = None
+
+from llm.providers.gemini import GeminiProvider
 
 _PROVIDER_MAP: dict[ProviderType, type[LLMProvider]] = {
     ProviderType.CLAUDE: ClaudeProvider,
     ProviderType.OPENAI: OpenAIProvider,
     ProviderType.OLLAMA: OllamaProvider,
+    ProviderType.GEMINI: GeminiProvider,
 }
 
 
 def get_provider(provider_type: ProviderType | str | None = None, **kwargs: str) -> LLMProvider:
     if provider_type is None:
-        provider_type = os.environ.get("LLM_PROVIDER", "claude").lower()
+        provider_type = os.environ.get("LLM_PROVIDER", "gemini").lower()
 
     if isinstance(provider_type, str):
         try:
@@ -29,8 +44,10 @@ def get_provider(provider_type: ProviderType | str | None = None, **kwargs: str)
             raise ValueError(f"Unknown provider type: {provider_type}. Valid types: {[p.value for p in ProviderType]}")
 
     provider_cls = _PROVIDER_MAP.get(provider_type)
-    if not provider_cls:
-        raise ValueError(f"No provider registered for type: {provider_type}")
+    
+    # Validação para evitar erro se o provider for None (não instalado)
+    if provider_cls is None:
+        raise ValueError(f"Provedor {provider_type} não está instalado ou disponível.")
 
     return provider_cls(**kwargs)
 

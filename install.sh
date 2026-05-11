@@ -1,32 +1,16 @@
 #!/usr/bin/env bash
-# install.sh — Legacy shell entrypoint for the ECC installer.
-#
-# This wrapper resolves the real repo/package root when invoked through a
-# symlinked npm bin, then delegates to the Node-based installer runtime.
+set -e
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-set -euo pipefail
+# Validação de Versão
+python3 -c "import sys; sys.exit(0 if sys.version_info >= (3,10) else 1)" || { echo "Python >= 3.10 requerido"; exit 1; }
+node -v >/dev/null 2>&1 || { echo "Node.js requerido"; exit 1; }
 
-SCRIPT_PATH="$0"
-while [ -L "$SCRIPT_PATH" ]; do
-    link_dir="$(cd "$(dirname "$SCRIPT_PATH")" && pwd)"
-    SCRIPT_PATH="$(readlink "$SCRIPT_PATH")"
-    [[ "$SCRIPT_PATH" != /* ]] && SCRIPT_PATH="$link_dir/$SCRIPT_PATH"
-done
-SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_PATH")" && pwd)"
+# Setup Python
+python3 -m venv "$PROJECT_ROOT/.venv"
+"$PROJECT_ROOT/.venv/bin/pip" install --upgrade pip
+"$PROJECT_ROOT/.venv/bin/pip" install -e .
 
-# Auto-install Node dependencies when running from a git clone
-if [ ! -d "$SCRIPT_DIR/node_modules" ]; then
-    echo "[ECC] Installing dependencies..."
-    (cd "$SCRIPT_DIR" && npm install --no-audit --no-fund --loglevel=error)
-fi
-
-# On MSYS2/Git Bash, convert the POSIX path to a Windows path so Node.js
-# (a native Windows binary) receives a valid path instead of a doubled one
-# like G:\g\projects\... that results from Git Bash's auto path conversion.
-if command -v cygpath &>/dev/null; then
-    NODE_SCRIPT="$(cygpath -w "$SCRIPT_DIR/scripts/install-apply.js")"
-else
-    NODE_SCRIPT="$SCRIPT_DIR/scripts/install-apply.js"
-fi
-
-exec node "$NODE_SCRIPT" "$@"
+# Setup Node (Yarn local)
+node "$PROJECT_ROOT/.yarn/releases/yarn-4.9.2.cjs" install
+EOF
