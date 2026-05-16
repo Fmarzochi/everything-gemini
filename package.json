@@ -43,5 +43,8 @@
     "openai",
     "hooks",
     "orchestration"
-  ]
+  ],
+  "devDependencies": {
+    "@eslint/js": "^10.0.1"
+  }
 }
