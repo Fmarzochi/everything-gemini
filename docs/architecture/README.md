@@ -1,10 +1,11 @@
 # EGC Architecture
 
-EGC ships as two coexisting runtimes plus a documented future kernel.
-This page is the index — read it first, then drill into the specific
-documents below.
+EGC ships as two coexisting production runtimes, alongside an
+exploratory kernel direction kept under `architecture/` for research
+and ecosystem-evolution work. This page is the index — read it first,
+then drill into the specific documents below.
 
-## Current runtimes (v1.x — shipping)
+## Runtimes
 
 ### Node.js plugin runtime (CI-covered)
 
@@ -26,9 +27,9 @@ npm/pnpm/yarn/bun.
 
 ### Python autonomous-platform runtime (CI-isolated)
 
-The persistent orchestration substrate referenced by the EGC 2.0
-blueprint. Importable and functionally tested in `tests/test_*.py`,
-but not driven by the JS-based CI matrix.
+The persistent orchestration substrate explored in the EGC 2.0
+architectural notes. Importable and functionally tested in
+`tests/test_*.py`, but not driven by the JS-based CI matrix.
 
 | Layer | Path | Role |
 |---|---|---|
@@ -55,14 +56,16 @@ These resolve a non-existent `registry/` path and have no callers.
 See `scripts/runtime/README.md` and `governance/SUBSYSTEM-MAP.md` for the
 DORMANT status.
 
-## Target runtime — EGC 2.0 (design proposal)
+## EGC 2.0 architectural exploration
 
-See `EGC_2.0_BLUEPRINT.md` and `EGC_2.0_TECHNICAL_DESIGN.md` for the
-full unified-control-plane (Rust kernel + Python LLM engine + Node hook
-worker + SQLite state store) target model.
+`EGC_2.0_BLUEPRINT.md` and `EGC_2.0_TECHNICAL_DESIGN.md` collect
+ecosystem-evolution research around a unified-control-plane variant
+(Rust kernel + Python LLM engine + Node hook worker + SQLite state
+store). They are advanced runtime studies, not a replacement schedule
+for the production runtimes documented above.
 
-The Rust scaffold at `egc/` is reserved as the kernel host once
-promotion to v2.0 occurs.
+The Rust scaffold at `egc/` is reserved for that exploration. It does
+not displace the current production runtimes.
 
 ## Documents in this folder
 

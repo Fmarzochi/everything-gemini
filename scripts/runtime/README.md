@@ -4,7 +4,7 @@
 `activator.js` implement a dynamic skill router that would materialize
 skills into `.agents/skills/` based on `runtime-map.json`.
 
-**Status: DORMANT since v1.x.**
+**Status: DORMANT.**
 
 Each script resolves the registry as `registry/runtime-map.json`
 (top-level), but the real path is `internal/registry/runtime-map.json`.
