@@ -38,14 +38,24 @@ $installerScript = Join-Path -Path (Join-Path -Path $scriptDir -ChildPath 'scrip
 $nodeCmd = Get-Command node -ErrorAction SilentlyContinue
 if (-not $nodeCmd) { Fail 'Node.js not found in PATH. Install Node.js >= 18.' }
 $nodeMajor = 0
-try { $nodeMajor = [int](& node -p 'process.versions.node.split(".")[0]') } catch { $nodeMajor = 0 }
+try {
+    $nodeRaw = (& node --version) -replace '^v', ''
+    $nodeMajor = [int]($nodeRaw.Split('.')[0])
+} catch { $nodeMajor = 0 }
 if ($nodeMajor -lt 18) { Fail "Node.js >= 18 required (found: $(& node --version 2>$null))." }
 
 $pythonCmd = Get-Command python -ErrorAction SilentlyContinue
 if (-not $pythonCmd) { $pythonCmd = Get-Command python3 -ErrorAction SilentlyContinue }
 if (-not $pythonCmd) { Fail 'Python not found in PATH. Install Python >= 3.10.' }
 $pyOk = 0
-try { $pyOk = [int](& $pythonCmd.Source -c 'import sys; print(1 if sys.version_info[:2] >= (3, 10) else 0)') } catch { $pyOk = 0 }
+try {
+    $pyRaw = (& $pythonCmd.Source --version 2>&1 | Out-String).Trim()
+    if ($pyRaw -match '(\d+)\.(\d+)') {
+        $pyMaj = [int]$matches[1]
+        $pyMin = [int]$matches[2]
+        if ($pyMaj -gt 3 -or ($pyMaj -eq 3 -and $pyMin -ge 10)) { $pyOk = 1 }
+    }
+} catch { $pyOk = 0 }
 if ($pyOk -ne 1) { Fail "Python >= 3.10 required (found: $(& $pythonCmd.Source --version 2>&1))." }
 
 # Repository-local binaries always win over host binaries.
