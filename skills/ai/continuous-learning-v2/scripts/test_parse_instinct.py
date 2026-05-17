@@ -508,9 +508,7 @@ def test_load_all_project_and_global(patch_globals):
     tree = patch_globals
     project = _make_project(tree)
 
-    # Write a project instinct
     (project["instincts_personal"] / "proj.yaml").write_text(SAMPLE_INSTINCT_YAML)
-    # Write a global instinct
     (tree["global_personal"] / "glob.yaml").write_text(SAMPLE_GLOBAL_INSTINCT_YAML)
 
     result = load_all_instincts(project)
@@ -670,12 +668,10 @@ def test_cmd_projects_with_registry(patch_globals, capsys):
     """Should list projects from registry."""
     tree = patch_globals
 
-    # Create a project dir with instincts
     pid = "test123abc"
     project = _make_project(tree, pid=pid, pname="my-app")
     (project["instincts_personal"] / "inst.yaml").write_text(SAMPLE_INSTINCT_YAML)
 
-    # Write registry
     registry = {
         pid: {
             "name": "my-app",
@@ -726,7 +722,6 @@ def test_promote_specific_already_global(patch_globals, capsys):
     tree = patch_globals
     project = _make_project(tree)
 
-    # Write same-id instinct in both project and global
     (project["instincts_personal"] / "shared.yaml").write_text(SAMPLE_INSTINCT_YAML)
     global_yaml = SAMPLE_INSTINCT_YAML  # same id: test-instinct
     (tree["global_personal"] / "shared.yaml").write_text(global_yaml)
@@ -749,7 +744,6 @@ def test_promote_specific_success(patch_globals, capsys):
     out = capsys.readouterr().out
     assert "Promoted" in out
 
-    # Verify file was created in global dir
     promoted_file = tree["global_personal"] / "test-instinct.yaml"
     assert promoted_file.exists()
     content = promoted_file.read_text()
@@ -779,7 +773,6 @@ def test_promote_auto_dry_run(patch_globals, capsys):
     """Dry run should list candidates but not write files."""
     tree = patch_globals
 
-    # Create two projects with the same high-confidence instinct
     p1 = _make_project(tree, pid="proj1", pname="project-one")
     p2 = _make_project(tree, pid="proj2", pname="project-two")
 
@@ -798,7 +791,6 @@ Always review for injection.
     (p1["instincts_personal"] / "cross.yaml").write_text(high_conf_yaml)
     (p2["instincts_personal"] / "cross.yaml").write_text(high_conf_yaml)
 
-    # Write registry
     registry = {
         "proj1": {"name": "project-one", "root": "/a", "remote": "", "last_seen": "2025-01-01T00:00:00Z"},
         "proj2": {"name": "project-two", "root": "/b", "remote": "", "last_seen": "2025-01-01T00:00:00Z"},
@@ -812,7 +804,6 @@ Always review for injection.
     assert "DRY RUN" in out
     assert "cross-project-instinct" in out
 
-    # Verify no file was created
     assert not (tree["global_personal"] / "cross-project-instinct.yaml").exists()
 
 

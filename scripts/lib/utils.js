@@ -264,7 +264,6 @@ function findFiles(dir, pattern, options = {}) {
 
   searchDir(dir);
 
-  // Sort by modification time (newest first)
   results.sort((a, b) => b.mtime - a.mtime);
 
   return results;

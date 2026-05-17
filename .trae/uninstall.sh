@@ -18,7 +18,6 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 # Get the trae directory name (.trae or .trae-cn)
 get_trae_dir() {
-    # Check environment variable first
     if [ "${TRAE_ENV:-}" = "cn" ]; then
         echo ".trae-cn"
     else
@@ -115,7 +114,6 @@ do_uninstall() {
     removed=0
     skipped=0
     
-    # Read manifest and remove files
     while IFS= read -r file_path; do
         [ -z "$file_path" ] && continue
 
@@ -190,5 +188,4 @@ do_uninstall() {
     fi
 }
 
-# Execute uninstall
 do_uninstall "$@"

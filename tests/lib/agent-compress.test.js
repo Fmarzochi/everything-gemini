@@ -258,7 +258,6 @@ function runTests() {
     );
   })) passed++; else failed++;
 
-  // Cleanup
   fs.rmSync(tmpDir, { recursive: true, force: true });
 
   console.log(`\nResults: Passed: ${passed}, Failed: ${failed}`);

@@ -176,7 +176,6 @@ function main() {
   const entries = Object.entries(projects);
   if (entries.length === 0) return parts;
 
-  // Load and sort by most recent
   const recent = entries
     .map(([path, info]) => {
       const ctx = readJson(resolve(CK_HOME, 'contexts', info.contextDir, 'context.json'));

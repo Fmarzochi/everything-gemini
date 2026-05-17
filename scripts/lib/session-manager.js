@@ -238,31 +238,26 @@ function parseSessionMetadata(content) {
 
   if (!content) return metadata;
 
-  // Extract title from first heading
   const titleMatch = content.match(/^#\s+(.+)$/m);
   if (titleMatch) {
     metadata.title = titleMatch[1].trim();
   }
 
-  // Extract date
   const dateMatch = content.match(/\*\*Date:\*\*\s*(\d{4}-\d{2}-\d{2})/);
   if (dateMatch) {
     metadata.date = dateMatch[1];
   }
 
-  // Extract started time
   const startedMatch = content.match(/\*\*Started:\*\*\s*([\d:]+)/);
   if (startedMatch) {
     metadata.started = startedMatch[1];
   }
 
-  // Extract last updated
   const updatedMatch = content.match(/\*\*Last Updated:\*\*\s*([\d:]+)/);
   if (updatedMatch) {
     metadata.lastUpdated = updatedMatch[1];
   }
 
-  // Extract control-plane metadata
   const projectMatch = content.match(/\*\*Project:\*\*\s*(.+)$/m);
   if (projectMatch) {
     metadata.project = projectMatch[1].trim();
@@ -278,7 +273,6 @@ function parseSessionMetadata(content) {
     metadata.worktree = worktreeMatch[1].trim();
   }
 
-  // Extract completed items
   const completedSection = content.match(/### Completed\s*\n([\s\S]*?)(?=###|\n\n|$)/);
   if (completedSection) {
     const items = completedSection[1].match(/- \[x\]\s*(.+)/g);
@@ -287,7 +281,6 @@ function parseSessionMetadata(content) {
     }
   }
 
-  // Extract in-progress items
   const progressSection = content.match(/### In Progress\s*\n([\s\S]*?)(?=###|\n\n|$)/);
   if (progressSection) {
     const items = progressSection[1].match(/- \[ \]\s*(.+)/g);
@@ -296,13 +289,11 @@ function parseSessionMetadata(content) {
     }
   }
 
-  // Extract notes
   const notesSection = content.match(/### Notes for Next Session\s*\n([\s\S]*?)(?=###|\n\n|$)/);
   if (notesSection) {
     metadata.notes = notesSection[1].trim();
   }
 
-  // Extract context to load
   const contextSection = content.match(/### Context to Load\s*\n```\n([\s\S]*?)```/);
   if (contextSection) {
     metadata.context = contextSection[1].trim();
@@ -375,7 +366,6 @@ function getAllSessions(options = {}) {
     return { sessions: [], total: 0, offset, limit, hasMore: false };
   }
 
-  // Apply pagination
   const paginatedSessions = sessions.slice(offset, offset + limit);
 
   return {

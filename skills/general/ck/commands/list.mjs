@@ -19,7 +19,6 @@ if (entries.length === 0) {
   process.exit(1);
 }
 
-// Build enriched list sorted alphabetically by contextDir
 const enriched = entries
   .map(([path, info]) => {
     const context = loadContext(info.contextDir);

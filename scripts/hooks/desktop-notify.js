@@ -55,7 +55,6 @@ function findPowerShell() {
         return path;
       }
     } catch {
-      // continue
     }
   }
   return null;

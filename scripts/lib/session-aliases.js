@@ -120,7 +120,6 @@ function saveAliases(aliases) {
   } catch (err) {
     log(`[Aliases] Error saving aliases: ${err.message}`);
 
-    // Restore from backup if exists
     if (fs.existsSync(backupPath)) {
       try {
         fs.copyFileSync(backupPath, aliasesPath);
@@ -243,10 +242,8 @@ function listAliases(options = {}) {
     title: info.title
   }));
 
-  // Sort by updated time (newest first)
   aliases.sort((a, b) => (new Date(b.updatedAt || b.createdAt || 0).getTime() || 0) - (new Date(a.updatedAt || a.createdAt || 0).getTime() || 0));
 
-  // Apply search filter
   if (search) {
     const searchLower = search.toLowerCase();
     aliases = aliases.filter(a =>

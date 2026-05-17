@@ -30,7 +30,6 @@ CONFIG_FILE="$SCRIPT_DIR/config.json"
 LEARNED_SKILLS_PATH="${HOME}/.gemini/skills/learned"
 MIN_SESSION_LENGTH=10
 
-# Load config if exists
 if [ -f "$CONFIG_FILE" ]; then
   if ! command -v jq &>/dev/null; then
     echo "[ContinuousLearning] jq is required to parse config.json but not installed, using defaults" >&2
@@ -40,7 +39,6 @@ if [ -f "$CONFIG_FILE" ]; then
   fi
 fi
 
-# Ensure learned skills directory exists
 mkdir -p "$LEARNED_SKILLS_PATH"
 
 # Get transcript path from stdin JSON (Gemini Code hook input)

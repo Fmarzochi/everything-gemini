@@ -7,7 +7,6 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from memory.experience_store import ExperienceStore
 
 async def test_memory():
-    # Cleanup
     if os.path.exists(".sessions/memory/egc_memory.db"):
         os.remove(".sessions/memory/egc_memory.db")
         

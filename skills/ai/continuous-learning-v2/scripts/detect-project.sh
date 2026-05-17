@@ -137,13 +137,11 @@ print(hashlib.sha256(s.encode("utf-8")).hexdigest()[:12])
     fi
   fi
 
-  # Export results
   _CLV2_PROJECT_ID="$project_id"
   _CLV2_PROJECT_NAME="$project_name"
   _CLV2_PROJECT_ROOT="$project_root"
   _CLV2_PROJECT_DIR="${_CLV2_PROJECTS_DIR}/${project_id}"
 
-  # Ensure project directory structure exists
   mkdir -p "${_CLV2_PROJECT_DIR}/instincts/personal"
   mkdir -p "${_CLV2_PROJECT_DIR}/instincts/inherited"
   mkdir -p "${_CLV2_PROJECT_DIR}/observations.archive"
@@ -151,7 +149,6 @@ print(hashlib.sha256(s.encode("utf-8")).hexdigest()[:12])
   mkdir -p "${_CLV2_PROJECT_DIR}/evolved/commands"
   mkdir -p "${_CLV2_PROJECT_DIR}/evolved/agents"
 
-  # Update project registry (lightweight JSON mapping)
   _clv2_update_project_registry "$project_id" "$project_name" "$project_root" "$remote_url"
 }
 

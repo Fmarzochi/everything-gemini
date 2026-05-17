@@ -117,7 +117,6 @@ do_install() {
     # Subdirectories to create
     SUBDIRS="commands agents skills rules"
 
-    # Create all required codebuddy subdirectories
     for dir in $SUBDIRS; do
         mkdir -p "$codebuddy_full_path/$dir"
     done
@@ -132,7 +131,6 @@ do_install() {
     skills=0
     rules=0
 
-    # Copy commands from repo root
     if [ -d "$REPO_ROOT/commands" ]; then
         for f in "$REPO_ROOT/commands"/*.md; do
             [ -f "$f" ] || continue
@@ -144,7 +142,6 @@ do_install() {
         done
     fi
 
-    # Copy agents from repo root
     if [ -d "$REPO_ROOT/agents" ]; then
         for f in "$REPO_ROOT/agents"/*.md; do
             [ -f "$f" ] || continue
@@ -156,7 +153,6 @@ do_install() {
         done
     fi
 
-    # Copy skills from repo root (if available)
     if [ -d "$REPO_ROOT/skills" ]; then
         for d in "$REPO_ROOT/skills"/*/; do
             [ -d "$d" ] || continue
@@ -180,7 +176,6 @@ do_install() {
         done
     fi
 
-    # Copy rules from repo root
     if [ -d "$REPO_ROOT/rules" ]; then
         while IFS= read -r rule_file; do
             relative_path="${rule_file#$REPO_ROOT/rules/}"
@@ -203,7 +198,6 @@ do_install() {
         fi
     done
 
-    # Add manifest file itself to manifest
     ensure_manifest_entry "$MANIFEST" ".egc-manifest"
 
     # Installation summary

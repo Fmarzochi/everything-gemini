@@ -690,7 +690,6 @@ class EGCDashboard(tk.Tk):
         self.title("EGC — Everything Gemini Code")
         self.geometry("1100x800")
 
-        # Hide window while building
         self.withdraw()
 
         self.agents = load_agents(self.project_path)
@@ -767,7 +766,6 @@ class EGCDashboard(tk.Tk):
         # Notebook (tabs)
         self.notebook = ttk.Notebook(main_frame)
 
-        # Create tabs
         self.create_agents_tab()
         self.create_skills_tab()
         self.create_commands_tab()
@@ -779,7 +777,6 @@ class EGCDashboard(tk.Tk):
         # Pack notebook after hydration
         self.notebook.pack(fill=tk.BOTH, expand=True)
         
-        # Start refresh loops
         self.refresh_live_execution()
         
         # Status bar
@@ -805,7 +802,6 @@ class EGCDashboard(tk.Tk):
         frame = ttk.Frame(self.notebook)
         self.notebook.add(frame, text=f"Agents ({len(self.agents)})")
         
-        # Search bar
         search_frame = ttk.Frame(frame)
         search_frame.pack(fill=tk.X, padx=10, pady=10)
         
@@ -865,7 +861,6 @@ class EGCDashboard(tk.Tk):
         self.agent_details = scrolledtext.ScrolledText(details_frame, wrap=tk.WORD, height=15)
         self.agent_details.pack(fill=tk.BOTH, expand=True)
 
-        # Bind selection
         self.agent_tree.bind('<<TreeviewSelect>>', self.on_agent_select)
 
         # Populate list
@@ -980,7 +975,6 @@ class EGCDashboard(tk.Tk):
         frame = ttk.Frame(self.notebook)
         self.notebook.add(frame, text=f"Skills ({len(self.skills)})")
         
-        # Search and filter
         filter_frame = ttk.Frame(frame)
         filter_frame.pack(fill=tk.X, padx=10, pady=10)
         
@@ -999,7 +993,6 @@ class EGCDashboard(tk.Tk):
         self.skill_count_label = ttk.Label(filter_frame, text=str(len(self.skills)))
         self.skill_count_label.pack(side=tk.LEFT)
         
-        # Split pane
         paned = ttk.PanedWindow(frame, orient=tk.HORIZONTAL)
         paned.pack(fill=tk.BOTH, expand=True, padx=10, pady=(0, 10))
         
@@ -1181,7 +1174,6 @@ class EGCDashboard(tk.Tk):
         ttk.Label(info_frame, text="These rules are automatically applied in Gemini Code", 
                   foreground='gray').pack(anchor=tk.W)
         
-        # Filter
         filter_frame = ttk.Frame(frame)
         filter_frame.pack(fill=tk.X, padx=10, pady=5)
         
@@ -1640,7 +1632,6 @@ Content:
         except Exception:
             pass
 
-        # Update status
         self.status_label.config(
             text=f"Ready | v{self.project_version} | Agents: {len(self.agents)} | Skills: {len(self.skills)} | Commands: {len(self.commands)} | Rules: {len(self.rules)}"
         )
@@ -1706,7 +1697,6 @@ Content:
 
 
 # ============================================================================
-# MAIN
 # ============================================================================
 
 def main():

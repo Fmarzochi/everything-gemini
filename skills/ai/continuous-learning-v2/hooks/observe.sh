@@ -16,10 +16,8 @@ set -e
 HOOK_PHASE="${1:-post}"
 
 # ─────────────────────────────────────────────
-# Read stdin first (before project detection)
 # ─────────────────────────────────────────────
 
-# Read JSON from stdin (Gemini Code hook format)
 INPUT_JSON=$(cat)
 
 # Exit if no input
@@ -85,7 +83,6 @@ fi
 export CLV2_PYTHON_CMD="${CLV2_PYTHON_CMD:-$PYTHON_CMD}"
 
 # ─────────────────────────────────────────────
-# Extract cwd from stdin for project detection
 # ─────────────────────────────────────────────
 
 # Extract cwd from the hook JSON to use for project detection.
@@ -204,7 +201,6 @@ try:
     hook_phase = os.environ.get("HOOK_PHASE", "post")
     event = "tool_start" if hook_phase == "pre" else "tool_complete"
 
-    # Extract fields - Gemini Code hook format
     tool_name = data.get("tool_name", data.get("tool", "unknown"))
     tool_input = data.get("tool_input", data.get("input", {}))
     tool_output = data.get("tool_response")
@@ -239,7 +235,6 @@ except Exception as e:
     print(json.dumps({"parsed": False, "error": str(e)}))
 ')
 
-# Check if parsing succeeded
 PARSED_OK=$(echo "$PARSED" | "$PYTHON_CMD" -c "import json,sys; print(json.load(sys.stdin).get('parsed', False))" 2>/dev/null || echo "False")
 
 if [ "$PARSED_OK" != "True" ]; then
@@ -273,7 +268,6 @@ if [ -f "$OBSERVATIONS_FILE" ]; then
   fi
 fi
 
-# Build and write observation (now includes project context)
 # Scrub common secret patterns from tool I/O before persisting
 timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
@@ -371,7 +365,6 @@ if [ "$OBSERVER_ENABLED" = "true" ]; then
   _CHECK_OBSERVER_RUNNING "${PROJECT_DIR}/.observer.pid" || true
   _CHECK_OBSERVER_RUNNING "${CONFIG_DIR}/.observer.pid" || true
 
-  # Check if observer is now running after cleanup
   if [ ! -f "${PROJECT_DIR}/.observer.pid" ] && [ ! -f "${CONFIG_DIR}/.observer.pid" ]; then
     # Use flock if available (Linux), fallback for macOS
     if command -v flock >/dev/null 2>&1; then

@@ -118,7 +118,6 @@ try {
   sessionId = shortId();
 }
 
-// Check for duplicate (re-save of same session)
 const existingIdx = context.sessions.findIndex(s => s.id === sessionId);
 
 const { summary, leftOff, nextSteps, decisions, blockers, goal } = input;
@@ -139,13 +138,11 @@ const session = {
 };
 
 if (existingIdx >= 0) {
-  // Update existing session (re-save)
   context.sessions[existingIdx] = session;
 } else {
   context.sessions.push(session);
 }
 
-// Update goal if provided
 if (goal && goal !== context.goal) {
   context.goal = goal;
 }

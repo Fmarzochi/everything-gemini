@@ -182,7 +182,6 @@ def detect_project() -> dict:
 
     project_dir = PROJECTS_DIR / project_id
 
-    # Ensure project directory structure
     for d in [
         project_dir / "instincts" / "personal",
         project_dir / "instincts" / "inherited",
@@ -193,7 +192,6 @@ def detect_project() -> dict:
     ]:
         d.mkdir(parents=True, exist_ok=True)
 
-    # Update registry
     _update_registry(project_id, project_name, project_root, remote_url)
 
     return {
@@ -281,7 +279,6 @@ def parse_instinct_file(content: str) -> list[dict]:
                 # End of frontmatter - content comes next
                 in_frontmatter = False
             else:
-                # Start of new frontmatter block
                 in_frontmatter = True
                 if current:
                     current['content'] = '\n'.join(content_lines).strip()
@@ -404,7 +401,6 @@ def cmd_status(args) -> int:
         print(f"  Project instincts:  {project['instincts_personal']}")
         print(f"  Global instincts:   {GLOBAL_PERSONAL_DIR}")
     else:
-        # Split by scope
         project_instincts = [i for i in instincts if i.get('_scope_label') == 'project']
         global_instincts = [i for i in instincts if i.get('_scope_label') == 'global']
 
@@ -446,7 +442,6 @@ def cmd_status(args) -> int:
             print(f"\n  \u26a0 {len(pending)} pending instincts awaiting review."
                   f" Unreviewed instincts auto-delete after {PENDING_TTL_DAYS} days.")
 
-        # Show instincts expiring within PENDING_EXPIRY_WARNING_DAYS
         expiry_threshold = PENDING_TTL_DAYS - PENDING_EXPIRY_WARNING_DAYS
         expiring_soon = [p for p in pending
                          if p["age_days"] >= expiry_threshold and p["age_days"] < PENDING_TTL_DAYS]
@@ -481,7 +476,6 @@ def _print_instincts_by_domain(instincts: list[dict]) -> None:
             print(f"    {conf_bar} {int(conf*100):3d}%  {inst.get('id', 'unnamed')} {scope_tag}")
             print(f"              trigger: {trigger}")
 
-            # Extract action from content
             content = inst.get('content', '')
             action_match = re.search(r'## Action\s*\n\s*(.+?)(?:\n\n|\n##|$)', content, re.DOTALL)
             if action_match:
@@ -492,7 +486,6 @@ def _print_instincts_by_domain(instincts: list[dict]) -> None:
 
 
 # ─────────────────────────────────────────────
-# Import Command
 # ─────────────────────────────────────────────
 
 def cmd_import(args) -> int:
@@ -500,13 +493,11 @@ def cmd_import(args) -> int:
     project = detect_project()
     source = args.source
 
-    # Determine target scope
     target_scope = args.scope or "project"
     if target_scope == "project" and project["id"] == "global":
         print("No project detected. Importing as global scope.")
         target_scope = "global"
 
-    # Fetch content
     if source.startswith('http://') or source.startswith('https://'):
         print(f"Fetching from URL: {source}")
         try:
@@ -571,7 +562,6 @@ def cmd_import(args) -> int:
         else:
             to_add.append(inst)
 
-    # Filter by minimum confidence
     min_conf = args.min_confidence if args.min_confidence is not None else 0.0
     to_add = [i for i in to_add if i.get('confidence', 0.5) >= min_conf]
     to_update = [i for i in to_update if i.get('confidence', 0.5) >= min_conf]
@@ -609,7 +599,6 @@ def cmd_import(args) -> int:
             print("Cancelled.")
             return 0
 
-    # Determine output directory based on scope
     if target_scope == "global":
         output_dir = GLOBAL_INHERITED_DIR
     else:
@@ -681,14 +670,12 @@ def cmd_import(args) -> int:
 
 
 # ─────────────────────────────────────────────
-# Export Command
 # ─────────────────────────────────────────────
 
 def cmd_export(args) -> int:
     """Export instincts to file."""
     project = detect_project()
 
-    # Determine what to export based on scope filter
     if args.scope == "project":
         instincts = load_project_only_instincts(project)
     elif args.scope == "global":
@@ -701,11 +688,9 @@ def cmd_export(args) -> int:
         print("No instincts to export.")
         return 1
 
-    # Filter by domain if specified
     if args.domain:
         instincts = [i for i in instincts if i.get('domain') == args.domain]
 
-    # Filter by minimum confidence
     if args.min_confidence:
         instincts = [i for i in instincts if i.get('confidence', 0.5) >= args.min_confidence]
 
@@ -713,7 +698,6 @@ def cmd_export(args) -> int:
         print("No instincts match the criteria.")
         return 1
 
-    # Generate output
     output = f"# Instincts export\n# Date: {datetime.now().isoformat()}\n# Total: {len(instincts)}\n"
     if args.scope:
         output += f"# Scope: {args.scope}\n"
@@ -734,7 +718,6 @@ def cmd_export(args) -> int:
         output += "---\n\n"
         output += inst.get('content', '') + "\n\n"
 
-    # Write to file or stdout
     if args.output:
         try:
             out_path = _validate_file_path(args.output)
@@ -776,7 +759,6 @@ def cmd_evolve(args) -> int:
     print(f"  Project-scoped: {len(project_instincts)} | Global: {len(global_instincts)}")
     print(f"{'='*60}\n")
 
-    # Group by domain
     by_domain = defaultdict(list)
     for inst in instincts:
         domain = inst.get('domain', 'general')
@@ -786,7 +768,6 @@ def cmd_evolve(args) -> int:
     high_conf = [i for i in instincts if i.get('confidence', 0) >= 0.8]
     print(f"High confidence instincts (>=80%): {len(high_conf)}")
 
-    # Find clusters (instincts with similar triggers)
     trigger_clusters = defaultdict(list)
     for inst in instincts:
         trigger = inst.get('trigger', '')
@@ -809,7 +790,6 @@ def cmd_evolve(args) -> int:
                 'scopes': list(set(i.get('scope', 'project') for i in cluster)),
             })
 
-    # Sort by cluster size and confidence
     skill_candidates.sort(key=lambda x: (-len(x['instincts']), -x['avg_confidence']))
 
     print(f"\nPotential skill clusters found: {len(skill_candidates)}")
@@ -907,7 +887,6 @@ def _show_promotion_candidates(project: dict) -> None:
     if not cross:
         return
 
-    # Filter to high-confidence ones not already global
     global_instincts = _load_instincts_from_dir(GLOBAL_PERSONAL_DIR, "personal", "global")
     global_instincts += _load_instincts_from_dir(GLOBAL_INHERITED_DIR, "inherited", "global")
     global_ids = {i.get('id') for i in global_instincts}
@@ -982,7 +961,6 @@ def _promote_specific(project: dict, instinct_id: str, force: bool, dry_run: boo
             print("Cancelled.")
             return 0
 
-    # Write to global personal directory
     output_file = GLOBAL_PERSONAL_DIR / f"{instinct_id}.yaml"
     output_content = "---\n"
     output_content += f"id: {target.get('id')}\n"
@@ -1127,14 +1105,12 @@ def cmd_projects(args) -> int:
 
 
 # ─────────────────────────────────────────────
-# Generate Evolved Structures
 # ─────────────────────────────────────────────
 
 def _generate_evolved(skill_candidates: list, workflow_instincts: list, agent_candidates: list, evolved_dir: Path) -> list[str]:
     """Generate skill/command/agent files from analyzed instinct clusters."""
     generated = []
 
-    # Generate skills from top candidates
     for cand in skill_candidates[:5]:
         trigger = cand['trigger'].strip()
         if not trigger:
@@ -1161,7 +1137,6 @@ def _generate_evolved(skill_candidates: list, workflow_instincts: list, agent_ca
         (skill_dir / "SKILL.md").write_text(content, encoding="utf-8")
         generated.append(str(skill_dir / "SKILL.md"))
 
-    # Generate commands from workflow instincts
     for inst in workflow_instincts[:5]:
         trigger = inst.get('trigger', 'unknown')
         cmd_name = re.sub(r'[^a-z0-9]+', '-', trigger.lower().replace('when ', '').replace('implementing ', ''))
@@ -1178,7 +1153,6 @@ def _generate_evolved(skill_candidates: list, workflow_instincts: list, agent_ca
         cmd_file.write_text(content, encoding="utf-8")
         generated.append(str(cmd_file))
 
-    # Generate agents from complex clusters
     for cand in agent_candidates[:3]:
         trigger = cand['trigger'].strip()
         agent_name = re.sub(r'[^a-z0-9]+', '-', trigger.lower()).strip('-')[:20]
@@ -1357,7 +1331,6 @@ def main() -> int:
     # Status
     status_parser = subparsers.add_parser('status', help='Show instinct status (project + global)')
 
-    # Import
     import_parser = subparsers.add_parser('import', help='Import instincts')
     import_parser.add_argument('source', help='File path or URL')
     import_parser.add_argument('--dry-run', action='store_true', help='Preview without importing')
@@ -1366,7 +1339,6 @@ def main() -> int:
     import_parser.add_argument('--scope', choices=['project', 'global'], default='project',
                                help='Import scope (default: project)')
 
-    # Export
     export_parser = subparsers.add_parser('export', help='Export instincts')
     export_parser.add_argument('--output', '-o', help='Output file')
     export_parser.add_argument('--domain', help='Filter by domain')

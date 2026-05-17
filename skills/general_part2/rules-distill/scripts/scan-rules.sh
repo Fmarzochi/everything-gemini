@@ -35,7 +35,6 @@ for i in "${!files[@]}"; do
   # Extract H2 headings (## Title) into a JSON array via jq
   headings_json=$({ grep -E '^## ' "$file" 2>/dev/null || true; } | sed 's/^## //' | jq -R . | jq -s '.')
 
-  # Get line count
   line_count=$(wc -l < "$file" | tr -d ' ')
 
   jq -n \

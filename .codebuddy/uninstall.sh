@@ -104,7 +104,6 @@ do_uninstall() {
     removed=0
     skipped=0
 
-    # Read manifest and remove files
     while IFS= read -r file_path; do
         [ -z "$file_path" ] && continue
 
@@ -180,5 +179,4 @@ do_uninstall() {
     fi
 }
 
-# Execute uninstall
 do_uninstall "$@"

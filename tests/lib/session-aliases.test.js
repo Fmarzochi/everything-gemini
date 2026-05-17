@@ -811,7 +811,6 @@ function runTests() {
     assert.ok(parsed.aliases['atomic-test'], 'First alias should exist');
     assert.ok(parsed.aliases['atomic-test-2'], 'Second alias should exist');
 
-    // Cleanup
     aliases.deleteAlias('atomic-test');
     aliases.deleteAlias('atomic-test-2');
   })) passed++; else failed++;
@@ -877,7 +876,6 @@ function runTests() {
       assert.ok(!fs.existsSync(aliasesPath + '.tmp'), 'No temp file should remain');
       assert.ok(!fs.existsSync(aliasesPath + '.bak'), 'No backup file should remain');
     } finally {
-      // Restore original platform descriptor
       if (origPlatform) {
         Object.defineProperty(process, 'platform', origPlatform);
       }

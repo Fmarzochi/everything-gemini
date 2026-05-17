@@ -72,7 +72,6 @@ def grade(
     # Step 1: LLM classifies all events in one batch call
     classification = classify_events(spec, sorted_trace, model=classifier_model)
 
-    # Convert indices to events
     classified: dict[str, list[ObservationEvent]] = {
         step_id: [sorted_trace[i] for i in indices if 0 <= i < len(sorted_trace)]
         for step_id, indices in classification.items()

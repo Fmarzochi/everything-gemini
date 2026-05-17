@@ -168,14 +168,12 @@ case "$ACTION" in
     ;;
 
   start)
-    # Check if observer is disabled in config
     if [ "$OBSERVER_ENABLED" != "true" ]; then
       echo "Observer is disabled in config.json (observer.enabled: false)."
       echo "Set observer.enabled to true in config.json to enable."
       exit 1
     fi
 
-    # Check if already running
     if [ -f "$PID_FILE" ]; then
       pid=$(cat "$PID_FILE")
       if kill -0 "$pid" 2>/dev/null; then
@@ -211,7 +209,6 @@ case "$ACTION" in
       CLV2_OBSERVER_PROMPT_PATTERN="$CLV2_OBSERVER_PROMPT_PATTERN" \
       "$OBSERVER_LOOP_SCRIPT" >> "$LOG_FILE" 2>&1 &
 
-    # Wait for PID file
     sleep 2
 
     # Check for confirmation-seeking output in the observer log

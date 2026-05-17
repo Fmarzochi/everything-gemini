@@ -178,7 +178,6 @@ def egc_observations_path() -> Path:
     if v:
         return Path(v).expanduser().resolve()
     
-    # Ensure the directory exists
     pdir = egc_project_dir()
     pdir.mkdir(parents=True, exist_ok=True)
     return pdir / "observations.jsonl"

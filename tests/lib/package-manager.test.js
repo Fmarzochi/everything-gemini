@@ -763,7 +763,6 @@ function runTests() {
       const saved = JSON.parse(fs.readFileSync(configPath, 'utf8'));
       assert.strictEqual(saved.packageManager, 'bun');
     } finally {
-      // Restore original config
       if (original) {
         fs.writeFileSync(configPath, original, 'utf8');
       } else {

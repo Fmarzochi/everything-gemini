@@ -77,7 +77,6 @@ function findEmptyDirs(dirPath) {
         walkDirs(subdirPath);
       }
 
-      // Check if directory is now empty
       try {
         const remaining = fs.readdirSync(currentPath);
         if (remaining.length === 0 && currentPath !== dirPath) {

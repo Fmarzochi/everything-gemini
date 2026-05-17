@@ -27,7 +27,6 @@ if (!resolved) {
 
 const { name, contextDir, projectPath } = resolved;
 
-// Remove context directory
 const contextDirPath = resolve(CONTEXTS_DIR, contextDir);
 try {
   rmSync(contextDirPath, { recursive: true, force: true });

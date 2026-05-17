@@ -107,7 +107,6 @@ do_install() {
     # Subdirectories to create
     SUBDIRS="commands agents skills rules"
 
-    # Create all required trae subdirectories
     for dir in $SUBDIRS; do
         mkdir -p "$trae_full_path/$dir"
     done
@@ -123,7 +122,6 @@ do_install() {
     rules=0
     other=0
 
-    # Copy commands from repo root
     if [ -d "$REPO_ROOT/commands" ]; then
         for f in "$REPO_ROOT/commands"/*.md; do
             [ -f "$f" ] || continue
@@ -135,7 +133,6 @@ do_install() {
         done
     fi
 
-    # Copy agents from repo root
     if [ -d "$REPO_ROOT/agents" ]; then
         for f in "$REPO_ROOT/agents"/*.md; do
             [ -f "$f" ] || continue
@@ -147,7 +144,6 @@ do_install() {
         done
     fi
 
-    # Copy skills from repo root (if available)
     if [ -d "$REPO_ROOT/skills" ]; then
         for d in "$REPO_ROOT/skills"/*/; do
             [ -d "$d" ] || continue
@@ -171,7 +167,6 @@ do_install() {
         done
     fi
 
-    # Copy rules from repo root
     if [ -d "$REPO_ROOT/rules" ]; then
         while IFS= read -r rule_file; do
             relative_path="${rule_file#$REPO_ROOT/rules/}"
@@ -184,7 +179,6 @@ do_install() {
         done < <(find "$REPO_ROOT/rules" -type f | sort)
     fi
 
-    # Copy README files from this directory
     for readme_file in "$SCRIPT_DIR/README.md" "$SCRIPT_DIR/README.zh-CN.md"; do
         if [ -f "$readme_file" ]; then
             local_name=$(basename "$readme_file")
@@ -195,7 +189,6 @@ do_install() {
         fi
     done
 
-    # Copy install and uninstall scripts
     for script_file in "$SCRIPT_DIR/install.sh" "$SCRIPT_DIR/uninstall.sh"; do
         if [ -f "$script_file" ]; then
             local_name=$(basename "$script_file")
@@ -206,7 +199,6 @@ do_install() {
         fi
     done
 
-    # Add manifest file itself to manifest
     ensure_manifest_entry "$MANIFEST" ".egc-manifest"
 
     # Installation summary

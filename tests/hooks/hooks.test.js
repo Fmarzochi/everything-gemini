@@ -1036,7 +1036,6 @@ async function runTests() {
       const count = parseInt(fs.readFileSync(counterFile, 'utf8').trim(), 10);
       assert.strictEqual(count, 3, `Counter should be 3, got ${count}`);
 
-      // Cleanup
       fs.unlinkSync(counterFile);
     })
   )
@@ -1057,7 +1056,6 @@ async function runTests() {
 
       assert.ok(result.stderr.includes('50 tool calls reached'), 'Should suggest compact at threshold');
 
-      // Cleanup
       fs.unlinkSync(counterFile);
     })
   )
@@ -1135,7 +1133,6 @@ async function runTests() {
 
       assert.strictEqual(result.code, 0, 'Should work with default session ID');
 
-      // Cleanup the default counter file
       const counterFile = path.join(os.tmpdir(), 'egc-tool-count-default');
       if (fs.existsSync(counterFile)) fs.unlinkSync(counterFile);
     })

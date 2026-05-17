@@ -41,7 +41,6 @@ load_dotenv()
 import videodb
 from videodb.exceptions import AuthenticationError
 
-# Retry config
 MAX_RETRIES = 10
 INITIAL_BACKOFF = 1  # seconds
 MAX_BACKOFF = 60     # seconds
@@ -241,7 +240,6 @@ async def main_async():
         log("Received shutdown signal")
         shutdown_event.set()
     
-    # Register signal handlers
     for sig in (signal.SIGINT, signal.SIGTERM):
         with contextlib.suppress(NotImplementedError):
             loop.add_signal_handler(sig, handle_signal)
@@ -257,7 +255,6 @@ async def main_async():
     if listen_task.done():
         await listen_task
     
-    # Cancel remaining tasks
     for task in pending:
         task.cancel()
         try:

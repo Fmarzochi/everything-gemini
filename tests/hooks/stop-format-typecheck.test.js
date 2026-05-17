@@ -232,7 +232,6 @@ if (test('stop hook passes stdin through unchanged', () => {
   assert.strictEqual(result.toString(), input);
 })) passed++; else failed++;
 
-// Restore env
 if (origSessionId === undefined) {
   delete process.env.EGC_SESSION_ID;
 } else {

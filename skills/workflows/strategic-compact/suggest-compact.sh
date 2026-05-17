@@ -33,7 +33,6 @@ SESSION_ID="${EGC_SESSION_ID:-${PPID:-default}}"
 COUNTER_FILE="/tmp/egc-tool-count-${SESSION_ID}"
 THRESHOLD=${COMPACT_THRESHOLD:-50}
 
-# Initialize or increment counter
 if [ -f "$COUNTER_FILE" ]; then
   count=$(cat "$COUNTER_FILE")
   count=$((count + 1))

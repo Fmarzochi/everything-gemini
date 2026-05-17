@@ -346,7 +346,6 @@ function runTests() {
 
       cleanupTestDir(testDir);
     } finally {
-      // Restore original config file
       if (originalContent !== null) {
         fs.writeFileSync(configPath, originalContent, 'utf8');
       } else {
@@ -395,7 +394,6 @@ function runTests() {
 
       cleanupTestDir(testDir);
     } finally {
-      // Restore original config file
       if (originalContent !== null) {
         fs.writeFileSync(configPath, originalContent, 'utf8');
       } else {

@@ -108,7 +108,6 @@ for (const [projectPath, info] of Object.entries(projects)) {
   console.log(`\n  → Migrating: ${contextDir}`);
 
   try {
-    // Read v1 files
     const contextMd = existsSync(contextMdPath) ? readFileSync(contextMdPath, 'utf8') : '';
     let meta = {};
     if (existsSync(metaPath)) {

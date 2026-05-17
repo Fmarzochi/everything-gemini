@@ -76,7 +76,6 @@ if [ -d "$SOURCE_KIRO/skills" ]; then
   done
 fi
 
-# Copy steering files (markdown)
 if [ -d "$SOURCE_KIRO/steering" ]; then
   for f in "$SOURCE_KIRO/steering"/*.md; do
     local_name=$(basename "$f")
@@ -99,7 +98,6 @@ if [ -d "$SOURCE_KIRO/hooks" ]; then
   done
 fi
 
-# Copy scripts (shell scripts) and make executable
 if [ -d "$SOURCE_KIRO/scripts" ]; then
   for f in "$SOURCE_KIRO/scripts"/*.sh; do
     local_name=$(basename "$f")
@@ -111,7 +109,6 @@ if [ -d "$SOURCE_KIRO/scripts" ]; then
   done
 fi
 
-# Copy settings (example files)
 if [ -d "$SOURCE_KIRO/settings" ]; then
   for f in "$SOURCE_KIRO/settings"/*; do
     [ -f "$f" ] || continue

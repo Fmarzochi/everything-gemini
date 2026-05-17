@@ -1,6 +1,5 @@
 #!/bin/bash
 # ─────────────────────────────────────────────────────────────
-# Format — auto-format a file using detected formatter
 # Detects: biome or prettier
 # Used by: .kiro/hooks/auto-format.json (fileEdited)
 # ─────────────────────────────────────────────────────────────
