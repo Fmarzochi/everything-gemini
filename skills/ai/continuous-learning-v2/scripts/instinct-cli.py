@@ -289,7 +289,6 @@ def parse_instinct_file(content: str) -> list[dict]:
                 current = {}
                 content_lines = []
         elif in_frontmatter:
-            # Parse YAML-like frontmatter
             if ':' in line:
                 key, value = line.split(':', 1)
                 key = key.strip()
@@ -409,7 +408,6 @@ def cmd_status(args) -> int:
         project_instincts = [i for i in instincts if i.get('_scope_label') == 'project']
         global_instincts = [i for i in instincts if i.get('_scope_label') == 'global']
 
-        # Print header
         print(f"\n{'='*60}")
         print(f"  INSTINCT STATUS - {len(instincts)} total")
         print(f"{'='*60}\n")
@@ -419,13 +417,11 @@ def cmd_status(args) -> int:
         print(f"  Global instincts:  {len(global_instincts)}")
         print()
 
-        # Print project-scoped instincts
         if project_instincts:
             print(f"## PROJECT-SCOPED ({project['name']})")
             print()
             _print_instincts_by_domain(project_instincts)
 
-        # Print global instincts
         if global_instincts:
             print("## GLOBAL (apply to all projects)")
             print()
@@ -530,7 +526,6 @@ def cmd_import(args) -> int:
             return 1
         content = path.read_text(encoding="utf-8")
 
-    # Parse instincts
     new_instincts = parse_instinct_file(content)
     if not new_instincts:
         print("No valid instincts found in source.")
@@ -966,7 +961,6 @@ def _promote_specific(project: dict, instinct_id: str, force: bool, dry_run: boo
         print(f"Instinct '{instinct_id}' not found in project {project['name']}.")
         return 1
 
-    # Check if already global
     global_instincts = _load_instincts_from_dir(GLOBAL_PERSONAL_DIR, "personal", "global")
     global_instincts += _load_instincts_from_dir(GLOBAL_INHERITED_DIR, "inherited", "global")
     if any(i.get('id') == instinct_id for i in global_instincts):
@@ -1353,7 +1347,6 @@ def cmd_prune(args) -> int:
 
 
 # ─────────────────────────────────────────────
-# Main
 # ─────────────────────────────────────────────
 
 def main() -> int:

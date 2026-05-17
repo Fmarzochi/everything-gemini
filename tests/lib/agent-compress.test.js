@@ -118,7 +118,6 @@ function runTests() {
 
   // --- loadAgent / loadAgents ---
 
-  // Create a temp directory with test agent files
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'agent-compress-test-'));
   const agentContent = '---\nname: test-agent\ndescription: A test agent\ntools: ["Read"]\nmodel: haiku\n---\n\nTest agent body paragraph.\n\n## Details\nMore info.';
   fs.writeFileSync(path.join(tmpDir, 'test-agent.md'), agentContent);
@@ -199,7 +198,6 @@ function runTests() {
   })) passed++; else failed++;
 
   if (test('buildAgentCatalog supports filter function', () => {
-    // Add a second agent
     fs.writeFileSync(
       path.join(tmpDir, 'other-agent.md'),
       '---\nname: other\ndescription: Other agent\ntools: ["Bash"]\nmodel: gemini-2.5-pro\n---\n\nOther body.'
@@ -247,7 +245,6 @@ function runTests() {
     const result = buildAgentCatalog(realAgentsDir, { mode: 'catalog' });
     assert.ok(result.agents.length > 0, 'Should find at least one agent');
     assert.ok(result.stats.compressedBytes < result.stats.originalBytes, 'Catalog should be smaller than original');
-    // Verify significant compression ratio
     const ratio = result.stats.compressedBytes / result.stats.originalBytes;
     assert.ok(ratio < 0.5, `Compression ratio ${ratio.toFixed(2)} should be < 0.5`);
   })) passed++; else failed++;

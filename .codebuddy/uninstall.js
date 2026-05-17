@@ -36,7 +36,6 @@ function resolvePath(filePath) {
  * Check if a manifest entry is valid (security check)
  */
 function isValidManifestEntry(entry) {
-  // Reject empty, absolute paths, parent directory references
   if (!entry || entry.length === 0) return false;
   if (entry.startsWith('/')) return false;
   if (entry.startsWith('~')) return false;
@@ -85,10 +84,8 @@ function findEmptyDirs(dirPath) {
           emptyDirs.push(currentPath);
         }
       } catch {
-        // Directory might have been deleted
       }
     } catch {
-      // Ignore errors
     }
   }
 
@@ -119,7 +116,6 @@ async function promptConfirm(question) {
 async function doUninstall() {
   const codebuddyDirName = '.codebuddy';
 
-  // Parse arguments
   let targetDir = process.cwd();
   if (process.argv.length > 2) {
     const arg = process.argv[2];
@@ -130,7 +126,6 @@ async function doUninstall() {
     }
   }
 
-  // Determine codebuddy full path
   let codebuddyFullPath;
   const baseName = path.basename(targetDir);
 
@@ -146,7 +141,6 @@ async function doUninstall() {
   console.log(`Target:  ${codebuddyFullPath}/`);
   console.log('');
 
-  // Check if codebuddy directory exists
   if (!fs.existsSync(codebuddyFullPath)) {
     console.error(`Error: ${codebuddyDirName} directory not found at ${targetDir}`);
     process.exit(1);
@@ -155,7 +149,6 @@ async function doUninstall() {
   const codebuddyRootResolved = resolvePath(codebuddyFullPath);
   const manifest = path.join(codebuddyFullPath, '.egc-manifest');
 
-  // Handle missing manifest
   if (!fs.existsSync(manifest)) {
     console.log('Warning: No manifest file found (.egc-manifest)');
     console.log('');
@@ -191,7 +184,6 @@ async function doUninstall() {
     process.exit(0);
   }
 
-  // Read manifest and remove files
   const manifestLines = readManifest(manifest);
   let removed = 0;
   let skipped = 0;
@@ -245,7 +237,6 @@ async function doUninstall() {
     }
   }
 
-  // Remove empty directories
   const emptyDirs = findEmptyDirs(codebuddyFullPath);
   for (const emptyDir of emptyDirs) {
     try {
@@ -254,11 +245,9 @@ async function doUninstall() {
       console.log(`Removed: ${relativePath}/`);
       removed += 1;
     } catch {
-      // Directory might not be empty anymore
     }
   }
 
-  // Try to remove main codebuddy directory if empty
   try {
     const files = fs.readdirSync(codebuddyFullPath);
     if (files.length === 0) {
@@ -267,10 +256,8 @@ async function doUninstall() {
       removed += 1;
     }
   } catch {
-    // Directory not empty
   }
 
-  // Print summary
   console.log('');
   console.log('Uninstall complete!');
   console.log('');
@@ -284,7 +271,6 @@ async function doUninstall() {
   }
 }
 
-// Run uninstaller
 doUninstall().catch((error) => {
   console.error(`Error: ${error.message}`);
   process.exit(1);

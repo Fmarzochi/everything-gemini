@@ -357,10 +357,8 @@ function detectProjectType(projectDir) {
   const elixirDeps = getElixirDeps(projectDir);
 
   for (const rule of FRAMEWORK_RULES) {
-    // Check marker files
     const hasMarker = rule.markers.some(m => fileExists(projectDir, m));
 
-    // Check package dependencies
     let hasDep = false;
     if (rule.packageKeys.length > 0) {
       let depList = [];
@@ -401,7 +399,6 @@ function detectProjectType(projectDir) {
     primary = languages[0];
   }
 
-  // Determine if fullstack (both frontend and backend languages)
   const frontendSignals = ['react', 'vue', 'angular', 'svelte', 'nextjs', 'nuxt', 'astro', 'remix'];
   const backendSignals = ['django', 'fastapi', 'flask', 'express', 'nestjs', 'rails', 'spring', 'laravel', 'phoenix', 'gin', 'echo', 'actix', 'axum'];
   const hasFrontend = frameworks.some(f => frontendSignals.includes(f));

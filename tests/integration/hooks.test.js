@@ -219,7 +219,6 @@ function runHookCommand(command, input = {}, env = {}, timeoutMs = 10000) {
   });
 }
 
-// Create a temporary test directory
 function createTestDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'hook-integration-test-'));
 }
@@ -618,7 +617,6 @@ async function runTests() {
     const counterFile = path.join(os.tmpdir(), `egc-tool-count-${sessionId}`);
 
     try {
-      // Set counter just below threshold
       fs.writeFileSync(counterFile, '49');
 
       const result = await runHookWithInput(
@@ -640,7 +638,6 @@ async function runTests() {
     const testDir = createTestDir();
     const transcriptPath = path.join(testDir, 'transcript.jsonl');
 
-    // Create a transcript with 15 user messages
     const messages = Array(15).fill(null).map((_, i) => ({
       type: 'user',
       content: `Test message ${i + 1}`
@@ -711,13 +708,11 @@ async function runTests() {
       assert.strictEqual(result.code, 0, 'Should exit 0');
       assert.ok(result.stderr.includes('[SessionEnd]'), 'Should have SessionEnd log');
 
-      // Verify a session file was created
       const sessionsDir = path.join(testDir, '.gemini', 'sessions');
       if (fs.existsSync(sessionsDir)) {
         const files = fs.readdirSync(sessionsDir).filter(f => f.endsWith('.tmp'));
         assert.ok(files.length > 0, 'Should create a session file');
 
-        // Verify session content includes tasks from user messages
         const content = fs.readFileSync(path.join(sessionsDir, files[0]), 'utf8');
         assert.ok(content.includes('Fix the login bug'), 'Should include first user message');
         assert.ok(content.includes('auth.ts'), 'Should include modified files');
@@ -781,7 +776,6 @@ async function runTests() {
 
       assert.strictEqual(result.code, 0, 'Should exit 0');
 
-      // Check session file was created
       const sessionsDir = path.join(testDir, '.gemini', 'sessions');
       if (fs.existsSync(sessionsDir)) {
         const files = fs.readdirSync(sessionsDir).filter(f => f.endsWith('.tmp'));

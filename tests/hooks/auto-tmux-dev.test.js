@@ -43,7 +43,6 @@ function runTests() {
   let passed = 0;
   let failed = 0;
 
-  // Check if tmux is available for conditional tests
   const tmuxAvailable = spawnSync('which', ['tmux'], { encoding: 'utf8' }).status === 0;
 
   console.log('Dev server detection:');

@@ -26,7 +26,6 @@ class TestLiveRuntimeAsync(unittest.IsolatedAsyncioTestCase):
         traces = self.tracer.get_traces()
         self.assertTrue(len(traces) > 0)
         
-        # Check for specific event types
         event_types = [t["type"] for t in traces]
         self.assertIn("start", event_types)
         self.assertIn("routing", event_types)

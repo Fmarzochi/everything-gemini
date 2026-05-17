@@ -403,7 +403,6 @@ function runTests() {
       assert.notStrictEqual(output.hookSpecificOutput.permissionDecision, 'deny',
         'should not deny when hook is disabled');
     } else {
-      // When disabled, hook passes through raw input
       assert.strictEqual(output.tool_name, 'Edit', 'pass-through should preserve input');
     }
   })) passed++; else failed++;

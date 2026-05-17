@@ -83,8 +83,6 @@ function isBaselineAbsentError(error, name) {
   if (error.code === 'ENOENT' && BASELINE_ABSENT_PATHS.some(p => haystack.includes(p))) {
     return true;
   }
-  // Any error whose message names a baseline-absent path (covers wrapped errors
-  // and synthesized errors from skipped optional builds like build-opencode).
   if (BASELINE_ABSENT_PATHS.some(p => haystack.includes(p))) {
     return true;
   }

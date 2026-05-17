@@ -65,7 +65,6 @@ function run(rawInput) {
           // Escape single quotes for shell safety: 'text' -> 'text'\''text'
           const escapedCmd = cmd.replace(/'/g, "'\\''");
 
-          // Build the transformed command:
           // 1. Kill existing session (silent if doesn't exist)
           // 2. Create new detached session with the dev command
           // 3. Echo confirmation message with instructions for viewing logs

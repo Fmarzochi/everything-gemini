@@ -5,7 +5,6 @@ from scripts.orchestration.router import AGENT_ROUTER
 
 class TestRouter(unittest.TestCase):
     def setUp(self):
-        # Create a dummy affinity map and runtime map for testing
         self.test_dir = "temp_test_router"
         os.makedirs(os.path.join(self.test_dir, "registry"), exist_ok=True)
         

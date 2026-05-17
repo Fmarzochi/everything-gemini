@@ -1,6 +1,5 @@
 import logging
 
-# Configure structured logging
 logger = logging.getLogger("EGC.DAGValidator")
 
 class DAG_VALIDATOR:

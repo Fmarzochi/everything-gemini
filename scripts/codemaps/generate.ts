@@ -293,7 +293,6 @@ function main(): void {
   console.log(`[generate.ts] Scanning: ${SRC_DIR}`);
   console.log(`[generate.ts] Output:   ${OUTPUT_DIR}`);
 
-  // Ensure output directory exists
   fs.mkdirSync(OUTPUT_DIR, { recursive: true });
 
   // Walk the directory tree
@@ -309,7 +308,6 @@ function main(): void {
   fs.writeFileSync(indexPath, indexContent, 'utf8');
   console.log(`[generate.ts] Written: ${rel(indexPath)}`);
 
-  // Generate per-area codemaps
   for (const [key, area] of Object.entries(areas)) {
     const content = generateAreaDoc(key, area, allFiles);
     const outPath = path.join(OUTPUT_DIR, `${key}.md`);

@@ -138,7 +138,6 @@ function validateHooks() {
     process.exit(1);
   }
 
-  // Validate against JSON schema
   if (fs.existsSync(HOOKS_SCHEMA_PATH)) {
     const schema = JSON.parse(fs.readFileSync(HOOKS_SCHEMA_PATH, 'utf-8'));
     const ajv = new Ajv({ allErrors: true });
@@ -190,7 +189,6 @@ function validateHooks() {
           console.error(`ERROR: ${eventType}[${i}] missing 'hooks' array`);
           hasErrors = true;
         } else {
-          // Validate each hook entry
           for (let j = 0; j < matcher.hooks.length; j++) {
             if (validateHookEntry(matcher.hooks[j], `${eventType}[${i}].hooks[${j}]`)) {
               hasErrors = true;
@@ -215,7 +213,6 @@ function validateHooks() {
         console.error(`ERROR: Hook ${i} missing 'hooks' array`);
         hasErrors = true;
       } else {
-        // Validate each hook entry
         for (let j = 0; j < hook.hooks.length; j++) {
           if (validateHookEntry(hook.hooks[j], `Hook ${i}.hooks[${j}]`)) {
             hasErrors = true;

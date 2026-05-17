@@ -34,7 +34,6 @@ async function main() {
 
   let count = 1;
 
-  // Read existing count or start at 1
   // Use fd-based read+write to reduce (but not eliminate) race window
   // between concurrent hook invocations
   try {

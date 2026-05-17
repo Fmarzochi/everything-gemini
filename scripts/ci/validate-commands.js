@@ -82,7 +82,6 @@ function validateCommands() {
     }
   }
 
-  // Build set of valid skill directory names
   const validSkills = new Set();
   if (fs.existsSync(SKILLS_DIR)) {
     for (const f of fs.readdirSync(SKILLS_DIR)) {
@@ -108,7 +107,6 @@ function validateCommands() {
       continue;
     }
 
-    // Validate the file is non-empty readable markdown
     if (content.trim().length === 0) {
       console.error(`ERROR: ${file} - Empty command file`);
       hasErrors = true;

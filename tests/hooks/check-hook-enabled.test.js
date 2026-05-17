@@ -26,7 +26,6 @@ function test(name, fn) {
 
 function runScript(args = [], envOverrides = {}) {
   const env = { ...process.env, ...envOverrides };
-  // Remove potentially interfering env vars unless explicitly set
   if (!envOverrides.ECC_HOOK_PROFILE) delete env.ECC_HOOK_PROFILE;
   if (!envOverrides.ECC_DISABLED_HOOKS) delete env.ECC_DISABLED_HOOKS;
 

@@ -54,18 +54,15 @@ function loadAliases() {
   try {
     const data = JSON.parse(content);
 
-    // Validate structure
     if (!data.aliases || typeof data.aliases !== 'object') {
       log('[Aliases] Invalid aliases file structure, resetting');
       return getDefaultAliases();
     }
 
-    // Ensure version field
     if (!data.version) {
       data.version = ALIAS_VERSION;
     }
 
-    // Ensure metadata
     if (!data.metadata) {
       data.metadata = {
         totalCount: Object.keys(data.aliases).length,
@@ -91,7 +88,6 @@ function saveAliases(aliases) {
   const backupPath = aliasesPath + '.bak';
 
   try {
-    // Update metadata
     aliases.metadata = {
       totalCount: Object.keys(aliases.aliases).length,
       lastUpdated: new Date().toISOString()
@@ -99,10 +95,8 @@ function saveAliases(aliases) {
 
     const content = JSON.stringify(aliases, null, 2);
 
-    // Ensure directory exists
     ensureDir(path.dirname(aliasesPath));
 
-    // Create backup if file exists
     if (fs.existsSync(aliasesPath)) {
       fs.copyFileSync(aliasesPath, backupPath);
     }
@@ -118,7 +112,6 @@ function saveAliases(aliases) {
     }
     fs.renameSync(tempPath, aliasesPath);
 
-    // Remove backup on success
     if (fs.existsSync(backupPath)) {
       fs.unlinkSync(backupPath);
     }
@@ -158,7 +151,6 @@ function saveAliases(aliases) {
 function resolveAlias(alias) {
   if (!alias) return null;
 
-  // Validate alias name (alphanumeric, dash, underscore)
   if (!/^[a-zA-Z0-9_-]+$/.test(alias)) {
     return null;
   }
@@ -186,12 +178,10 @@ function resolveAlias(alias) {
  * @returns {object} Result with success status and message
  */
 function setAlias(alias, sessionPath, title = null) {
-  // Validate alias name
   if (!alias || alias.length === 0) {
     return { success: false, error: 'Alias name cannot be empty' };
   }
 
-  // Validate session path
   if (!sessionPath || typeof sessionPath !== 'string' || sessionPath.trim().length === 0) {
     return { success: false, error: 'Session path cannot be empty' };
   }
@@ -312,7 +302,6 @@ function renameAlias(oldAlias, newAlias) {
     return { success: false, error: `Alias '${oldAlias}' not found` };
   }
 
-  // Validate new alias name (same rules as setAlias)
   if (!newAlias || newAlias.length === 0) {
     return { success: false, error: 'New alias name cannot be empty' };
   }

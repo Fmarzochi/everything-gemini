@@ -124,7 +124,6 @@ async function asyncTest(name, fn) {
   }
 }
 
-// Run a script and capture output
 function runScript(scriptPath, input = '', env = {}) {
   return new Promise((resolve, reject) => {
     const proc = spawn('node', [scriptPath], {
@@ -174,7 +173,6 @@ function runShellScript(scriptPath, args = [], input = '', env = {}, cwd = proce
   });
 }
 
-// Create a temporary test directory
 function createTestDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'hooks-test-'));
 }
@@ -384,7 +382,6 @@ async function runTests() {
       fs.mkdirSync(sessionsDir, { recursive: true });
       fs.mkdirSync(path.join(isoHome, '.gemini', 'skills', 'learned'), { recursive: true });
 
-      // Create a session file with template placeholder
       const sessionFile = path.join(sessionsDir, '2026-02-11-abcd1234-session.tmp');
       fs.writeFileSync(sessionFile, '## Current State\n\n[Session context goes here]\n');
 
@@ -411,7 +408,6 @@ async function runTests() {
       fs.mkdirSync(sessionsDir, { recursive: true });
       fs.mkdirSync(path.join(isoHome, '.gemini', 'skills', 'learned'), { recursive: true });
 
-      // Create a real session file
       const sessionFile = path.join(sessionsDir, '2026-02-11-efgh5678-session.tmp');
       fs.writeFileSync(sessionFile, '# Real Session\n\nI worked on authentication refactor.\n');
 
@@ -611,7 +607,6 @@ async function runTests() {
       fs.mkdirSync(learnedDir, { recursive: true });
       fs.mkdirSync(getCanonicalSessionsDir(isoHome), { recursive: true });
 
-      // Create learned skill files
       fs.writeFileSync(path.join(learnedDir, 'testing-patterns.md'), '# Testing');
       fs.writeFileSync(path.join(learnedDir, 'debugging.md'), '# Debugging');
 
@@ -745,14 +740,12 @@ async function runTests() {
           USERPROFILE: isoHome
         });
 
-        // Check if session file was created
         // Note: Without EGC_SESSION_ID, falls back to project/worktree name (not 'default')
         // Use local time to match the script's getDateString() function
         const sessionsDir = getCanonicalSessionsDir(isoHome);
         const now = new Date();
         const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 
-        // Get the expected session ID (project name fallback)
         const utils = require('../../scripts/lib/utils');
         const expectedId = utils.getSessionIdShort();
         const sessionFile = path.join(sessionsDir, `${today}-${expectedId}-session.tmp`);
@@ -779,7 +772,6 @@ async function runTests() {
           EGC_SESSION_ID: testSessionId
         });
 
-        // Check if session file was created with session ID
         // Use local time to match the script's getDateString() function
         const sessionsDir = getCanonicalSessionsDir(isoHome);
         const now = new Date();
@@ -1036,14 +1028,12 @@ async function runTests() {
     await asyncTest('increments counter on each call', async () => {
       const sessionId = 'test-counter-' + Date.now();
 
-      // Run multiple times
       for (let i = 0; i < 3; i++) {
         await runScript(path.join(scriptsDir, 'suggest-compact.js'), '', {
           EGC_SESSION_ID: sessionId
         });
       }
 
-      // Check counter file
       const counterFile = path.join(os.tmpdir(), `egc-tool-count-${sessionId}`);
       const count = parseInt(fs.readFileSync(counterFile, 'utf8').trim(), 10);
       assert.strictEqual(count, 3, `Counter should be 3, got ${count}`);
@@ -1060,7 +1050,6 @@ async function runTests() {
       const sessionId = 'test-threshold-' + Date.now();
       const counterFile = path.join(os.tmpdir(), `egc-tool-count-${sessionId}`);
 
-      // Set counter to threshold - 1
       fs.writeFileSync(counterFile, '49');
 
       const result = await runScript(path.join(scriptsDir, 'suggest-compact.js'), '', {
@@ -1195,7 +1184,6 @@ async function runTests() {
       const testDir = createTestDir();
       const transcriptPath = path.join(testDir, 'transcript.jsonl');
 
-      // Create a short transcript (less than 10 user messages)
       const transcript = Array(5).fill('{"type":"user","content":"test"}\n').join('');
       fs.writeFileSync(transcriptPath, transcript);
 
@@ -1215,7 +1203,6 @@ async function runTests() {
       const testDir = createTestDir();
       const transcriptPath = path.join(testDir, 'transcript.jsonl');
 
-      // Create a longer transcript (more than 10 user messages)
       const transcript = Array(15).fill('{"type":"user","content":"test"}\n').join('');
       fs.writeFileSync(transcriptPath, transcript);
 
@@ -1236,7 +1223,6 @@ async function runTests() {
       const testDir = createTestDir();
       const transcriptPath = path.join(testDir, 'transcript.jsonl');
 
-      // Create transcript with whitespace around colons (pretty-printed style)
       const lines = [];
       for (let i = 0; i < 15; i++) {
         lines.push('{ "type" : "user", "content": "message ' + i + '" }');
@@ -1260,7 +1246,6 @@ async function runTests() {
       const testDir = createTestDir();
       const transcriptPath = path.join(testDir, 'transcript.jsonl');
 
-      // Create transcript with null elements in content array
       const lines = [
         '{"type":"user","content":[null,{"text":"hello"},null,{"text":"world"}]}',
         '{"type":"user","content":"simple string message"}',
@@ -1856,7 +1841,6 @@ async function runTests() {
       });
       assert.strictEqual(result.code, 0, 'Should handle backticks without crash');
 
-      // Find the session file in the temp HOME
       const claudeDir = getCanonicalSessionsDir(testDir);
       if (fs.existsSync(claudeDir)) {
         const files = fs.readdirSync(claudeDir).filter(f => f.endsWith('.tmp'));
@@ -2270,7 +2254,6 @@ async function runTests() {
       assert.ok(!commandText.includes('find '), 'Should not scan arbitrary plugin paths with find');
       assert.ok(!commandText.includes('head -n 1'), 'Should not pick the first matching plugin path');
 
-      // Verify the bootstrap script itself contains the expected logic
       const bootstrapPath = path.join(__dirname, '..', '..', 'scripts', 'hooks', 'session-start-bootstrap.js');
       assert.ok(fs.existsSync(bootstrapPath), 'Bootstrap script should exist at scripts/hooks/session-start-bootstrap.js');
       const bootstrapSrc = fs.readFileSync(bootstrapPath, 'utf8');
@@ -3051,7 +3034,6 @@ async function runTests() {
       const lines = ['{"type":"user","content":"msg1"}', '{"type":"user","content":"msg2"}'];
       fs.writeFileSync(transcriptPath, lines.join('\n'));
 
-      // Create a config file with min_session_length=0
       const skillsDir = path.join(testDir, 'skills', 'ai', 'continuous-learning');
       fs.mkdirSync(skillsDir, { recursive: true });
       const configPath = path.join(skillsDir, 'config.json');
@@ -3183,11 +3165,9 @@ async function runTests() {
       const sessionsDir = getCanonicalSessionsDir(testDir);
       fs.mkdirSync(sessionsDir, { recursive: true });
 
-      // Get the expected filename
       const utils = require('../../scripts/lib/utils');
       const today = utils.getDateString();
 
-      // Create a pre-existing session file with known timestamp
       const shortId = 'update01';
       const sessionFile = path.join(sessionsDir, `${today}-${shortId}-session.tmp`);
       const originalContent = `# Session: ${today}\n**Date:** ${today}\n**Started:** 09:00\n**Last Updated:** 09:00\n\n---\n\n## Current State\n\n[Session context goes here]\n\n### Completed\n- [ ]\n\n### In Progress\n- [ ]\n\n### Notes for Next Session\n-\n\n### Context to Load\n\`\`\`\n[relevant files]\n\`\`\`\n`;
@@ -3257,7 +3237,6 @@ async function runTests() {
       const originalContent = `# Session: ${today}\n**Date:** ${today}\n**Started:** 09:00\n**Last Updated:** 09:00\n\n---\n\n## Current State\n\n[Session context goes here]\n\n### Completed\n- [ ]\n\n### In Progress\n- [ ]\n\n### Notes for Next Session\n-\n\n### Context to Load\n\`\`\`\n[relevant files]\n\`\`\`\n`;
       fs.writeFileSync(sessionFile, originalContent);
 
-      // Create a transcript with user messages
       const transcriptPath = path.join(testDir, 'transcript.jsonl');
       const lines = ['{"type":"user","content":"Fix auth bug"}', '{"type":"tool_use","tool_name":"Edit","tool_input":{"file_path":"/src/auth.ts"}}'];
       fs.writeFileSync(transcriptPath, lines.join('\n'));
@@ -3632,7 +3611,6 @@ async function runTests() {
       fs.mkdirSync(sessionsDir, { recursive: true });
       fs.mkdirSync(path.join(isoHome, '.gemini', 'skills', 'learned'), { recursive: true });
 
-      // Create a session file with the blank template marker
       const today = new Date().toISOString().slice(0, 10);
       const sessionFile = path.join(sessionsDir, `${today}-blank-session.tmp`);
       fs.writeFileSync(sessionFile, '# Session\n[Session context goes here]\n');
@@ -3904,7 +3882,6 @@ async function runTests() {
       for (const substr of expectedSubstrings) {
         assert.ok(source.includes(substr), `Should include pattern containing "${substr}"`);
       }
-      // Verify the array name exists
       assert.ok(source.includes('EXCLUDED_PATTERNS'), 'Should have EXCLUDED_PATTERNS array');
     })
   )
@@ -3957,7 +3934,6 @@ async function runTests() {
       const runAllSource = fs.readFileSync(path.join(__dirname, '..', 'run-all.js'), 'utf8');
       assert.ok(runAllSource.includes('spawnSync'), 'Should use spawnSync instead of execSync');
       assert.ok(!runAllSource.includes('execSync'), 'Should not use execSync');
-      // Verify it shows stderr
       assert.ok(runAllSource.includes('stderr'), 'Should handle stderr output');
       assert.ok(runAllSource.includes('result.status !== 0'), 'Should treat non-zero child exits as failures');
     })
@@ -4048,7 +4024,6 @@ async function runTests() {
 
   if (
     await asyncTest('passes through data when git commands fail', async () => {
-      // Run from a non-git directory
       const testDir = createTestDir();
       const stdinData = JSON.stringify({ tool_name: 'Write', tool_input: {} });
       const result = await runScript(path.join(scriptsDir, 'check-console-log.js'), stdinData);
@@ -4163,7 +4138,6 @@ async function runTests() {
       // ~ should expand to os.homedir() which during the script run is the real home
       // The script creates the directory via ensureDir — check that it attempted to
       // create a directory starting with the home dir, not a literal ~/
-      // Verify the literal ~/test-tilde-skills was NOT created
       assert.ok(!fs.existsSync(path.join(testDir, '~', 'test-tilde-skills')), 'Should NOT create literal ~/test-tilde-skills directory');
       cleanupTestDir(testDir);
     })
@@ -4244,7 +4218,6 @@ async function runTests() {
       const sessionsDir = getCanonicalSessionsDir(isoHome);
       fs.mkdirSync(sessionsDir, { recursive: true });
 
-      // Create two session files with different mtimes
       const olderSession = path.join(sessionsDir, '2026-01-01-older-session.tmp');
       const newerSession = path.join(sessionsDir, '2026-02-11-newer-session.tmp');
       fs.writeFileSync(olderSession, '# Older Session\n');
@@ -4292,7 +4265,6 @@ async function runTests() {
       });
       assert.strictEqual(result.code, 0);
 
-      // Find the session file and verify newlines were collapsed
       const claudeDir = getCanonicalSessionsDir(testDir);
       if (fs.existsSync(claudeDir)) {
         const files = fs.readdirSync(claudeDir).filter(f => f.endsWith('.tmp'));
@@ -4323,7 +4295,6 @@ async function runTests() {
       fs.mkdirSync(sessionsDir, { recursive: true });
       fs.mkdirSync(path.join(isoHome, '.gemini', 'skills', 'learned'), { recursive: true });
 
-      // Create a 0-byte session file (simulates truncated/corrupted write)
       const today = new Date().toISOString().slice(0, 10);
       const sessionFile = path.join(sessionsDir, `${today}-empty0000-session.tmp`);
       fs.writeFileSync(sessionFile, '');
@@ -4634,12 +4605,10 @@ async function runTests() {
 
       const now = Date.now();
 
-      // Create older session (2 days ago)
       const olderSession = path.join(sessionsDir, '2026-02-11-olderabc-session.tmp');
       fs.writeFileSync(olderSession, '# Older Session\n\nOLDER_CONTEXT_MARKER');
       fs.utimesSync(olderSession, new Date(now - 2 * 86400000), new Date(now - 2 * 86400000));
 
-      // Create newer session (1 day ago)
       const newerSession = path.join(sessionsDir, '2026-02-12-newerdef-session.tmp');
       fs.writeFileSync(newerSession, '# Newer Session\n\nNEWER_CONTEXT_MARKER');
       fs.utimesSync(newerSession, new Date(now - 1 * 86400000), new Date(now - 1 * 86400000));
@@ -4825,7 +4794,6 @@ async function runTests() {
       const sessionsDir = getCanonicalSessionsDir(isoHome);
       fs.mkdirSync(sessionsDir, { recursive: true });
 
-      // Create a session file then make it read-only
       const sessionFile = path.join(sessionsDir, `${Date.now()}-session.tmp`);
       fs.writeFileSync(sessionFile, '# Active session\n');
       fs.chmodSync(sessionFile, 0o444);

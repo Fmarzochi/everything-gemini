@@ -85,7 +85,6 @@ function findFileIssues(filePath) {
         });
       }
       
-      // Check for debugger statements
       if (/\bdebugger\b/.test(line) && !line.trim().startsWith('//')) {
         issues.push({
           type: 'debugger',
@@ -106,7 +105,6 @@ function findFileIssues(filePath) {
         });
       }
       
-      // Check for hardcoded secrets (basic patterns)
       const secretPatterns = [
         { pattern: /sk-[a-zA-Z0-9]{20,}/, name: 'OpenAI API key' },
         { pattern: /ghp_[a-zA-Z0-9]{36}/, name: 'GitHub PAT' },
@@ -145,7 +143,6 @@ function validateCommitMessage(command) {
   const message = messageMatch[1];
   const issues = [];
   
-  // Check conventional commit format
   const conventionalCommit = /^(feat|fix|docs|style|refactor|test|chore|build|ci|perf|revert)(\(.+\))?:\s*.+/;
   if (!conventionalCommit.test(message)) {
     issues.push({
@@ -155,7 +152,6 @@ function validateCommitMessage(command) {
     });
   }
   
-  // Check message length
   if (message.length > 72) {
     issues.push({
       type: 'length',
@@ -164,7 +160,6 @@ function validateCommitMessage(command) {
     });
   }
   
-  // Check for lowercase first letter (conventional)
   if (conventionalCommit.test(message)) {
     const afterColon = message.split(':')[1];
     if (afterColon && /^[A-Z]/.test(afterColon.trim())) {
@@ -176,7 +171,6 @@ function validateCommitMessage(command) {
     }
   }
   
-  // Check for trailing period
   if (message.endsWith('.')) {
     issues.push({
       type: 'punctuation',
@@ -252,7 +246,6 @@ function runLinter(files) {
     golint: null
   };
   
-  // Run ESLint if available
   if (jsFiles.length > 0) {
     const eslintBin = process.platform === 'win32' ? 'eslint.cmd' : 'eslint';
     const eslintPath = path.join(process.cwd(), 'node_modules', '.bin', eslintBin);
@@ -265,7 +258,6 @@ function runLinter(files) {
     }
   }
   
-  // Run Pylint if available
   if (pyFiles.length > 0) {
     try {
       const pylintPath = resolveCommand('pylint');
@@ -283,7 +275,6 @@ function runLinter(files) {
     }
   }
   
-  // Run golint if available
   if (goFiles.length > 0) {
     try {
       const golintPath = resolveCommand('golint');
@@ -324,7 +315,6 @@ function evaluate(rawInput) {
       return { output: rawInput, exitCode: 0 };
     }
     
-    // Get staged files
     const stagedFiles = getStagedFiles();
     
     if (stagedFiles.length === 0) {
@@ -334,7 +324,6 @@ function evaluate(rawInput) {
     
     console.error(`[Hook] Checking ${stagedFiles.length} staged file(s)...`);
     
-    // Check each staged file
     const filesToCheck = stagedFiles.filter(shouldCheckFile);
     let totalIssues = 0;
     let errorCount = 0;
@@ -356,7 +345,6 @@ function evaluate(rawInput) {
       }
     }
     
-    // Validate commit message if provided
     const messageValidation = validateCommitMessage(command);
     if (messageValidation && messageValidation.issues.length > 0) {
       console.error('\nCommit Message Issues:');
@@ -370,7 +358,6 @@ function evaluate(rawInput) {
       }
     }
     
-    // Run linter
     const lintResults = runLinter(filesToCheck);
     
     if (lintResults.eslint && !lintResults.eslint.success) {

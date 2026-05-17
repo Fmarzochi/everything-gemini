@@ -2,7 +2,6 @@ import logging
 import asyncio
 from typing import Callable, Any, Optional, List
 
-# Configure structured logging
 logger = logging.getLogger("EGC.Fallback")
 
 class FALLBACK_MANAGER:

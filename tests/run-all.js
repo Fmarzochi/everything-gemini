@@ -85,7 +85,6 @@ for (const testFile of testFiles) {
   if (stdout) console.log(stdout);
   if (stderr) console.log(stderr);
 
-  // Parse results from combined output
   const combined = stdout + stderr;
   const passedMatch = combined.match(/Passed:\s*(\d+)/);
   const failedMatch = combined.match(/Failed:\s*(\d+)/);

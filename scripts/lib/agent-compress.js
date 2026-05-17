@@ -215,14 +215,12 @@ function buildAgentCatalog(agentsDir, options = {}) {
  * Returns null if not found.
  */
 function lazyLoadAgent(agentsDir, agentName) {
-  // Validate agentName: only allow alphanumeric, hyphen, underscore
   if (!/^[\w-]+$/.test(agentName)) {
     return null;
   }
 
   const filePath = path.resolve(agentsDir, `${agentName}.md`);
 
-  // Verify the resolved path is still within agentsDir
   const resolvedAgentsDir = path.resolve(agentsDir);
   if (!filePath.startsWith(resolvedAgentsDir + path.sep)) {
     return null;

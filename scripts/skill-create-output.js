@@ -235,10 +235,8 @@ async function demo() {
   output.footer();
 }
 
-// Export for use in other scripts
 module.exports = { SkillCreateOutput, demo };
 
-// Run demo if executed directly
 if (require.main === module) {
   demo().catch(console.error);
 }

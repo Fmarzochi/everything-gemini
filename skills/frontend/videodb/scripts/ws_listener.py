@@ -53,7 +53,6 @@ logging.basicConfig(
 )
 LOGGER = logging.getLogger(__name__)
 
-# Parse arguments
 RETRYABLE_ERRORS = (ConnectionError, TimeoutError)
 
 
@@ -247,7 +246,6 @@ async def main_async():
         with contextlib.suppress(NotImplementedError):
             loop.add_signal_handler(sig, handle_signal)
     
-    # Run listener with cancellation support
     listen_task = asyncio.create_task(listen_with_retry())
     shutdown_task = asyncio.create_task(shutdown_event.wait())
     

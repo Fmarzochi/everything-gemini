@@ -269,7 +269,6 @@ function runTests() {
       assert.strictEqual(result.code, 0, `Expected exit 0, got ${result.code}. stderr: ${result.stderr}`);
       assert.ok(result.stdout.includes('Global preference set to'), 'Should show success message');
       assert.ok(result.stdout.includes('npm'), 'Should mention npm');
-      // Verify config file was created
       const configPath = path.join(tmpDir, '.gemini', 'package-manager.json');
       assert.ok(fs.existsSync(configPath), 'Config file should be created');
       const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
@@ -288,7 +287,6 @@ function runTests() {
       const result = run(['npm'], { HOME: tmpDir, USERPROFILE: tmpDir });
       assert.strictEqual(result.code, 0, `Expected exit 0, got ${result.code}. stderr: ${result.stderr}`);
       assert.ok(result.stdout.includes('Global preference set to'), 'Should show success message');
-      // Verify config file was created
       const configPath = path.join(tmpDir, '.gemini', 'package-manager.json');
       assert.ok(fs.existsSync(configPath), 'Config file should be created');
       const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
@@ -323,7 +321,6 @@ function runTests() {
       assert.strictEqual(result.status, 0, `Expected exit 0, got ${result.status}. stderr: ${result.stderr}`);
       assert.ok(result.stdout.includes('Project preference set to'), 'Should show project success message');
       assert.ok(result.stdout.includes('npm'), 'Should mention npm');
-      // Verify config file was created in the project CWD
       const configPath = path.join(tmpDir, '.gemini', 'package-manager.json');
       assert.ok(fs.existsSync(configPath), 'Project config file should be created in CWD');
       const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));

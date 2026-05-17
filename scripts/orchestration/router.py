@@ -3,7 +3,6 @@ import json
 import logging
 from typing import List, Dict, Optional
 
-# Configure structured logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s [%(levelname)s] %(name)s: %(message)s',
@@ -55,7 +54,6 @@ class AGENT_ROUTER:
                 if re.search(pattern, task_lower):
                     scores[domain] += 1
         
-        # Get domain with highest score
         best_domain = max(scores, key=scores.get)
         if scores[best_domain] == 0:
             return "general"

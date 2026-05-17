@@ -31,7 +31,6 @@ class TestOrchestratorAsync(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(res["status"], "success")
         self.assertEqual(res["agent"], "agent-a")
         
-        # Verify logging
         log_path = os.path.join(self.test_dir, ".sessions", "execution_log.jsonl")
         self.assertTrue(os.path.exists(log_path))
 

@@ -21,7 +21,6 @@ class TestSessionIsolation(unittest.TestCase):
         for t in threads: t.start()
         for t in threads: t.join()
         
-        # Verify no events were lost due to race conditions
         total_events = sum(1 for task in self.sm.state["tasks"] if task["task_id"] == task_id for _ in task["events"])
         self.assertEqual(total_events, 250)
 

@@ -11,7 +11,6 @@ const path = require('path');
 const fs = require('fs');
 const { spawnSync } = require('child_process');
 
-// Import the module
 const utils = require('../../scripts/lib/utils');
 
 // Test helper
@@ -621,9 +620,6 @@ function runTests() {
   console.log('\nisGitRepo():');
 
   if (test('isGitRepo returns true in a git repo', () => {
-    // We're running from within the EGC repo, so this should be true.
-    // In CI checkouts the .git directory is always present; in stripped
-    // mirrors (e.g. tarball extracts) it isn't — treat that as environmental.
     const fs = require('fs');
     const gitDir = require('path').join(__dirname, '..', '..', '.git');
     if (!fs.existsSync(gitDir)) {
@@ -780,7 +776,6 @@ function runTests() {
     const testDir = path.join(utils.getTempDir(), `utils-test-regex-${Date.now()}`);
     try {
       fs.mkdirSync(testDir);
-      // Create files with regex-special characters in names
       fs.writeFileSync(path.join(testDir, 'file(1).txt'), 'content');
       fs.writeFileSync(path.join(testDir, 'file+2.txt'), 'content');
       fs.writeFileSync(path.join(testDir, 'file[3].txt'), 'content');
@@ -933,7 +928,6 @@ function runTests() {
       const f1 = path.join(testDir, 'old.txt');
       const f2 = path.join(testDir, 'new.txt');
       fs.writeFileSync(f1, 'old');
-      // Set older mtime on first file
       const past = new Date(Date.now() - 60000);
       fs.utimesSync(f1, past, past);
       fs.writeFileSync(f2, 'new');
@@ -957,7 +951,6 @@ function runTests() {
       const old = path.join(testDir, 'old.txt');
       fs.writeFileSync(recent, 'new');
       fs.writeFileSync(old, 'old');
-      // Set mtime to 30 days ago
       const past = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
       fs.utimesSync(old, past, past);
 
@@ -1059,7 +1052,6 @@ function runTests() {
     // which should arrive in multiple chunks. With maxSize=100, only the first chunk(s)
     // totaling under 100 bytes should be captured; subsequent chunks are dropped.
     const script = 'const u=require("./scripts/lib/utils");u.readStdinJson({timeoutMs:2000,maxSize:100}).then(d=>{process.stdout.write(JSON.stringify(d))})';
-    // Generate 100KB of data (arrives in multiple chunks)
     const bigInput = '{"k":"' + 'X'.repeat(100000) + '"}';
     const result = execFileSync('node', ['-e', script], { ...stdinOpts, input: bigInput });
     // Truncated mid-string → invalid JSON → resolves to {}
@@ -1314,7 +1306,6 @@ function runTests() {
       fs.chmodSync(filePath, 0o444);
       const result = utils.replaceInFile(filePath, 'hello', 'goodbye');
       assert.strictEqual(result, false, 'Should return false when file is read-only');
-      // Verify content unchanged
       const content = fs.readFileSync(filePath, 'utf8');
       assert.strictEqual(content, 'hello world', 'Original content should be preserved');
     } finally {
@@ -1351,7 +1342,6 @@ function runTests() {
     fs.mkdirSync(readableSubdir, { recursive: true });
     fs.mkdirSync(unreadableSubdir, { recursive: true });
 
-    // Create files in both subdirectories
     fs.writeFileSync(path.join(readableSubdir, 'found.txt'), 'data');
     fs.writeFileSync(path.join(unreadableSubdir, 'hidden.txt'), 'data');
 
@@ -1684,7 +1674,6 @@ function runTests() {
     const tmpDir = fs.mkdtempSync(path.join(utils.getTempDir(), 'r99-cr-only-'));
     const testFile = path.join(tmpDir, 'cr-only.txt');
     try {
-      // Write file with CR-only line endings (no LF)
       fs.writeFileSync(testFile, 'alpha\rbeta\rgamma');
       const matches = utils.grepFile(testFile, 'beta');
       assert.strictEqual(matches.length, 1,
@@ -1705,7 +1694,6 @@ function runTests() {
     const subDir = path.join(tmpDir, 'nested');
     try {
       fs.mkdirSync(subDir);
-      // Create files: one in root, one in subdirectory
       const rootFile = path.join(tmpDir, 'root.txt');
       const nestedFile = path.join(subDir, 'nested.txt');
       fs.writeFileSync(rootFile, 'root file');
@@ -1964,7 +1952,6 @@ function runTests() {
     fs.writeFileSync(path.join(unreadableDir, 'secret.txt'), 'hidden');
     try {
       fs.chmodSync(unreadableDir, 0o000);
-      // Verify dir exists but is unreadable
       assert.ok(fs.existsSync(unreadableDir), 'Directory should exist');
       // findFiles should NOT throw — catch block at line 188 handles EACCES
       const results = utils.findFiles(unreadableDir, '*');
@@ -2119,7 +2106,6 @@ function runTests() {
     const tmpDir = fs.mkdtempSync(path.join(utils.getTempDir(), 'r117-grep-crlf-'));
     const testFile = path.join(tmpDir, 'test.txt');
     try {
-      // Write CRLF content
       fs.writeFileSync(testFile, 'hello\r\nworld\r\nfoo bar\r\n');
 
       // Unanchored pattern works — 'hello' matches in 'hello\r'
@@ -2260,7 +2246,6 @@ function runTests() {
     const tmpDir = fs.mkdtempSync(path.join(utils.getTempDir(), 'r119-appendfile-type-'));
     const testFile = path.join(tmpDir, 'test.txt');
     try {
-      // Create file with initial content
       fs.writeFileSync(testFile, 'initial');
 
       // null content → TypeError from fs.appendFileSync
@@ -2284,7 +2269,6 @@ function runTests() {
         'appendFile(path, 42) should throw TypeError'
       );
 
-      // Verify original content is unchanged after failed appends
       assert.strictEqual(utils.readFile(testFile), 'initial',
         'File content should be unchanged after failed appends');
 
@@ -2340,7 +2324,6 @@ function runTests() {
   if (test('findFiles with ? glob matches single character only — test?.txt matches test1 but not test12', () => {
     const tmpDir = fs.mkdtempSync(path.join(utils.getTempDir(), 'r121-glob-question-'));
     try {
-      // Create test files
       fs.writeFileSync(path.join(tmpDir, 'test1.txt'), 'a');
       fs.writeFileSync(path.join(tmpDir, 'testA.txt'), 'b');
       fs.writeFileSync(path.join(tmpDir, 'test12.txt'), 'c');
@@ -2477,7 +2460,6 @@ function runTests() {
     // difference from shell globbing that could surprise users.
     const tmpDir = fs.mkdtempSync(path.join(utils.getTempDir(), 'r124-dotfiles-'));
     try {
-      // Create normal and hidden files
       fs.writeFileSync(path.join(tmpDir, 'normal.txt'), 'visible');
       fs.writeFileSync(path.join(tmpDir, '.hidden'), 'hidden');
       fs.writeFileSync(path.join(tmpDir, '.gitignore'), 'ignore');
@@ -2522,7 +2504,6 @@ function runTests() {
     const tmpDir = fs.mkdtempSync(path.join(utils.getTempDir(), 'r125-binary-'));
     const testFile = path.join(tmpDir, 'binary.dat');
     try {
-      // Write raw binary data (invalid UTF-8 sequences)
       const binaryData = Buffer.from([0x00, 0x80, 0xFF, 0xFE, 0x48, 0x65, 0x6C, 0x6C, 0x6F]);
       fs.writeFileSync(testFile, binaryData);
 

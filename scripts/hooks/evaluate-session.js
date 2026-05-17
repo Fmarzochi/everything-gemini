@@ -42,7 +42,6 @@ process.stdin.on('end', () => {
 });
 
 async function main() {
-  // Parse stdin JSON to get transcript_path
   let transcriptPath;
   try {
     const input = JSON.parse(stdinData);
@@ -52,7 +51,6 @@ async function main() {
     transcriptPath = process.env.GEMINI_TRANSCRIPT_PATH;
   }
 
-  // Get script directory to find config
   const scriptDir = __dirname;
   const configFile = path.join(scriptDir, '..', '..', 'skills', 'ai', 'continuous-learning', 'config.json');
 
@@ -60,7 +58,6 @@ async function main() {
   let minSessionLength = 10;
   let learnedSkillsPath = getLearnedSkillsDir();
 
-  // Load config if exists
   const configContent = readFile(configFile);
   if (configContent) {
     try {
@@ -68,7 +65,6 @@ async function main() {
       minSessionLength = config.min_session_length ?? 10;
 
       if (config.learned_skills_path) {
-        // Handle ~ in path
         learnedSkillsPath = config.learned_skills_path.replace(/^~/, require('os').homedir());
       }
     } catch (err) {
@@ -76,7 +72,6 @@ async function main() {
     }
   }
 
-  // Ensure learned skills directory exists
   ensureDir(learnedSkillsPath);
 
   if (!transcriptPath || !fs.existsSync(transcriptPath)) {

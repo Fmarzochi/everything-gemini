@@ -212,7 +212,6 @@ async function main() {
   if (transcriptPath) {
     const m = path.basename(transcriptPath).match(/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\.jsonl$/i);
     if (m) {
-      // Run through sanitizeSessionId() for byte-for-byte parity with
       // getSessionIdShort(sessionId.slice(-8)).
       shortId = sanitizeSessionId(m[1].slice(-8).toLowerCase());
     }
@@ -272,7 +271,6 @@ async function main() {
 
     log(`[SessionEnd] Updated session file: ${sessionFile}`);
   } else {
-    // Create new session file
     const summarySection = summary
       ? `${buildSummaryBlock(summary)}\n\n### Notes for Next Session\n-\n\n### Context to Load\n\`\`\`\n[relevant files]\n\`\`\``
       : `## Current State\n\n[Session context goes here]\n\n### Completed\n- [ ]\n\n### In Progress\n- [ ]\n\n### Notes for Next Session\n-\n\n### Context to Load\n\`\`\`\n[relevant files]\n\`\`\``;

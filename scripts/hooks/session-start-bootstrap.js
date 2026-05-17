@@ -42,7 +42,6 @@ const KNOWN_PLUGIN_PATHS = [
 ];
 const CACHE_PLUGIN_SLUGS = [CURRENT_PLUGIN_SLUG, LEGACY_PLUGIN_SLUG];
 
-// Read the raw JSON event from stdin
 const raw = fs.readFileSync(0, 'utf8');
 
 // Path (relative to plugin root) to the hook runner

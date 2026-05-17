@@ -12,7 +12,6 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 
-// Platform detection
 const isWindows = process.platform === 'win32';
 
 /**
@@ -81,7 +80,6 @@ function ensureManifestEntry(manifestPath, entry) {
 function copyManagedFile(sourcePath, targetPath, manifestPath, manifestEntry, makeExecutable = false) {
   const alreadyManaged = manifestHasEntry(manifestPath, manifestEntry);
 
-  // If target file already exists
   if (fs.existsSync(targetPath)) {
     if (alreadyManaged) {
       ensureManifestEntry(manifestPath, manifestEntry);
@@ -89,12 +87,10 @@ function copyManagedFile(sourcePath, targetPath, manifestPath, manifestEntry, ma
     return false;
   }
 
-  // Copy the file
   try {
     ensureDir(path.dirname(targetPath));
     fs.copyFileSync(sourcePath, targetPath);
 
-    // Make executable on Unix systems
     if (makeExecutable && !isWindows) {
       fs.chmodSync(targetPath, 0o755);
     }
@@ -129,13 +125,11 @@ function findFiles(dir, extension = '') {
           }
         }
       } catch {
-        // Ignore permission errors
       }
     }
 
     walk(dir);
   } catch {
-    // Ignore errors
   }
   return results.sort();
 }
@@ -144,12 +138,10 @@ function findFiles(dir, extension = '') {
  * Main install function
  */
 function doInstall() {
-  // Resolve script directory (where this file lives)
   const scriptDir = path.dirname(path.resolve(__filename));
   const repoRoot = path.dirname(scriptDir);
   const codebuddyDirName = '.codebuddy';
 
-  // Parse arguments
   let targetDir = process.cwd();
   if (process.argv.length > 2) {
     const arg = process.argv[2];
@@ -160,7 +152,6 @@ function doInstall() {
     }
   }
 
-  // Determine codebuddy full path
   let codebuddyFullPath;
   const baseName = path.basename(targetDir);
 
@@ -177,23 +168,19 @@ function doInstall() {
   console.log(`Target:  ${codebuddyFullPath}/`);
   console.log('');
 
-  // Create subdirectories
   const subdirs = ['commands', 'agents', 'skills', 'rules'];
   for (const dir of subdirs) {
     ensureDir(path.join(codebuddyFullPath, dir));
   }
 
-  // Manifest file
   const manifest = path.join(codebuddyFullPath, '.egc-manifest');
   ensureDir(path.dirname(manifest));
 
-  // Counters
   let commands = 0;
   let agents = 0;
   let skills = 0;
   let rules = 0;
 
-  // Copy commands
   const commandsDir = path.join(repoRoot, 'commands');
   if (fs.existsSync(commandsDir)) {
     const files = findFiles(commandsDir, '.md');
@@ -208,7 +195,6 @@ function doInstall() {
     }
   }
 
-  // Copy agents
   const agentsDir = path.join(repoRoot, 'agents');
   if (fs.existsSync(agentsDir)) {
     const files = findFiles(agentsDir, '.md');
@@ -223,7 +209,6 @@ function doInstall() {
     }
   }
 
-  // Copy skills (with subdirectories)
   const skillsDir = path.join(repoRoot, 'skills');
   if (fs.existsSync(skillsDir)) {
     const skillDirs = fs.readdirSync(skillsDir, { withFileTypes: true })
@@ -252,7 +237,6 @@ function doInstall() {
     }
   }
 
-  // Copy rules (with subdirectories)
   const rulesDir = path.join(repoRoot, 'rules');
   if (fs.existsSync(rulesDir)) {
     const ruleFiles = findFiles(rulesDir);
@@ -278,10 +262,8 @@ function doInstall() {
     }
   }
 
-  // Add manifest itself
   ensureManifestEntry(manifest, '.egc-manifest');
 
-  // Print summary
   console.log('Installation complete!');
   console.log('');
   console.log('Components installed:');
@@ -303,7 +285,6 @@ function doInstall() {
   console.log('');
 }
 
-// Run installer
 try {
   doInstall();
 } catch (error) {

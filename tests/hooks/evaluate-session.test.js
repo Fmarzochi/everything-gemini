@@ -180,7 +180,6 @@ function runTests() {
 
   if (test('uses custom min_session_length from config file', () => {
     const testDir = createTestDir();
-    // Create a config that sets min_session_length to 3
     const configDir = path.join(testDir, 'skills', 'ai', 'continuous-learning');
     fs.mkdirSync(configDir, { recursive: true });
     fs.writeFileSync(path.join(configDir, 'config.json'), JSON.stringify({
@@ -327,7 +326,6 @@ function runTests() {
     }
 
     try {
-      // Write corrupt JSON to the config file
       fs.writeFileSync(configPath, 'NOT VALID JSON {{{ corrupt data !!!', 'utf8');
 
       // Create a transcript with 12 user messages (above default threshold of 10)
@@ -378,13 +376,11 @@ function runTests() {
     }
 
     try {
-      // Write config with a custom learned_skills_path using ~ prefix
       fs.writeFileSync(configPath, JSON.stringify({
         min_session_length: 10,
         learned_skills_path: '~/custom-learned-skills-dir'
       }));
 
-      // Create a transcript with 12 user messages (above threshold)
       const testDir = createTestDir();
       const transcript = createTranscript(testDir, 12);
       const result = runEvaluate({ transcript_path: transcript });

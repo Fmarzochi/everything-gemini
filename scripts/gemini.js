@@ -39,7 +39,6 @@ function main() {
   // Set PYTHONPATH so python can find the 'llm' package in 'src'
   env.PYTHONPATH = path.join(pluginRoot, 'src');
 
-  // Execute the bridge to Python
   const result = spawnSync(pythonBin, ['-m', 'llm.cli.prompt', ...args], {
     cwd: process.cwd(),
     env,

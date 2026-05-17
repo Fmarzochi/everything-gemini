@@ -35,8 +35,6 @@ async function loadPlugin() {
     encoding: "utf8",
   })
   if (buildResult.status !== 0 || /SKIP: build-opencode/.test(buildResult.stdout || "")) {
-    // Build was skipped (optional @opencode-ai/plugin peer missing) or failed
-    // outright. Surface as baseline-absent so runTest converts to SKIP.
     const error = new Error(`OpenCode build unavailable: .opencode/dist (${buildResult.stderr || buildResult.stdout || "no output"})`)
     throw error
   }

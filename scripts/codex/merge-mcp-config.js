@@ -281,7 +281,6 @@ function main() {
         }
         toAppend.push(spec.toml);
       } else {
-        // Add-only mode: skip, but warn about drift
         if (legacyName && !hasCanonical) {
           warn(`mcp_servers.${legacyName} is a legacy name for ${name} (run with --update-mcp to migrate)`);
         } else if (configDiffers(finalEntry, spec.fields)) {

@@ -69,7 +69,6 @@ function validateAgents() {
       }
     }
 
-    // Validate model is a known value
     if (frontmatter.model && !VALID_MODELS.includes(frontmatter.model)) {
       console.error(`ERROR: ${file} - Invalid model '${frontmatter.model}'. Must be one of: ${VALID_MODELS.join(', ')}`);
       hasErrors = true;

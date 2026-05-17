@@ -34,7 +34,6 @@ function test(name, fn) {
   }
 }
 
-// Create a temporary directory for testing
 function createTempDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'egc-test-'));
 }
@@ -46,7 +45,6 @@ function cleanupDir(dir) {
   } catch { /* ignore */ }
 }
 
-// Write a file in the temp directory
 function writeTestFile(dir, filePath, content = '') {
   const fullPath = path.join(dir, filePath);
   const dirName = path.dirname(fullPath);

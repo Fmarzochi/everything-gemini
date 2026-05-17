@@ -6,7 +6,6 @@
 
 const assert = require('assert');
 
-// Import the module
 const {
   VALID_PROFILES,
   normalizeId,

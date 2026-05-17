@@ -69,7 +69,6 @@ import sys
 import time
 from typing import Any, Dict, List, Tuple
 
-# Configure logging to stderr so it does not interfere with stdout protocol
 logging.basicConfig(
     stream=sys.stderr,
     format="[InsAIts] %(message)s",
@@ -242,7 +241,6 @@ def main() -> None:
 
     anomalies: List[Any] = result.get("anomalies", [])
 
-    # Write audit event regardless of findings
     write_audit({
         "tool": data.get("tool_name", "unknown"),
         "context": context,
@@ -255,7 +253,6 @@ def main() -> None:
         log.debug("Clean -- no anomalies detected.")
         sys.exit(0)
 
-    # Determine maximum severity
     has_critical: bool = any(
         get_anomaly_attr(a, "severity").upper() in BLOCKING_SEVERITIES
         for a in anomalies

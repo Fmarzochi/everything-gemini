@@ -113,7 +113,6 @@ function runTests() {
   if (test('suggests compact at threshold (COMPACT_THRESHOLD=3)', () => {
     const { sessionId, cleanup } = createCounterContext();
     cleanup();
-    // Run 3 times with threshold=3
     runCompact({ EGC_SESSION_ID: sessionId, COMPACT_THRESHOLD: '3' });
     runCompact({ EGC_SESSION_ID: sessionId, COMPACT_THRESHOLD: '3' });
     const result = runCompact({ EGC_SESSION_ID: sessionId, COMPACT_THRESHOLD: '3' });
@@ -144,7 +143,6 @@ function runTests() {
   if (test('suggests at threshold + 25 interval', () => {
     const { sessionId, counterFile, cleanup } = createCounterContext();
     cleanup();
-    // Set counter to threshold+24 (so next run = threshold+25)
     // threshold=3, so we need count=28 → 25 calls past threshold
     // Write 27 to the counter file, next run will be 28 = 3 + 25
     fs.writeFileSync(counterFile, '27');
@@ -167,7 +165,6 @@ function runTests() {
     // Write counter to 49, next run will be 50 = default threshold
     fs.writeFileSync(counterFile, '49');
     const result = runCompact({ EGC_SESSION_ID: sessionId });
-    // Remove COMPACT_THRESHOLD from env
     assert.ok(
       result.stderr.includes('50 tool calls reached'),
       `Should use default threshold of 50. Got stderr: ${result.stderr}`

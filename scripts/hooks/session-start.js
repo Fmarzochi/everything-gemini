@@ -500,7 +500,6 @@ async function main() {
   const explicitContextDisabled = isSessionStartContextDisabled();
   const shouldInjectContext = !explicitContextDisabled && maxContextChars !== 0;
 
-  // Ensure directories exist
   ensureDir(sessionsDir);
   ensureDir(learnedDir);
 
@@ -540,7 +539,6 @@ async function main() {
       additionalContextParts.push(instinctSummary);
     }
 
-    // Check for recent session files (last 7 days)
     const recentSessions = dedupeRecentSessions(sessionSearchDirs);
 
     if (recentSessions.length > 0) {
@@ -587,7 +585,6 @@ async function main() {
       }
     }
 
-    // Check for learned skills
     const learnedSkills = collectLearnedSkillFiles(learnedDir);
 
     if (learnedSkills.length > 0) {
@@ -600,7 +597,6 @@ async function main() {
     }
   }
 
-  // Check for available session aliases
   const aliases = listAliases({ limit: 5 });
 
   if (aliases.length > 0) {

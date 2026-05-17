@@ -19,10 +19,8 @@ class TestConcurrency(unittest.IsolatedAsyncioTestCase):
         for i in range(10):
             await self.eq.submit_task(1, f"task-{i}", self.dummy_task, f"task-{i}", delay=0.01)
             
-        # Wait for queue to process
         await self.eq.queue.join()
         
-        # Verify all tasks completed
         self.assertEqual(len(self.completed_tasks), 10)
 
     async def test_priority(self):

@@ -46,10 +46,8 @@ Examples:
   # Detect current package manager
   node scripts/setup-package-manager.js --detect
 
-  # Set pnpm as global preference
   node scripts/setup-package-manager.js --global pnpm
 
-  # Set bun for current project
   node scripts/setup-package-manager.js --project bun
 
   # List available package managers

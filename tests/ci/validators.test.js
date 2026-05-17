@@ -1479,7 +1479,6 @@ function runTests() {
     const testDir = createTestDir();
     const agentsDir = createTestDir();
     const skillsDir = createTestDir();
-    // Create a matching skill directory
     fs.mkdirSync(path.join(skillsDir, 'my-skill'));
     fs.writeFileSync(path.join(testDir, 'cmd.md'),
       '# Command\nSee skills/my-skill/ for details.');
@@ -1561,7 +1560,6 @@ function runTests() {
     for (let i = 0; i < 5; i++) {
       manyHooks.push({ type: 'command', command: 'echo ok' });
     }
-    // Add an invalid hook at index 5
     manyHooks.push({ type: 'command', command: '' });
     fs.writeFileSync(hooksFile, JSON.stringify({
       hooks: {
@@ -1613,7 +1611,6 @@ function runTests() {
     const testDir = createTestDir();
     const agentsDir = createTestDir();
     const skillsDir = createTestDir();
-    // Create two valid commands
     fs.writeFileSync(path.join(testDir, 'cmd-a.md'), '# Command A\nBasic command.');
     fs.writeFileSync(path.join(testDir, 'cmd-b.md'), '# Command B\nBasic command.');
     // Create a third command that references both on one line
@@ -2035,9 +2032,7 @@ function runTests() {
 
   if (test('reports error for broken symlink .md file in rules directory', () => {
     const testDir = createTestDir();
-    // Create a valid rule first
     fs.writeFileSync(path.join(testDir, 'valid.md'), '# Valid Rule');
-    // Create a broken symlink (dangling → target doesn't exist)
     // statSync follows symlinks and throws ENOENT, exercising catch (lines 35-38)
     try {
       fs.symlinkSync('/nonexistent/target.md', path.join(testDir, 'broken.md'));
@@ -2293,7 +2288,6 @@ function runTests() {
     const agentsDir = createTestDir();
     const skillsDir = createTestDir();
 
-    // Create one valid skill directory and one broken symlink
     const validSkill = path.join(skillsDir, 'valid-skill');
     fs.mkdirSync(validSkill, { recursive: true });
     // Broken symlink: target does not exist — statSync will throw ENOENT
@@ -2363,7 +2357,6 @@ function runTests() {
     const testDir = createTestDir();
     const agentsDir = createTestDir();
     const skillsDir = createTestDir();
-    // Create a command that references 2 non-existent skill directories
     // Each triggers a WARN (not error) — warnCount should be 2
     fs.writeFileSync(path.join(testDir, 'cmd-warn.md'),
       '# Command\nSee skills/fake-skill-a/ and skills/fake-skill-b/ for details.');

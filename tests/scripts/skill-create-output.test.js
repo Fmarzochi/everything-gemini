@@ -7,7 +7,6 @@
  */
 
 const assert = require('assert');
-// Import the module
 const { SkillCreateOutput } = require('../../scripts/skill-create-output');
 
 // We also need to test the un-exported helpers by requiring the source
@@ -259,7 +258,6 @@ function runTests() {
     ]));
     const combined = logs.join('\n');
     const boxLines = combined.split('\n').filter(l => stripAnsi(l).trim().length > 0);
-    // Find lines that start with box-drawing characters
     const boxDrawn = boxLines.filter(l => {
       const s = stripAnsi(l).trim();
       return s.startsWith('\u256D') || s.startsWith('\u2502') || s.startsWith('\u2570');
@@ -325,7 +323,6 @@ function runTests() {
   if (test('header subtitle line matches border width', () => {
     const output = new SkillCreateOutput('test-repo');
     const logs = captureLog(() => output.header());
-    // Find the border and subtitle lines
     const lines = logs.map(l => stripAnsi(l));
     const borderLine = lines.find(l => l.includes('═══'));
     const subtitleLine = lines.find(l => l.includes('Extracting patterns'));
@@ -356,7 +353,6 @@ function runTests() {
     const subtitleLine = lines.find(l => l.includes('Extracting patterns'));
     assert.ok(subtitleLine, 'Should find subtitle line');
     // Content between ║ and ║ should be 64 chars (border is 66 total)
-    // Format: ║ + content(64) + ║ = 66
     assert.strictEqual(subtitleLine.length, 66,
       `Total subtitle line width should be 66, got ${subtitleLine.length}`);
   })) passed++; else failed++;

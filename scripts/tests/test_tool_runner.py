@@ -2,7 +2,6 @@ import asyncio
 import sys
 import os
 
-# Add scripts directory to path for imports
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from execution.tool_runner import run_command

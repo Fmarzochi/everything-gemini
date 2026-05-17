@@ -9,7 +9,6 @@ const path = require('path');
 const fs = require('fs');
 const os = require('os');
 
-// Import the modules
 const pm = require('../../scripts/lib/package-manager');
 
 // Test helper
@@ -25,7 +24,6 @@ function test(name, fn) {
   }
 }
 
-// Create a temporary test directory
 function createTestDir() {
   const testDir = path.join(os.tmpdir(), `pm-test-${Date.now()}`);
   fs.mkdirSync(testDir, { recursive: true });
@@ -157,7 +155,6 @@ function runTests() {
   if (test('respects detection priority (pnpm > npm)', () => {
     const testDir = createTestDir();
     try {
-      // Create both lock files
       fs.writeFileSync(path.join(testDir, 'package-lock.json'), '{}');
       fs.writeFileSync(path.join(testDir, 'pnpm-lock.yaml'), '');
       const result = pm.detectFromLockFile(testDir);
@@ -389,7 +386,6 @@ function runTests() {
       const result = pm.setProjectPackageManager('pnpm', testDir);
       assert.strictEqual(result.packageManager, 'pnpm');
       assert.ok(result.setAt, 'Should have setAt timestamp');
-      // Verify file was created
       const configPath = path.join(testDir, '.gemini', 'package-manager.json');
       assert.ok(fs.existsSync(configPath), 'Config file should exist');
       const saved = JSON.parse(fs.readFileSync(configPath, 'utf8'));
@@ -764,7 +760,6 @@ function runTests() {
       const config = pm.setPreferredPackageManager('bun');
       assert.strictEqual(config.packageManager, 'bun');
       assert.ok(config.setAt, 'Should have setAt timestamp');
-      // Verify it was persisted
       const saved = JSON.parse(fs.readFileSync(configPath, 'utf8'));
       assert.strictEqual(saved.packageManager, 'bun');
     } finally {
@@ -1306,7 +1301,6 @@ function runTests() {
     const origPM = process.env.GEMINI_PACKAGE_MANAGER;
 
     try {
-      // Create corrupted global config file
       const claudeDir = path.join(tmpDir, '.gemini');
       fs.mkdirSync(claudeDir, { recursive: true });
       fs.writeFileSync(path.join(claudeDir, 'package-manager.json'), '{ invalid json !!!', 'utf8');
@@ -1349,7 +1343,6 @@ function runTests() {
     const origPM = process.env.GEMINI_PACKAGE_MANAGER;
 
     try {
-      // Create valid global config with pnpm preference
       const claudeDir = path.join(tmpDir, '.gemini');
       fs.mkdirSync(claudeDir, { recursive: true });
       fs.writeFileSync(path.join(claudeDir, 'package-manager.json'), JSON.stringify({ packageManager: 'pnpm', setAt: '2026-01-01T00:00:00Z' }), 'utf8');
@@ -1488,7 +1481,6 @@ function runTests() {
     const pattern = pm.getCommandPattern('');
     assert.ok(typeof pattern === 'string', 'Should return a string');
     assert.ok(pattern.length > 0, 'Should return non-empty pattern');
-    // Verify the pattern compiles without error
     const regex = new RegExp(pattern);
     assert.ok(regex instanceof RegExp, 'Pattern should compile to valid RegExp');
     // The pattern should match package manager commands with trailing space

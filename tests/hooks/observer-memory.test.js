@@ -101,7 +101,6 @@ test('on_usr1 checks ANALYZING before starting analysis', () => {
 
 test('on_usr1 sets ANALYZING=1 before and ANALYZING=0 after analysis', () => {
   const content = fs.readFileSync(observerLoopPath, 'utf8');
-  // Check that ANALYZING=1 is set before analyze_observations
   const analyzeCall = content.indexOf('ANALYZING=1');
   const analyzeObsCall = content.indexOf('analyze_observations', analyzeCall);
   const analyzeReset = content.indexOf('ANALYZING=0', analyzeObsCall);
@@ -303,7 +302,6 @@ test('counter file handles missing/corrupt file gracefully', () => {
   const testDir = createTempDir();
   const counterFile = path.join(testDir, '.observer-signal-counter');
 
-  // Write corrupt content
   fs.writeFileSync(counterFile, 'not-a-number');
   const counter = parseInt(fs.readFileSync(counterFile, 'utf8').trim(), 10) || 0;
   assert.strictEqual(counter, 0, 'Corrupt counter should default to 0');

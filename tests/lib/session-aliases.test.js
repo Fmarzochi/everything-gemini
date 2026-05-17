@@ -235,7 +235,6 @@ function runTests() {
     assert.strictEqual(result.success, true);
     assert.strictEqual(result.alias, 'to-delete');
 
-    // Verify it's gone
     assert.strictEqual(aliases.resolveAlias('to-delete'), null);
   })) passed++; else failed++;
 
@@ -256,7 +255,6 @@ function runTests() {
     assert.strictEqual(result.oldAlias, 'original');
     assert.strictEqual(result.newAlias, 'renamed');
 
-    // Verify old is gone, new exists
     assert.strictEqual(aliases.resolveAlias('original'), null);
     assert.ok(aliases.resolveAlias('renamed'));
   })) passed++; else failed++;
@@ -385,7 +383,6 @@ function runTests() {
     assert.strictEqual(result.removed, 2);
     assert.strictEqual(result.removedAliases.length, 2);
 
-    // Verify surviving alias
     assert.ok(aliases.resolveAlias('exists'));
     assert.strictEqual(aliases.resolveAlias('gone'), null);
   })) passed++; else failed++;
@@ -496,7 +493,6 @@ function runTests() {
     const first = aliases.loadAliases().aliases['preserve-date'];
     const firstCreated = first.createdAt;
 
-    // Update same alias
     aliases.setAlias('preserve-date', '/path/v2', 'V2');
     const second = aliases.loadAliases().aliases['preserve-date'];
 
@@ -701,7 +697,6 @@ function runTests() {
     const before = aliases.loadAliases();
     assert.ok(before.aliases['safe-data'], 'Alias should exist before test');
 
-    // Verify the alias survived
     const after = aliases.loadAliases();
     assert.ok(after.aliases['safe-data'], 'Alias should still exist');
   })) passed++; else failed++;
@@ -785,7 +780,6 @@ function runTests() {
     resetAliases();
     aliases.setAlias('before-fail', '/path/safe');
 
-    // Verify the file exists
     const aliasesPath = path.join(tmpHome, '.gemini', 'session-aliases.json');
     assert.ok(fs.existsSync(aliasesPath), 'Aliases file should exist');
 
@@ -805,7 +799,6 @@ function runTests() {
   console.log('\nRound 39: atomic overwrite:');
 
   if (test('saveAliases overwrites existing file atomically', () => {
-    // Create initial aliases
     aliases.setAlias('atomic-test', '2026-01-01-abc123-session.tmp');
     const aliasesPath = aliases.getAliasesPath();
     assert.ok(fs.existsSync(aliasesPath), 'Aliases file should exist');
@@ -876,7 +869,6 @@ function runTests() {
       const r2 = aliases.setAlias('win-updated', '2026-02-01-def456-session.tmp');
       assert.strictEqual(r2.success, true, 'setAlias should succeed under win32 mock');
 
-      // Verify data integrity after the Windows path
       assert.ok(fs.existsSync(aliasesPath), 'Aliases file should exist after win32 save');
       const data = aliases.loadAliases();
       assert.ok(data.aliases['win-initial'], 'Original alias should still exist');
@@ -957,7 +949,6 @@ function runTests() {
   if (test('loadAliases backfills only metadata when version already present', () => {
     resetAliases();
     const aliasesPath = aliases.getAliasesPath();
-    // Write a file WITH version but WITHOUT metadata
     fs.writeFileSync(aliasesPath, JSON.stringify({
       version: '1.0',
       aliases: {
@@ -1007,7 +998,6 @@ function runTests() {
       delete require.cache[require.resolve('../../scripts/lib/utils')];
       const freshAliases = require('../../scripts/lib/session-aliases');
 
-      // Set up a valid alias
       freshAliases.setAlias('title-save-fail', '/path/session', 'Original Title');
       // Verify no leftover .tmp/.bak
       const ap = freshAliases.getAliasesPath();
@@ -1050,7 +1040,6 @@ function runTests() {
       delete require.cache[require.resolve('../../scripts/lib/utils')];
       const freshAliases = require('../../scripts/lib/session-aliases');
 
-      // Create an alias first (writes the file)
       freshAliases.setAlias('to-delete', '/path/session', 'Test');
       const ap = freshAliases.getAliasesPath();
       assert.ok(fs.existsSync(ap), 'Alias file should exist after setAlias');
@@ -1092,7 +1081,6 @@ function runTests() {
       delete require.cache[require.resolve('../../scripts/lib/utils')];
       const freshAliases = require('../../scripts/lib/session-aliases');
 
-      // Create aliases — one to keep, one to remove
       freshAliases.setAlias('keep-me', '/sessions/real', 'Kept');
       freshAliases.setAlias('remove-me', '/sessions/gone', 'Gone');
 
@@ -1277,7 +1265,6 @@ function runTests() {
 
   if (test('renameAlias returns "already exists" error when renaming alias to itself', () => {
     resetAliases();
-    // Create an alias first
     const created = aliases.setAlias('self-rename', '/path/session', 'Self Rename');
     assert.strictEqual(created.success, true, 'Setup: alias should be created');
 
@@ -1287,7 +1274,6 @@ function runTests() {
     assert.ok(result.error.includes('already exists'),
       'Error should indicate alias already exists (line 333-334 check)');
 
-    // Verify original alias is still intact
     const resolved = aliases.resolveAlias('self-rename');
     assert.ok(resolved, 'Original alias should still exist after failed self-rename');
     assert.strictEqual(resolved.sessionPath, '/path/session',
@@ -1389,7 +1375,6 @@ function runTests() {
       'Whitespace-only title is accepted (no trim check on title)');
     assert.strictEqual(titleResult.title, '   ',
       'Title stored as whitespace string (truthy, so title || null returns the whitespace)');
-    // Verify persisted correctly
     const loaded = aliases.loadAliases();
     assert.strictEqual(loaded.aliases['ws-title'].title, '   ',
       'Whitespace title persists in JSON as-is');
@@ -1407,7 +1392,6 @@ function runTests() {
     assert.strictEqual(result.success, true,
       '128-char alias should be accepted (128 is NOT > 128)');
     assert.strictEqual(result.isNew, true);
-    // Verify it can be resolved
     const resolved = aliases.resolveAlias(alias128);
     assert.notStrictEqual(resolved, null, '128-char alias should be resolvable');
     assert.strictEqual(resolved.sessionPath, '/path/to/session');
@@ -1457,7 +1441,6 @@ function runTests() {
   if (test('listAliases throws TypeError when search option is a number (no toLowerCase method)', () => {
     resetAliases();
 
-    // Set up some aliases to search through
     aliases.setAlias('alpha-session', '/path/to/alpha');
     aliases.setAlias('beta-session', '/path/to/beta');
 
@@ -1488,12 +1471,10 @@ function runTests() {
   if (test('updateAliasTitle with empty string stores null but returns empty string (|| coercion mismatch)', () => {
     resetAliases();
 
-    // Create alias with a title
     aliases.setAlias('r115-alias', '/path/to/session', 'Original Title');
     const before = aliases.resolveAlias('r115-alias');
     assert.strictEqual(before.title, 'Original Title', 'Baseline: title should be set');
 
-    // Update title with empty string
     // Line 383: typeof "" === 'string' → passes validation
     // Line 393: "" || null → null (empty string is falsy in JS)
     // Line 400: returns { title: "" } (original parameter, not stored value)
@@ -1577,7 +1558,6 @@ function runTests() {
     assert.ok(result.error.includes('already exists'),
       'Error should say "already exists" (not "same name" or a no-op success)');
 
-    // Verify alias is unchanged
     const resolved = aliases.resolveAlias('same-name');
     assert.ok(resolved, 'Original alias should still exist');
     assert.strictEqual(resolved.sessionPath, '/path/to/session');
@@ -1637,7 +1617,6 @@ function runTests() {
     const deleteResult = aliases.renameAlias('my-alias', 'DELETE');
     assert.strictEqual(deleteResult.success, false, '"DELETE" should be rejected');
 
-    // Verify alias is unchanged
     const resolved = aliases.resolveAlias('my-alias');
     assert.ok(resolved, 'Original alias should still exist after failed renames');
     assert.strictEqual(resolved.sessionPath, '/path/to/session');
@@ -1672,7 +1651,6 @@ function runTests() {
     assert.strictEqual(result1.success, true,
       'Single character alias should be accepted');
 
-    // Verify the 128-char alias was actually stored
     const resolved = aliases.resolveAlias(name128);
     assert.ok(resolved, '128-char alias should be resolvable');
     assert.strictEqual(resolved.sessionPath, '/path/to/session');
@@ -1785,7 +1763,6 @@ function runTests() {
 }`;
     fs.writeFileSync(aliasesPath, rawJson);
 
-    // Load aliases — should NOT pollute prototype
     const data = aliases.loadAliases();
 
     // Verify __proto__ did NOT pollute Object.prototype

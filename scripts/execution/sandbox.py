@@ -31,7 +31,6 @@ class SandboxController:
         if not abs_cwd.startswith(self.root):
             return ValidationResult(False, "Directory outside workspace root.")
         
-        # Check if in allowed subdirectories
         rel_path = os.path.relpath(abs_cwd, self.root)
         if rel_path == ".":
             return ValidationResult(True)

@@ -24,7 +24,6 @@ function test(name, fn) {
   }
 }
 
-// Create a temp directory for session tests
 function createTempSessionDir() {
   const dir = path.join(os.tmpdir(), `egc-test-sessions-${Date.now()}`);
   fs.mkdirSync(dir, { recursive: true });
@@ -348,7 +347,6 @@ src/main.ts
   const origHome = process.env.HOME;
   const origUserProfile = process.env.USERPROFILE;
 
-  // Create test session files with controlled modification times
   const testSessions = [
     { name: '2026-01-15-abcd1234-session.tmp', content: '# Session 1' },
     { name: '2026-01-20-efgh5678-session.tmp', content: '# Session 2' },
@@ -612,7 +610,6 @@ src/main.ts
     const dir = createTempSessionDir();
     try {
       const sessionPath = path.join(dir, 'large.tmp');
-      // Create a file > 1MB
       fs.writeFileSync(sessionPath, 'x'.repeat(1024 * 1024 + 100));
       const size = sessionManager.getSessionSize(sessionPath);
       assert.ok(size.includes('MB'), `Expected MB, got: ${size}`);
@@ -1023,7 +1020,6 @@ src/main.ts
     // "Session" appears in file CONTENT (e.g. "# Session 1") but not in any shortId
     const result = sessionManager.getAllSessions({ search: 'Session', limit: 100 });
     assert.strictEqual(result.total, 0, 'Search should not match title/content, only shortId');
-    // Verify that searching by actual shortId substring still works
     const result2 = sessionManager.getAllSessions({ search: 'abcd', limit: 100 });
     assert.strictEqual(result2.total, 1, 'Search by shortId should still work');
   })) passed++; else failed++;
@@ -1299,7 +1295,6 @@ src/main.ts
     const savedHome = process.env.HOME;
     const savedProfile = process.env.USERPROFILE;
     try {
-      // Create one non-empty session and one empty session
       fs.writeFileSync(path.join(isoSessions, '2026-04-01-nonempty-session.tmp'), '# Has content');
       fs.writeFileSync(path.join(isoSessions, '2026-04-02-emptyfile-session.tmp'), '');
 
@@ -1378,7 +1373,6 @@ src/main.ts
     const sessionsDir = path.join(isoHome, '.gemini', 'sessions');
     fs.mkdirSync(sessionsDir, { recursive: true });
 
-    // Create one real session file
     const realFile = '2026-02-10-abcd1234-session.tmp';
     fs.writeFileSync(path.join(sessionsDir, realFile), '# Real session\n');
 
@@ -1472,7 +1466,6 @@ src/main.ts
     const sessionsDir = path.join(isoHome, '.gemini', 'sessions');
     fs.mkdirSync(sessionsDir, { recursive: true });
 
-    // Create a real session file
     const realFile = '2026-02-11-abcd1234-session.tmp';
     fs.writeFileSync(path.join(sessionsDir, realFile), '# Test session');
 
@@ -1555,7 +1548,6 @@ src/main.ts
   const origHome2 = process.env.HOME;
   const origUserProfile2 = process.env.USERPROFILE;
 
-  // Create test session files for these tests
   const testSessions2 = [
     { name: '2026-01-15-aaaa1111-session.tmp', content: '# Test Session 1' },
     { name: '2026-02-01-bbbb2222-session.tmp', content: '# Test Session 2' },
@@ -1794,7 +1786,6 @@ file.ts
     const meta = sessionManager.parseSessionMetadata(content);
     assert.strictEqual(meta.notes, '',
       'Whitespace-only notes should trim to empty string');
-    // Verify getSessionStats reports hasNotes as false
     const stats = sessionManager.getSessionStats(content);
     assert.strictEqual(stats.hasNotes, false,
       'hasNotes should be false because !!"" is false (whitespace-only notes treated as absent)');
@@ -1830,7 +1821,6 @@ file.ts
     const isoHome = path.join(os.tmpdir(), `egc-r106-limit-coerce-${Date.now()}`);
     const isoSessionsDir = path.join(isoHome, '.gemini', 'sessions');
     fs.mkdirSync(isoSessionsDir, { recursive: true });
-    // Create 3 test sessions
     for (let i = 0; i < 3; i++) {
       const name = `2026-03-0${i + 1}-aaaa${i}${i}${i}${i}-session.tmp`;
       const filePath = path.join(isoSessionsDir, name);
@@ -1876,7 +1866,6 @@ file.ts
     const isoHome = path.join(os.tmpdir(), `egc-r109-nonsession-${Date.now()}`);
     const isoSessionsDir = path.join(isoHome, '.gemini', 'sessions');
     fs.mkdirSync(isoSessionsDir, { recursive: true });
-    // Create one valid session file
     const validName = '2026-03-01-abcd1234-session.tmp';
     fs.writeFileSync(path.join(isoSessionsDir, validName), '# Valid Session');
     // Create non-session .tmp files that don't match the expected pattern
@@ -2058,7 +2047,6 @@ file.ts
       fs.writeFileSync(readOnlyFile, '# Session\n\nInitial content\n');
       // Make file read-only
       fs.chmodSync(readOnlyFile, 0o444);
-      // Verify it exists and is readable
       const content = fs.readFileSync(readOnlyFile, 'utf8');
       assert.ok(content.includes('Initial content'), 'File should be readable');
 
@@ -2067,7 +2055,6 @@ file.ts
       assert.strictEqual(result, false,
         'Should return false when file is read-only (fs.appendFileSync throws EACCES)');
 
-      // Verify original content unchanged
       const afterContent = fs.readFileSync(readOnlyFile, 'utf8');
       assert.ok(!afterContent.includes('Appended data'),
         'Original content should be unchanged');
@@ -2102,7 +2089,6 @@ file.ts
     assert.notStrictEqual(result2400, null,
       '2400 IS a leap year (div by 400) — Feb 29 should be accepted');
 
-    // Verify Feb 28 always works in non-leap century years
     const result1900Feb28 = sessionManager.parseSessionFilename('1900-02-28-abcd1234-session.tmp');
     assert.notStrictEqual(result1900Feb28, null,
       'Feb 28 should always be valid even in non-leap years');
@@ -2417,7 +2403,6 @@ file.ts
     const origUserProfile = process.env.USERPROFILE;
     const origDir = process.env.GEMINI_DIR;
     try {
-      // Set up isolated environment
       const claudeDir = path.join(tmpDir, '.gemini');
       const sessionsDir = path.join(claudeDir, 'sessions');
       fs.mkdirSync(sessionsDir, { recursive: true });
@@ -2430,11 +2415,9 @@ file.ts
       delete require.cache[require.resolve('../../scripts/lib/session-manager')];
       const freshSM = require('../../scripts/lib/session-manager');
 
-      // Create old-format session file (no short ID)
       const oldFile = path.join(sessionsDir, '2026-01-15-session.tmp');
       fs.writeFileSync(oldFile, '# Old Format Session\n\n**Date:** 2026-01-15\n');
 
-      // Search by date — triggers noIdMatch path
       const result = freshSM.getSessionById('2026-01-15');
       assert.ok(result, 'Should find old-format session by date string');
       assert.strictEqual(result.shortId, 'no-id',
@@ -2442,7 +2425,6 @@ file.ts
       assert.strictEqual(result.date, '2026-01-15');
       assert.strictEqual(result.filename, '2026-01-15-session.tmp');
 
-      // Search by non-matching date — should not find
       const noResult = freshSM.getSessionById('2026-01-16');
       assert.strictEqual(noResult, null,
         'Non-matching date should return null');
@@ -2553,7 +2535,6 @@ file.ts
       delete require.cache[require.resolve('../../scripts/lib/session-manager')];
       const freshSM = require('../../scripts/lib/session-manager');
 
-      // Create a session file with valid date
       const sessionsDir = path.join(homeDir, '.gemini', 'sessions');
       fs.writeFileSync(
         path.join(sessionsDir, '2026-01-15-abcd1234-session.tmp'),
