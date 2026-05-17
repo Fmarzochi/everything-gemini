@@ -247,5 +247,5 @@ genhtml coverage.info --output-directory coverage_html
 
 ## Related
 
-- Skill: `skills/cpp-testing/`
-- Skill: `skills/tdd-workflow/`
+- Skill: `skills/testing/cpp-testing/`
+- Skill: `skills/testing/tdd-workflow/`

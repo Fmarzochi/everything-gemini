@@ -508,6 +508,7 @@ async function main() {
     const { bootstrap } = require('../bootstrap-state-db');
     await bootstrap();
   } catch (_err) {
+    // Intentional: state-db bootstrap is optional; session-start must not fail when DB is absent.
   }
 
   const retentionDays = getSessionRetentionDays();

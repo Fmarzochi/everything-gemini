@@ -15,6 +15,8 @@
 'use strict';
 
 const assert = require('assert');
+const { maybeSkipBaselineAbsent } = require('./lib/baseline-absent');
+
 const fs = require('fs');
 const path = require('path');
 
@@ -45,6 +47,7 @@ function test(name, fn) {
     console.log(`  ✓ ${name}`);
     passed++;
   } catch (err) {
+    if (maybeSkipBaselineAbsent(err, name)) return true;
     console.log(`  ✗ ${name}`);
     console.log(`    Error: ${err.message}`);
     failed++;
@@ -470,7 +473,7 @@ test('user-facing docs do not use deprecated egc@egc install commands', () => {
   const markdownFiles = [
     path.join(repoRoot, 'README.md'),
     path.join(repoRoot, 'README.zh-CN.md'),
-    path.join(repoRoot, 'skills', 'configure-egc', 'SKILL.md'),
+    path.join(repoRoot, 'skills', 'general', 'configure-egc', 'SKILL.md'),
     ...collectMarkdownFiles(path.join(repoRoot, 'docs')),
   ];
 

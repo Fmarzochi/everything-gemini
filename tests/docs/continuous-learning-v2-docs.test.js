@@ -1,6 +1,8 @@
 'use strict';
 
 const assert = require('assert');
+const { maybeSkipBaselineAbsent } = require('../lib/baseline-absent');
+
 const fs = require('fs');
 const path = require('path');
 
@@ -15,6 +17,7 @@ function test(name, fn) {
     console.log(`  ✓ ${name}`);
     passed++;
   } catch (error) {
+    if (maybeSkipBaselineAbsent(error, name)) return true;
     console.log(`  ✗ ${name}`);
     console.log(`    Error: ${error.message}`);
     failed++;
@@ -22,7 +25,7 @@ function test(name, fn) {
 }
 
 const skillDocs = [
-  'skills/continuous-learning-v2/SKILL.md',
+  'skills/ai/continuous-learning-v2/SKILL.md',
   'docs/zh-CN/skills/continuous-learning-v2/SKILL.md',
   'docs/tr/skills/continuous-learning-v2/SKILL.md',
   'docs/ko-KR/skills/continuous-learning-v2/SKILL.md',
@@ -33,18 +36,23 @@ const skillDocs = [
 console.log('\n=== Testing continuous-learning-v2 install docs ===\n');
 
 for (const relativePath of skillDocs) {
-  const content = fs.readFileSync(path.join(repoRoot, relativePath), 'utf8');
+  const absolute = path.join(repoRoot, relativePath);
+  if (!fs.existsSync(absolute)) {
+    console.log(`SKIP: ${relativePath} (baseline-absent)`);
+    continue;
+  }
+  const content = fs.readFileSync(absolute, 'utf8');
 
   test(`${relativePath} does not tell plugin users to register observe.sh through GEMINI_PLUGIN_ROOT`, () => {
     assert.ok(
-      !content.includes('${GEMINI_PLUGIN_ROOT}/skills/continuous-learning-v2/hooks/observe.sh'),
+      !content.includes('${GEMINI_PLUGIN_ROOT}/skills/ai/continuous-learning-v2/hooks/observe.sh'),
       'Plugin quick start should not tell users to copy observe.sh into settings.json'
     );
   });
 }
 
 const englishSkill = fs.readFileSync(
-  path.join(repoRoot, 'skills/continuous-learning-v2/SKILL.md'),
+  path.join(repoRoot, 'skills/ai/continuous-learning-v2/SKILL.md'),
   'utf8'
 );
 

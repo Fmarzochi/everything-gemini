@@ -31,7 +31,7 @@ function stringifyJson(value, label) {
   try {
     return JSON.stringify(value);
   } catch (error) {
-    throw new Error(`Failed to serialize ${label}: ${error.message}`);
+    throw new Error(`Failed to serialize ${label}: ${error.message}`, { cause: error });
   }
 }
 

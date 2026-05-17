@@ -79,7 +79,7 @@ function withEnv(vars, fn) {
 }
 
 function writeFakeObserveScript(tempRoot) {
-  const scriptPath = path.join(tempRoot, 'skills', 'continuous-learning-v2', 'hooks', 'observe.sh');
+  const scriptPath = path.join(tempRoot, 'skills', 'ai', 'continuous-learning-v2', 'hooks', 'observe.sh');
   fs.mkdirSync(path.dirname(scriptPath), { recursive: true });
   fs.writeFileSync(
     scriptPath,
@@ -121,7 +121,7 @@ function runTests() {
 
       assert.ok(command.includes(`node scripts/hooks/run-with-flags.js ${phase} scripts/hooks/observe-runner.js standard,strict`));
       assert.ok(!command.includes('shell scripts/hooks/run-with-flags-shell.sh'), `${hookId} should not use shell-mode bootstrap`);
-      assert.ok(!command.includes('skills/continuous-learning-v2/hooks/observe.sh'), `${hookId} should not call observe.sh directly from hooks.json`);
+      assert.ok(!command.includes('skills/ai/continuous-learning-v2/hooks/observe.sh'), `${hookId} should not call observe.sh directly from hooks.json`);
     }
   })) passed++; else failed++;
 

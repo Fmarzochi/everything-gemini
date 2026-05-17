@@ -304,5 +304,5 @@ cargo test --no-fail-fast
 
 ## Related
 
-- Skill: `skills/rust-testing/`
-- Skill: `skills/rust-patterns/`
+- Skill: `skills/testing/rust-testing/`
+- Skill: `skills/backend/rust-patterns/`

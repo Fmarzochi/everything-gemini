@@ -137,4 +137,4 @@ Recommendation: FAIL: Block merge until CRITICAL issue is fixed
 ## Related
 
 - Agent: `agents/kotlin-reviewer.md`
-- Skills: `skills/kotlin-patterns/`, `skills/kotlin-testing/`
+- Skills: `skills/language/kotlin-patterns/`, `skills/testing/kotlin-testing/`

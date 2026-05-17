@@ -150,7 +150,7 @@ function validateCommands() {
       }
     }
 
-    // Check skill directory references (e.g., "skills/tdd-workflow/")
+    // Check skill directory references (e.g., "skills/testing/tdd-workflow/")
     // learned and imported are reserved roots (~/.gemini/skills/); no local dir expected
     const reservedSkillRoots = new Set(['learned', 'imported']);
     const skillRefs = contentNoCodeBlocks.matchAll(/skills\/([a-z][-a-z0-9]*)\//g);

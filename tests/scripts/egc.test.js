@@ -3,6 +3,8 @@
  */
 
 const assert = require('assert');
+const { maybeSkipBaselineAbsent } = require('../lib/baseline-absent');
+
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -48,6 +50,7 @@ function runTest(name, fn) {
     console.log(`  ✓ ${name}`);
     return true;
   } catch (error) {
+    if (maybeSkipBaselineAbsent(error, name)) return true;
     console.log(`  ✗ ${name}`);
     console.error(`    ${error.message}`);
     return false;

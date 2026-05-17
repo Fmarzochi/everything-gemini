@@ -140,5 +140,5 @@ Test Status: PASS ✓
 
 - Agent: `agents/flutter-reviewer.md`
 - Agent: `agents/dart-build-resolver.md`
-- Skill: `skills/flutter-dart-code-review/`
+- Skill: `skills/general/flutter-dart-code-review/`
 - Rules: `rules/dart/testing.md`

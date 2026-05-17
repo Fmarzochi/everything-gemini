@@ -29,7 +29,7 @@ const guardrails = [
     ],
   },
   {
-    path: 'skills/autonomous-agent-harness/SKILL.md',
+    path: 'skills/ai/autonomous-agent-harness/SKILL.md',
     heading: '## Consent and Safety Boundaries',
     requiredPatterns: [
       /explicitly requested and scoped/i,
@@ -38,7 +38,7 @@ const guardrails = [
     ],
   },
   {
-    path: 'skills/defi-amm-security/SKILL.md',
+    path: 'skills/security/defi-amm-security/SKILL.md',
     heading: '## Execution Safety',
     requiredPatterns: [
       /local audit examples/i,

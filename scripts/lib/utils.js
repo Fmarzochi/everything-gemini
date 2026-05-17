@@ -96,7 +96,7 @@ function ensureDir(dirPath) {
   } catch (err) {
     // EEXIST is fine (race condition with another process creating it)
     if (err.code !== 'EEXIST') {
-      throw new Error(`Failed to create directory '${dirPath}': ${err.message}`);
+      throw new Error(`Failed to create directory '${dirPath}': ${err.message}`, { cause: err });
     }
   }
   return dirPath;

@@ -144,7 +144,9 @@ function main() {
     return;
   }
 
-  try { fs.unlinkSync(accumFile); } catch {}
+  try { fs.unlinkSync(accumFile); } catch {
+    // Intentional: accumulator file may already be gone if another runner consumed it.
+  }
 
   const files = parseAccumulator(raw);
   if (files.length === 0) return;

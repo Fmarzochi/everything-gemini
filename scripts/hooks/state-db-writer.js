@@ -12,10 +12,13 @@ function resolveStateDbPath() {
 }
 
 async function main() {
-  let raw = '';
+  let raw;
   try {
     raw = fs.readFileSync(0, 'utf8');
-  } catch (_) {}
+  } catch (_) {
+    // Intentional: writer is best-effort; absent stdin (e.g., direct invocation) is a no-op.
+    return;
+  }
 
   if (!raw.trim()) return;
 
@@ -52,8 +55,11 @@ async function main() {
       timestamp: new Date().toISOString(),
     });
   } catch (_) {
+    // Intentional: event insertion is best-effort observability; hook must not fail caller.
   } finally {
-    try { store.close(); } catch (_) {}
+    try { store.close(); } catch (_) {
+      // Intentional: close errors are non-actionable in a fire-and-forget writer.
+    }
   }
 }
 

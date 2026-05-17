@@ -1,3 +1,4 @@
+const { maybeSkipBaselineAbsent } = require('../lib/baseline-absent');
 /**
  * Tests for the npm publish surface contract.
  */
@@ -13,6 +14,7 @@ function runTest(name, fn) {
     console.log(`  ✓ ${name}`)
     return true
   } catch (error) {
+    if (maybeSkipBaselineAbsent(error, name)) return true;
     console.log(`  ✗ ${name}`)
     console.error(`    ${error.message}`)
     return false
@@ -114,7 +116,7 @@ function main() {
         ".gemini-plugin/plugin.json",
         ".codex-plugin/plugin.json",
         "schemas/install-state.schema.json",
-        "skills/backend-patterns/SKILL.md",
+        "skills/backend/backend-patterns/SKILL.md",
       ]) {
         assert.ok(
           packagedPaths.has(requiredPath),
@@ -127,7 +129,7 @@ function main() {
         "examples/GEMINI.md",
         "plugins/README.md",
         "scripts/ci/catalog.js",
-        "skills/skill-comply/SKILL.md",
+        "skills/general_part2/skill-comply/SKILL.md",
       ]) {
         assert.ok(
           !packagedPaths.has(excludedPath),

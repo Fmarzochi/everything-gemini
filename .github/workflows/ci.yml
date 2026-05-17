@@ -145,8 +145,10 @@ jobs:
             # (for example msgpackr-extract) even though this repo is Yarn-native
             # and pnpm is only exercised here as a compatibility lane.
             pnpm) pnpm install --config.strict-dep-builds=false --no-frozen-lockfile ;;
-            # Yarn Berry (v4+) removed --ignore-engines; engine checking is no longer a core feature
-            yarn) yarn install ;;
+            # Yarn Berry (v4+) removed --ignore-engines; engine checking is no longer a core feature.
+            # --no-immutable: this is a compat lane (repo is npm-native, yarn.lock is legacy v1
+            # auto-migrated by Berry); CI must not assert lockfile-format equality across PM lanes.
+            yarn) yarn install --no-immutable ;;
             bun) bun install ;;
             *) echo "Unsupported package manager: ${{ matrix.pm }}" && exit 1 ;;
           esac

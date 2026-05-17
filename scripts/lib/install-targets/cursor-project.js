@@ -25,7 +25,7 @@ function readJsonObject(filePath, label) {
   try {
     parsed = JSON.parse(fs.readFileSync(filePath, 'utf8'));
   } catch (error) {
-    throw new Error(`Failed to parse ${label} at ${filePath}: ${error.message}`);
+    throw new Error(`Failed to parse ${label} at ${filePath}: ${error.message}`, { cause: error });
   }
 
   if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {

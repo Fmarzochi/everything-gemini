@@ -31,12 +31,14 @@ function getGeminiManagedDestinationPath(adapter, sourceRelativePath, input) {
   }
 
   if (normalizedSourcePath.startsWith('skills/')) {
-    return path.join(
-      targetRoot,
-      'skills',
-      GEMINI_EGC_NAMESPACE,
-      normalizedSourcePath.slice('skills/'.length)
-    );
+    // Source layout in the repo is `skills/<category>/<skillName>[/<file>]`.
+    // The Gemini-home install contract exposes a flat skill namespace
+    // (`skills/<namespace>/<skillName>[/<file>]`) so consumers don't depend
+    // on the repo's category taxonomy. Strip exactly the leading category
+    // segment when present; leave already-flat paths untouched.
+    const parts = normalizedSourcePath.slice('skills/'.length).split('/');
+    const flatRemainder = parts.length >= 2 ? parts.slice(1).join('/') : parts.join('/');
+    return path.join(targetRoot, 'skills', GEMINI_EGC_NAMESPACE, flatRemainder);
   }
 
   return null;

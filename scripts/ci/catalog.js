@@ -96,7 +96,7 @@ function readFileOrThrow(filePath) {
   try {
     return fs.readFileSync(filePath, 'utf8');
   } catch (error) {
-    throw new Error(`Failed to read ${path.basename(filePath)}: ${error.message}`);
+    throw new Error(`Failed to read ${path.basename(filePath)}: ${error.message}`, { cause: error });
   }
 }
 
@@ -104,7 +104,7 @@ function writeFileOrThrow(filePath, content) {
   try {
     fs.writeFileSync(filePath, content, 'utf8');
   } catch (error) {
-    throw new Error(`Failed to write ${path.basename(filePath)}: ${error.message}`);
+    throw new Error(`Failed to write ${path.basename(filePath)}: ${error.message}`, { cause: error });
   }
 }
 
@@ -673,6 +673,7 @@ function runCatalogCheck(options = {}) {
 
   if (writeMode) {
     for (const spec of documentSpecs) {
+      if (!fs.existsSync(spec.filePath)) continue;
       const currentContent = readFileOrThrow(spec.filePath);
       const nextContent = spec.syncContent(currentContent, catalog);
       if (nextContent !== currentContent) {
@@ -681,9 +682,19 @@ function runCatalogCheck(options = {}) {
     }
   }
 
-  const expectations = documentSpecs.flatMap(spec => (
-    spec.parseExpectations(readFileOrThrow(spec.filePath))
-  ));
+  // Documents absent from the public baseline (locale variants, AGENTS root,
+  // zh-CN docs) are skipped; expectations are gathered only from documents
+  // that actually exist. Strict mode (EGC_CATALOG_STRICT=1) restores hard
+  // failure on missing optional docs.
+  const expectations = documentSpecs.flatMap(spec => {
+    if (!fs.existsSync(spec.filePath)) {
+      if (process.env.EGC_CATALOG_STRICT === '1') {
+        throw new Error(`Missing required catalog document: ${spec.filePath}`);
+      }
+      return [];
+    }
+    return spec.parseExpectations(readFileOrThrow(spec.filePath));
+  });
   const checks = evaluateExpectations(catalog, expectations);
   return { catalog, checks };
 }

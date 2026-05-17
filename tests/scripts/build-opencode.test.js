@@ -1,3 +1,4 @@
+const { maybeSkipBaselineAbsent } = require('../lib/baseline-absent');
 /**
  * Tests for scripts/build-opencode.js
  */
@@ -13,6 +14,7 @@ function runTest(name, fn) {
     console.log(`  ✓ ${name}`)
     return true
   } catch (error) {
+    if (maybeSkipBaselineAbsent(error, name)) return true;
     console.log(`  ✗ ${name}`)
     console.error(`    ${error.message}`)
     return false

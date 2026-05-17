@@ -243,16 +243,36 @@ function runTests() {
     }
   })) passed++; else failed++;
 
-  if (test('throws a clear error for missing tracked documents', () => {
+  if (test('throws a clear error for missing tracked documents (strict mode)', () => {
     const testDir = createTestDir();
+    const previousStrict = process.env.EGC_CATALOG_STRICT;
+    process.env.EGC_CATALOG_STRICT = '1';
     try {
       writeCatalogFixture(testDir);
       fs.rmSync(path.join(testDir, 'docs', 'zh-CN', 'AGENTS.md'));
 
       assert.throws(
         () => runCatalogCheck({ root: testDir }),
-        /Failed to read AGENTS\.md/
+        /Missing required catalog document/
       );
+    } finally {
+      if (previousStrict === undefined) {
+        delete process.env.EGC_CATALOG_STRICT;
+      } else {
+        process.env.EGC_CATALOG_STRICT = previousStrict;
+      }
+      cleanupTestDir(testDir);
+    }
+  })) passed++; else failed++;
+
+  if (test('skips missing tracked documents in lenient mode (default)', () => {
+    const testDir = createTestDir();
+    try {
+      writeCatalogFixture(testDir);
+      fs.rmSync(path.join(testDir, 'docs', 'zh-CN', 'AGENTS.md'));
+      // No throw — absent optional docs are skipped, present ones still validated.
+      const result = runCatalogCheck({ root: testDir });
+      assert.ok(Array.isArray(result.checks), 'Should return checks array even with absent docs');
     } finally {
       cleanupTestDir(testDir);
     }

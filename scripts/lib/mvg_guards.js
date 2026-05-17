@@ -5,7 +5,6 @@
  */
 
 const fs = require('fs');
-const path = require('os');
 const { log } = require('./utils');
 
 const MAX_ACTIVATION_DEPTH = 3;
@@ -45,8 +44,8 @@ function resetRecursion(sessionId) {
   const lockFile = `/tmp/egc-recursion-${sessionId}.lock`;
   try {
     if (fs.existsSync(lockFile)) fs.unlinkSync(lockFile);
-  } catch (err) {
-    // Ignore
+  } catch {
+    // Intentional: best-effort cleanup of recursion lock; absent or unwritable file is a no-op.
   }
 }
 

@@ -13,7 +13,7 @@ function readJson(filePath, label) {
   try {
     return JSON.parse(fs.readFileSync(filePath, 'utf8'));
   } catch (error) {
-    throw new Error(`Invalid JSON in ${label}: ${error.message}`);
+    throw new Error(`Invalid JSON in ${label}: ${error.message}`, { cause: error });
   }
 }
 

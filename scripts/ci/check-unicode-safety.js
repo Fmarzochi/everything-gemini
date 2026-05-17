@@ -54,6 +54,16 @@ const writableExtensions = new Set([
   '.txt',
 ]);
 
+// Documentation extensions where intentional emoji-based visual hierarchy is
+// part of product UX (README pillars, doc section headers, callouts). Dangerous
+// invisible code points stay blocked everywhere — this only relaxes the emoji
+// gate, not the invisible-character gate.
+const documentationExtensions = new Set([
+  '.md',
+  '.mdx',
+  '.txt',
+]);
+
 const writeModeSkip = new Set([
   path.normalize('scripts/ci/check-unicode-safety.js'),
   path.normalize('tests/scripts/check-unicode-safety.test.js'),
@@ -113,6 +123,12 @@ function isAllowedEmojiLikeSymbol(char) {
   return allowedSymbolCodePoints.has(char.codePointAt(0));
 }
 
+// True weaponizable invisible code points:
+//   ZWSP/ZWNJ/ZWJ (U+200B..200D), Word Joiner (U+2060), BOM (U+FEFF),
+//   Bidi overrides (U+202A..202E), Bidi isolates (U+2066..2069),
+//   Tag characters (U+E0100..E01EF used for invisible ASCII smuggling).
+// Variation Selectors (U+FE00..FE0F) are NOT included here: they are emoji/
+// CJK presentation modifiers, not attack vectors.
 function isDangerousInvisibleCodePoint(codePoint) {
   return (
     (codePoint >= 0x200B && codePoint <= 0x200D) ||
@@ -120,7 +136,6 @@ function isDangerousInvisibleCodePoint(codePoint) {
     codePoint === 0xFEFF ||
     (codePoint >= 0x202A && codePoint <= 0x202E) ||
     (codePoint >= 0x2066 && codePoint <= 0x2069) ||
-    (codePoint >= 0xFE00 && codePoint <= 0xFE0F) ||
     (codePoint >= 0xE0100 && codePoint <= 0xE01EF)
   );
 }
@@ -135,15 +150,17 @@ function stripDangerousInvisibleChars(text) {
   return next;
 }
 
-function sanitizeText(text) {
+function sanitizeText(text, { preserveEmoji = false } = {}) {
   let next = text;
   next = stripDangerousInvisibleChars(next);
 
-  for (const [pattern, replacement] of targetedReplacements) {
-    next = next.replace(pattern, replacement);
+  if (!preserveEmoji) {
+    for (const [pattern, replacement] of targetedReplacements) {
+      next = next.replace(pattern, replacement);
+    }
+    next = next.replace(emojiRe, match => (isAllowedEmojiLikeSymbol(match) ? match : ''));
   }
 
-  next = next.replace(emojiRe, match => (isAllowedEmojiLikeSymbol(match) ? match : ''));
   next = next.replace(/^ +(?=\*\*)/gm, '');
   next = next.replace(/^(\*\*)\s+/gm, '$1');
   next = next.replace(/^(#+)\s{2,}/gm, '$1 ');
@@ -209,12 +226,14 @@ for (const filePath of listFiles(repoRoot)) {
     continue;
   }
 
+  const isDocFile = documentationExtensions.has(path.extname(relativePath).toLowerCase());
+
   if (
     writeMode &&
     !writeModeSkip.has(path.normalize(relativePath)) &&
     canAutoWrite(relativePath)
   ) {
-    const sanitized = sanitizeText(text);
+    const sanitized = sanitizeText(text, { preserveEmoji: isDocFile });
     if (sanitized !== text) {
       fs.writeFileSync(filePath, sanitized, 'utf8');
       changedFiles.push(relativePath);
@@ -224,7 +243,9 @@ for (const filePath of listFiles(repoRoot)) {
 
   const fileViolations = [
     ...collectDangerousInvisibleMatches(text),
-    ...collectMatches(text, emojiRe, 'emoji'),
+    // Emoji gate enforced on code only. Documentation files use emoji-based
+    // visual hierarchy as product UX (see documentationExtensions above).
+    ...(isDocFile ? [] : collectMatches(text, emojiRe, 'emoji')),
   ];
 
   for (const violation of fileViolations) {

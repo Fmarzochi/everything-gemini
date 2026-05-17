@@ -60,7 +60,7 @@ if (testFiles.length === 0) {
 
 let totalPassed = 0;
 let totalFailed = 0;
-let totalTests = 0;
+let totalTests;
 
 for (const testFile of testFiles) {
   const testPath = path.join(testsDir, testFile);

@@ -64,8 +64,7 @@ function runBash(command, options = {}) {
 const repoRoot = path.resolve(__dirname, '..', '..');
 const detectProjectPath = path.join(
   repoRoot,
-  'skills',
-  'continuous-learning-v2',
+  'skills', 'ai', 'continuous-learning-v2',
   'scripts',
   'detect-project.sh'
 );

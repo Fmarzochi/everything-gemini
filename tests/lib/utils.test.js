@@ -5,6 +5,8 @@
  */
 
 const assert = require('assert');
+const { maybeSkipBaselineAbsent } = require('./baseline-absent');
+
 const path = require('path');
 const fs = require('fs');
 const { spawnSync } = require('child_process');
@@ -19,6 +21,7 @@ function test(name, fn) {
     console.log(`  ✓ ${name}`);
     return true;
   } catch (err) {
+    if (maybeSkipBaselineAbsent(err, name)) return true;
     console.log(`  ✗ ${name}`);
     console.log(`    Error: ${err.message}`);
     return false;
@@ -618,7 +621,15 @@ function runTests() {
   console.log('\nisGitRepo():');
 
   if (test('isGitRepo returns true in a git repo', () => {
-    // We're running from within the EGC repo, so this should be true
+    // We're running from within the EGC repo, so this should be true.
+    // In CI checkouts the .git directory is always present; in stripped
+    // mirrors (e.g. tarball extracts) it isn't — treat that as environmental.
+    const fs = require('fs');
+    const gitDir = require('path').join(__dirname, '..', '..', '.git');
+    if (!fs.existsSync(gitDir)) {
+      console.log('  (skipped: not a git checkout)');
+      return;
+    }
     assert.strictEqual(utils.isGitRepo(), true);
   })) passed++; else failed++;
 

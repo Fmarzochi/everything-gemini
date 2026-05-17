@@ -143,8 +143,8 @@ function runTests() {
       assert.ok(fs.existsSync(path.join(projectDir, '.cursor', 'mcp.json')));
       assert.ok(fs.existsSync(path.join(projectDir, '.cursor', 'hooks', 'session-start.js')));
       assert.ok(fs.existsSync(path.join(projectDir, '.cursor', 'scripts', 'lib', 'utils.js')));
-      assert.ok(fs.existsSync(path.join(projectDir, '.cursor', 'skills', 'tdd-workflow', 'SKILL.md')));
-      assert.ok(fs.existsSync(path.join(projectDir, '.cursor', 'skills', 'coding-standards', 'SKILL.md')));
+      assert.ok(fs.existsSync(path.join(projectDir, '.cursor', 'skills', 'testing', 'tdd-workflow', 'SKILL.md')));
+      assert.ok(fs.existsSync(path.join(projectDir, '.cursor', 'skills', 'general', 'coding-standards', 'SKILL.md')));
 
       const hooksConfig = readJson(path.join(projectDir, '.cursor', 'hooks.json'));
       const mcpConfig = readJson(path.join(projectDir, '.cursor', 'mcp.json'));
@@ -331,7 +331,7 @@ function runTests() {
     try {
       const geminiRoot = path.join(homeDir, '.gemini');
       const userRulePath = path.join(geminiRoot, 'rules', 'common', 'coding-style.md');
-      const userSkillPath = path.join(geminiRoot, 'skills', 'tdd-workflow', 'SKILL.md');
+      const userSkillPath = path.join(geminiRoot, 'skills', 'testing', 'tdd-workflow', 'SKILL.md');
       fs.mkdirSync(path.dirname(userRulePath), { recursive: true });
       fs.mkdirSync(path.dirname(userSkillPath), { recursive: true });
       fs.writeFileSync(userRulePath, '# User custom rule\n');
@@ -361,7 +361,7 @@ function runTests() {
       assert.ok(fs.existsSync(path.join(projectDir, '.agent', 'rules', 'common-coding-style.md')));
       assert.ok(fs.existsSync(path.join(projectDir, '.agent', 'skills', 'architect.md')));
       assert.ok(fs.existsSync(path.join(projectDir, '.agent', 'workflows', 'plan.md')));
-      assert.ok(fs.existsSync(path.join(projectDir, '.agent', 'skills', 'tdd-workflow', 'SKILL.md')));
+      assert.ok(fs.existsSync(path.join(projectDir, '.agent', 'skills', 'testing', 'tdd-workflow', 'SKILL.md')));
 
       const state = readJson(path.join(projectDir, '.agent', 'egc-install-state.json'));
       assert.strictEqual(state.request.profile, 'core');

@@ -43,7 +43,7 @@ process.stdin.on('end', () => {
 
 async function main() {
   // Parse stdin JSON to get transcript_path
-  let transcriptPath = null;
+  let transcriptPath;
   try {
     const input = JSON.parse(stdinData);
     transcriptPath = input.transcript_path;
@@ -54,7 +54,7 @@ async function main() {
 
   // Get script directory to find config
   const scriptDir = __dirname;
-  const configFile = path.join(scriptDir, '..', '..', 'skills', 'continuous-learning', 'config.json');
+  const configFile = path.join(scriptDir, '..', '..', 'skills', 'ai', 'continuous-learning', 'config.json');
 
   // Default configuration
   let minSessionLength = 10;

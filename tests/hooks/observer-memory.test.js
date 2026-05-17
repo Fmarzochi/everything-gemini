@@ -43,8 +43,8 @@ function cleanupDir(dir) {
 }
 
 const repoRoot = path.resolve(__dirname, '..', '..');
-const observeShPath = path.join(repoRoot, 'skills', 'continuous-learning-v2', 'hooks', 'observe.sh');
-const observerLoopPath = path.join(repoRoot, 'skills', 'continuous-learning-v2', 'agents', 'observer-loop.sh');
+const observeShPath = path.join(repoRoot, 'skills', 'ai', 'continuous-learning-v2', 'hooks', 'observe.sh');
+const observerLoopPath = path.join(repoRoot, 'skills', 'ai', 'continuous-learning-v2', 'agents', 'observer-loop.sh');
 
 console.log('\n=== Observer Memory Fix Tests (#521) ===\n');
 

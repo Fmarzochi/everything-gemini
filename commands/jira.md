@@ -102,5 +102,5 @@ After analyzing a ticket:
 
 ## Related
 
-- **Skill:** `skills/jira-integration/`
+- **Skill:** `skills/integrations/jira-integration/`
 - **MCP config:** `mcp-configs/mcp-servers.json` → `jira`

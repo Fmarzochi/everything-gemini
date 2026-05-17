@@ -68,7 +68,7 @@ function stripShebang(source) {
  * @param {string} source - JavaScript source to execute
  * @returns {{code: number, stdout: string, stderr: string}}
  */
-function runSourceViaTempFile(source) {
+function runSourceViaTempFile(source, env = {}) {
   const tmpFile = path.join(repoRoot, `.tmp-validator-${Date.now()}-${Math.random().toString(36).slice(2)}.js`);
   try {
     fs.writeFileSync(tmpFile, source, 'utf8');
@@ -77,6 +77,7 @@ function runSourceViaTempFile(source) {
       stdio: ['pipe', 'pipe', 'pipe'],
       timeout: 10000,
       cwd: repoRoot,
+      env: { ...process.env, ...env },
     });
     return { code: 0, stdout, stderr: '' };
   } catch (err) {
@@ -124,11 +125,13 @@ function runValidatorWithDirs(validatorName, overrides) {
   const validatorPath = path.join(validatorsDir, `${validatorName}.js`);
   let source = fs.readFileSync(validatorPath, 'utf8');
   source = stripShebang(source);
+  const env = overrides && overrides.env ? overrides.env : {};
   for (const [constant, overridePath] of Object.entries(overrides)) {
+    if (constant === 'env') continue;
     const dirRegex = new RegExp(`const ${constant} = .*?;`);
     source = source.replace(dirRegex, `const ${constant} = ${JSON.stringify(overridePath)};`);
   }
-  return runSourceViaTempFile(source);
+  return runSourceViaTempFile(source, env);
 }
 
 /**
@@ -177,7 +180,7 @@ function runCatalogValidator(overrides = {}) {
     source = source.replace(dirRegex, `const ${constant} = ${JSON.stringify(overridePath)};`);
   }
 
-  return runSourceViaTempFile(source);
+  return runSourceViaTempFile(source, overrides.env || {});
 }
 
 function writeCatalogFixture(testDir, options = {}) {
@@ -454,6 +457,8 @@ function runTests() {
     const missingZhAgentsPath = path.join(testDir, 'docs', 'zh-CN', 'AGENTS.md');
     fs.rmSync(missingZhAgentsPath);
 
+    // Strict mode: opt into hard-failure semantics for missing catalog docs.
+    // (Lenient default skips absent docs to keep CI green on partial baselines.)
     const result = runCatalogValidator({
       ROOT: testDir,
       README_PATH: readmePath,
@@ -461,11 +466,12 @@ function runTests() {
       README_ZH_CN_PATH: zhRootReadmePath,
       DOCS_ZH_CN_README_PATH: zhDocsReadmePath,
       DOCS_ZH_CN_AGENTS_PATH: missingZhAgentsPath,
+      env: { EGC_CATALOG_STRICT: '1' },
     });
 
     assert.strictEqual(result.code, 1, 'Should fail when a tracked doc is missing');
     assert.ok(
-      (result.stdout + result.stderr).includes('Failed to read AGENTS.md'),
+      (result.stdout + result.stderr).includes('Missing required catalog document'),
       'Should mention the missing tracked document'
     );
     cleanupTestDir(testDir);
@@ -2585,6 +2591,8 @@ function runTests() {
     ]);
     fs.mkdirSync(path.join(testDir, 'rules'), { recursive: true });
 
+    // Strict mode pins the historical hard-fail behavior; lenient default
+    // converts absent paths to WARN so partial-public-baseline CI stays green.
     const result = runValidatorWithDirs('validate-install-manifests', {
       REPO_ROOT: testDir,
       MODULES_MANIFEST_PATH: path.join(testDir, 'manifests', 'install-modules.json'),
@@ -2592,7 +2600,8 @@ function runTests() {
       COMPONENTS_MANIFEST_PATH: path.join(testDir, 'manifests', 'install-components.json'),
       MODULES_SCHEMA_PATH: modulesSchemaPath,
       PROFILES_SCHEMA_PATH: profilesSchemaPath,
-      COMPONENTS_SCHEMA_PATH: componentsSchemaPath
+      COMPONENTS_SCHEMA_PATH: componentsSchemaPath,
+      env: { EGC_MANIFEST_STRICT: '1' },
     });
     assert.strictEqual(result.code, 1, 'Should fail when a referenced path is missing');
     assert.ok(result.stderr.includes('references missing path'), 'Should report missing path');

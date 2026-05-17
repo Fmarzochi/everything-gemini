@@ -47,7 +47,7 @@ test('observation layer writes and reads structured skill outcomes', () => {
       task: 'Fix flaky Playwright test',
       skill: {
         id: 'e2e-testing',
-        path: 'skills/e2e-testing/SKILL.md'
+        path: 'skills/testing/e2e-testing/SKILL.md'
       },
       success: false,
       error: 'playwright timeout',
@@ -77,21 +77,21 @@ test('health inspector traces recurring failures for a skill across runs', () =>
     [
       createSkillObservation({
         task: 'Ship Next.js auth middleware',
-        skill: { id: 'security-review', path: 'skills/security-review/SKILL.md' },
+        skill: { id: 'security-review', path: 'skills/security/security-review/SKILL.md' },
         success: false,
         error: 'missing csrf guidance',
         feedback: 'Did not mention CSRF'
       }),
       createSkillObservation({
         task: 'Harden Next.js auth middleware',
-        skill: { id: 'security-review', path: 'skills/security-review/SKILL.md' },
+        skill: { id: 'security-review', path: 'skills/security/security-review/SKILL.md' },
         success: false,
         error: 'missing csrf guidance',
         feedback: 'Repeated omission'
       }),
       createSkillObservation({
         task: 'Review payment webhook security',
-        skill: { id: 'security-review', path: 'skills/security-review/SKILL.md' },
+        skill: { id: 'security-review', path: 'skills/security/security-review/SKILL.md' },
         success: true
       })
     ].forEach(record => appendSkillObservation(record, { projectRoot }));
@@ -116,14 +116,14 @@ test('amendify proposes SKILL.md patch content from failure evidence', () => {
   const records = [
     createSkillObservation({
       task: 'Add API rate limiting',
-      skill: { id: 'api-design', path: 'skills/api-design/SKILL.md' },
+      skill: { id: 'api-design', path: 'skills/backend/api-design/SKILL.md' },
       success: false,
       error: 'missing rate limiting guidance',
       feedback: 'No rate-limit section'
     }),
     createSkillObservation({
       task: 'Design public API error envelopes',
-      skill: { id: 'api-design', path: 'skills/api-design/SKILL.md' },
+      skill: { id: 'api-design', path: 'skills/backend/api-design/SKILL.md' },
       success: false,
       error: 'missing error response examples',
       feedback: 'Need explicit examples'
@@ -144,26 +144,26 @@ test('evaluation scaffold compares amended and baseline performance', () => {
   const records = [
     createSkillObservation({
       task: 'Fix flaky login test',
-      skill: { id: 'e2e-testing', path: 'skills/e2e-testing/SKILL.md' },
+      skill: { id: 'e2e-testing', path: 'skills/testing/e2e-testing/SKILL.md' },
       success: false,
       variant: 'baseline'
     }),
     createSkillObservation({
       task: 'Fix flaky checkout test',
-      skill: { id: 'e2e-testing', path: 'skills/e2e-testing/SKILL.md' },
+      skill: { id: 'e2e-testing', path: 'skills/testing/e2e-testing/SKILL.md' },
       success: true,
       variant: 'baseline'
     }),
     createSkillObservation({
       task: 'Fix flaky login test',
-      skill: { id: 'e2e-testing', path: 'skills/e2e-testing/SKILL.md' },
+      skill: { id: 'e2e-testing', path: 'skills/testing/e2e-testing/SKILL.md' },
       success: true,
       variant: 'amended',
       amendmentId: 'amend-1'
     }),
     createSkillObservation({
       task: 'Fix flaky checkout test',
-      skill: { id: 'e2e-testing', path: 'skills/e2e-testing/SKILL.md' },
+      skill: { id: 'e2e-testing', path: 'skills/testing/e2e-testing/SKILL.md' },
       success: true,
       variant: 'amended',
       amendmentId: 'amend-1'

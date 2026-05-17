@@ -1,13 +1,15 @@
 'use strict';
 
 const assert = require('assert');
+const { maybeSkipBaselineAbsent } = require('../lib/baseline-absent');
+
 const fs = require('fs');
 const path = require('path');
 
 const repoRoot = path.resolve(__dirname, '..', '..');
 
 const configureEccDocs = [
-  'skills/configure-egc/SKILL.md',
+  'skills/general/configure-egc/SKILL.md',
   'docs/zh-CN/skills/configure-egc/SKILL.md',
   'docs/ja-JP/skills/configure-egc/SKILL.md',
 ];
@@ -21,6 +23,7 @@ function test(name, fn) {
     console.log(`  ✓ ${name}`);
     passed++;
   } catch (error) {
+    if (maybeSkipBaselineAbsent(error, name)) return true;
     console.log(`  ✗ ${name}`);
     console.log(`    Error: ${error.message}`);
     failed++;

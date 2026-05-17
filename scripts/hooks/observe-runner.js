@@ -5,7 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const { spawnSync, spawn } = require('child_process');
 
-const OBSERVE_RELATIVE_PATH = path.join('skills', 'continuous-learning-v2', 'hooks', 'observe.sh');
+const OBSERVE_RELATIVE_PATH = path.join('skills', 'ai', 'continuous-learning-v2', 'hooks', 'observe.sh');
 const DEFAULT_TIMEOUT_MS = 9000;
 
 function getPluginRoot(options = {}) {
@@ -188,11 +188,13 @@ function teeEventToStateDb(raw) {
     });
     child.stdin.end(raw);
     child.unref();
-  } catch (_) {}
+  } catch (_) {
+    // Intentional: state-db tee is best-effort; runtime must not block on writer failures.
+  }
 }
 
 if (require.main === module) {
-  let raw = '';
+  let raw;
   try {
     raw = fs.readFileSync(0, 'utf8');
   } catch (_error) {

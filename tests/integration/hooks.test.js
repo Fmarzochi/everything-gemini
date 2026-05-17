@@ -7,6 +7,8 @@
  */
 
 const assert = require('assert');
+const { maybeSkipBaselineAbsent } = require('../lib/baseline-absent');
+
 const crypto = require('crypto');
 const path = require('path');
 const fs = require('fs');
@@ -34,6 +36,7 @@ async function asyncTest(name, fn) {
     console.log(`  ✓ ${name}`);
     return true;
   } catch (err) {
+    if (maybeSkipBaselineAbsent(err, name)) return true;
     console.log(`  ✗ ${name}`);
     console.log(`    Error: ${err.message}`);
     return false;

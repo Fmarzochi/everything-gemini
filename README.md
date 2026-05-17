@@ -45,6 +45,30 @@ Not just configs. EGC is a massive, production-grade system: skills, memory opti
 
 ---
 
+## 📊 Catalog & Cross-Tool Parity
+
+Out of the box you get **access to 62 agents, 228 skills, and 74 commands**, organized across 14 categories and continuously validated by the CI catalog gate (`scripts/ci/catalog.js`).
+
+### Catalog Snapshot
+
+| Surface | Inventory |
+|---------|-----------|
+| Agents | 62 agents |
+| Commands | 74 commands |
+| Skills | 228 skills |
+
+### Cross-Harness Parity
+
+How the EGC native inventory compares to the same surfaces in other major AI coding harnesses:
+
+| Surface | Gemini Code (EGC) | Claude Code | Codex CLI | OpenCode |
+|---------|------------------:|-------------|-----------|---------:|
+| **Agents** | 62 | Shared (AGENTS.md) | Shared (AGENTS.md) | 12 |
+| **Commands** | 74 | Shared | Instruction-based | 31 |
+| **Skills** | 228 | Shared | 10 (native format) | 37 |
+
+---
+
 ## 🧠 Why EGC Exists
 
 AI code assistants often degrade into confusing text files and fragmented commands. **Everything Google Code (EGC)** fixes this by wrapping the Gemini AI ecosystem in a strict, observable, and professional engineering architecture. It transforms a standard AI assistant into a **managed team of cognitive workers**, monitored via a real-time dashboard.
