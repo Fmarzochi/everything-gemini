@@ -4,6 +4,7 @@ import os
 import uuid
 import time
 import signal
+from collections import deque
 from datetime import datetime, timezone
 from enum import Enum
 from dataclasses import dataclass, field
@@ -46,6 +47,7 @@ class ExecutionOrchestrator:
         self._worker_count = worker_count
         self._workers: List[asyncio.Task] = []
         self._results: Dict[str, asyncio.Future] = {}
+        self._dead_letters: deque = deque(maxlen=100)
 
     async def dispatch(self, task_description: str) -> Dict[str, Any]:
         execution_id = str(uuid.uuid4())
@@ -163,7 +165,11 @@ class ExecutionOrchestrator:
                 "workers": len(self._workers),
                 "awaiting_results": len(self._results),
             },
+            "dead_letters": {"count": len(self._dead_letters)},
         }
+
+    def get_dead_letters(self, limit: int = 50) -> List[Dict[str, Any]]:
+        return list(self._dead_letters)[-limit:]
 
     async def _ensure_workers(self) -> None:
         if not self._workers:
@@ -183,9 +189,26 @@ class ExecutionOrchestrator:
             })
             try:
                 result = await self.execute_task(task_description, agent_id, prompt, session_id, task_id=task_id)
+                if isinstance(result, dict) and result.get("status") in ("failed", "blocked"):
+                    self._dead_letters.append({
+                        "task_id": task_id,
+                        "session_id": session_id,
+                        "agent": agent_id,
+                        "reason": result.get("status"),
+                        "detail": result.get("error") if isinstance(result.get("error"), (str, dict)) else result,
+                        "timestamp": datetime.now(timezone.utc).isoformat(),
+                    })
                 if not future.done():
                     future.set_result(result)
             except Exception as exc:
+                self._dead_letters.append({
+                    "task_id": task_id,
+                    "session_id": session_id,
+                    "agent": agent_id,
+                    "reason": "exception",
+                    "detail": str(exc),
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                })
                 if not future.done():
                     future.set_exception(exc)
 
