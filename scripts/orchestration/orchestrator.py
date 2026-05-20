@@ -36,6 +36,12 @@ class ExecutionSession:
     task_description: str = ""
 
 class ExecutionOrchestrator:
+    """
+    [DORMANT / TEST-ONLY SYSTEM]
+    The ExecutionOrchestrator provides a Python-native event loop and task queue.
+    Currently, this system is primarily an architectural mockup kept alive by tests.
+    The true execution routing is handled through the Node.js mesh and simple prompt pipelines.
+    """
     def __init__(self, workspace_root: str, max_concurrent: int = 5, worker_count: int = 3):
         self.root = workspace_root
         self.sandbox = SandboxController(workspace_root)

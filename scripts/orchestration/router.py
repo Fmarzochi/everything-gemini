@@ -97,7 +97,7 @@ class AGENT_ROUTER:
     def _resolve_physical_agent(self, slug: str) -> Optional[Dict]:
         """
         Resolves a slug to physical agent metadata from runtime-map.json.
-        Ignores virtual aliases.
+        Ignores virtual aliases. Falls back to physical disk search.
         """
         filename = f"{slug}.md" if not slug.endswith(".md") else slug
         
@@ -109,6 +109,22 @@ class AGENT_ROUTER:
                     "physicalPath": agent["physicalPath"],
                     "status": agent["status"]
                 }
+                
+        # Physical fallback
+        import glob
+        for base_dir in ["agents", ".agents/agents", ".codex/agents"]:
+            search_path = os.path.join(self.project_root, base_dir, "**", filename)
+            matches = glob.glob(search_path, recursive=True)
+            if matches:
+                # Return the first match relative to project_root
+                rel_path = os.path.relpath(matches[0], self.project_root)
+                return {
+                    "id": slug.replace(".md", ""),
+                    "name": filename,
+                    "physicalPath": rel_path,
+                    "status": "hot" if ".agents" in rel_path else "cold"
+                }
+                
         return None
 
 if __name__ == "__main__":

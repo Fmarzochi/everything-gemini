@@ -8,6 +8,12 @@ from runtime.runtime_context import RuntimeContext
 from orchestration.orchestrator import ExecutionOrchestrator
 
 class WorkflowEngine:
+    """
+    [DORMANT / TEST-ONLY SYSTEM]
+    The WorkflowEngine interprets and executes workflow specifications.
+    This component is primarily an architectural mockup kept alive by the topology CI tests.
+    Real workflows are handled by scripts/hooks or third-party harnesses.
+    """
     def __init__(self, workspace_root: str, *, orchestrator=None):
         self.root = workspace_root
         self.planner = TaskPlanner()

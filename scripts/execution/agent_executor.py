@@ -19,6 +19,12 @@ def _build_runtime_env(workspace_root: str, agent_id: str) -> dict:
 
 
 class AgentExecutor:
+    """
+    [DORMANT / TEST-ONLY SYSTEM]
+    The AgentExecutor handles resolving the agent path and dispatching it to the LLM core.
+    Currently, this acts as a simulated dispatch mechanism for the Orchestrator, but the 
+    real CLI entrypoint (src/llm/cli/prompt.py) bypasses this completely.
+    """
     def __init__(self, workspace_root: str):
         self.workspace_root = workspace_root
         self.loader = AgentLoader(workspace_root)

@@ -475,11 +475,11 @@ def _humanize_name(slug: str) -> str:
 def load_agents(project_path: str) -> List[Dict]:
     """Load agents from the hybrid registry and physical directories."""
     agents_list: List[Dict] = []
-    registry_path = os.path.join(project_path, "registry", "runtime-map.json")
-    
+    registry_path = _get_registry_path(project_path)
+
     seen_slugs = set()
 
-    if os.path.isfile(registry_path):
+    if registry_path:
         try:
             with open(registry_path, "r", encoding="utf-8") as f:
                 registry = json.load(f)
@@ -526,30 +526,30 @@ def load_agents(project_path: str) -> List[Dict]:
             print(f"Registry load error: {e}")
 
     # Fallback to physical scanning for unmapped agents
-    agents_dir = os.path.join(project_path, "agents")
-    hot_agents_dir = os.path.join(project_path, ".agents", "agents")
+    agents_dirs = [os.path.join(project_path, "agents"), os.path.join(project_path, ".agents", "agents"), os.path.join(project_path, ".codex", "agents")]
     
-    for d in [agents_dir, hot_agents_dir]:
+    for d in agents_dirs:
         if not os.path.isdir(d): continue
-        for item in sorted(os.listdir(d)):
-            if not item.endswith(".md") or item.startswith("_"): continue
-            slug = item[:-3]
-            if slug in seen_slugs: continue
-            
-            agent_path = os.path.join(d, item)
-            try:
-                with open(agent_path, "r", encoding="utf-8") as f:
-                    content = f.read()
-                metadata = parse_frontmatter(content)
-                name = _as_text(metadata.get("name")) or slug
-                cog = infer_cognitive_metadata("agent", name, "", [], "", content)
-                agents_list.append({
-                    "name": name, "slug": slug, "purpose": _as_text(metadata.get("description")) or f"{_humanize_name(slug)} agent",
-                    "when_to_use": "Direct discovery", "role": "", "tools": [], "tools_display": "(inherits)",
-                    "model": "", "model_strategy": cog["model_strategy"], "cognitive": cog, "source": agent_path,
-                })
-                seen_slugs.add(slug)
-            except: continue
+        for root_dir, _, files in os.walk(d):
+            for item in sorted(files):
+                if not item.endswith(".md") or item.startswith("_"): continue
+                slug = item[:-3]
+                if slug in seen_slugs: continue
+                
+                agent_path = os.path.join(root_dir, item)
+                try:
+                    with open(agent_path, "r", encoding="utf-8") as f:
+                        content = f.read()
+                    metadata = parse_frontmatter(content)
+                    name = _as_text(metadata.get("name")) or slug
+                    cog = infer_cognitive_metadata("agent", name, "", [], "", content)
+                    agents_list.append({
+                        "name": name, "slug": slug, "purpose": _as_text(metadata.get("description")) or f"{_humanize_name(slug)} agent",
+                        "when_to_use": "Direct discovery", "role": "", "tools": [], "tools_display": "(inherits)",
+                        "model": "", "model_strategy": cog["model_strategy"], "cognitive": cog, "source": agent_path,
+                    })
+                    seen_slugs.add(slug)
+                except: continue
 
     return agents_list
 
@@ -563,8 +563,29 @@ def _skill_category(name: str, domain_id: str) -> str:
     return "General"
 
 
+def _build_skill_entry(skill_file: str, skill_path: str, slug: str, folder_name: str) -> Optional[Dict]:
+    try:
+        with open(skill_file, "r", encoding="utf-8") as f2: content = f2.read()
+        metadata = parse_frontmatter(content)
+        name = _as_text(metadata.get("name")) or _humanize_name(folder_name)
+        description = _as_text(metadata.get("description"))
+        cog = infer_cognitive_metadata("skill", name, description, [], "", content)
+        runtime_tuple = tuple(cog.get("runtime", []))
+        tools_tuple = tuple(cog.get("tools", []))
+        return {
+            "name": name, "slug": slug, "description": description or f"{_humanize_name(folder_name)} skill",
+            "category": _skill_category(folder_name, cog["domain_id"]),
+            "activation": extract_section(content, _SKILL_ACTIVATION_HEADERS) or "Auto-activated.",
+            "path": skill_path, "cognitive": {**cog, "runtime": runtime_tuple, "tools": tools_tuple},
+        }
+    except Exception as e:
+        logging.warning(f"Error parsing skill: {e}")
+        return None
+
+
 def load_skills(project_path: str) -> List[Dict]:
     skills: List[Dict] = []
+    seen: set = set()
     registry_path = _get_registry_path(project_path)
     if registry_path:
         try:
@@ -577,22 +598,31 @@ def load_skills(project_path: str) -> List[Dict]:
                         skill_path = os.path.join(project_path, from_portable_path(skill_meta["physicalPath"]))
                         skill_file = os.path.join(skill_path, "SKILL.md")
                         if not os.path.isfile(skill_file): continue
-                    try:
-                        with open(skill_file, "r", encoding="utf-8") as f2: content = f2.read()
-                        metadata = parse_frontmatter(content)
-                        name = _as_text(metadata.get("name")) or _humanize_name(skill_meta["name"])
-                        description = _as_text(metadata.get("description"))
-                        cog = infer_cognitive_metadata("skill", name, description, [], "", content)
-                        runtime_tuple = tuple(cog.get("runtime", []))
-                        tools_tuple = tuple(cog.get("tools", []))
-                        skills.append({
-                            "name": name, "slug": skill_meta["id"], "description": description or f"{_humanize_name(skill_meta['name'])} skill",
-                            "category": _skill_category(skill_meta["name"], cog["domain_id"]),
-                            "activation": extract_section(content, _SKILL_ACTIVATION_HEADERS) or "Auto-activated.",
-                            "path": skill_path, "cognitive": {**cog, "runtime": runtime_tuple, "tools": tools_tuple},
-                        })
-                    except Exception as e: logging.warning(f"Error parsing skill: {e}")
+                    entry = _build_skill_entry(skill_file, skill_path, skill_meta["id"], skill_meta["name"])
+                    if entry:
+                        skills.append(entry)
+                        seen.add((skill_meta.get("namespace"), skill_meta.get("name")))
         except Exception as e: logging.error(f"Skill registry error: {e}")
+
+    skills_dirs = [os.path.join(project_path, "skills"), os.path.join(project_path, ".agents", "skills")]
+    for skills_dir in skills_dirs:
+        if not os.path.isdir(skills_dir): continue
+        for root_dir, dirs, files in os.walk(skills_dir):
+            if "__pycache__" in dirs:
+                dirs.remove("__pycache__")
+            if "SKILL.md" in files:
+                skill_path = root_dir
+                folder_name = os.path.basename(skill_path)
+                rel_path = os.path.relpath(skill_path, skills_dir)
+                parts = rel_path.split(os.sep)
+                namespace = parts[0] if len(parts) > 1 else "general"
+                
+                if (namespace, folder_name) in seen: continue
+                skill_file = os.path.join(skill_path, "SKILL.md")
+                entry = _build_skill_entry(skill_file, skill_path, f"{namespace}-{folder_name}", folder_name)
+                if entry:
+                    skills.append(entry)
+                    seen.add((namespace, folder_name))
     return skills
 
 def load_commands(project_path: str) -> List[Dict]:
@@ -1505,7 +1535,7 @@ Content:
         self.execute_run_button = ttk.Button(entry_frame, text="Run", command=self._on_execute_run)
         self.execute_run_button.pack(side=tk.LEFT)
         self.execute_use_orch = tk.BooleanVar(value=False)
-        ttk.Checkbutton(entry_frame, text="Use orchestrator queue (experimental)", variable=self.execute_use_orch).pack(side=tk.LEFT, padx=5)
+        ttk.Checkbutton(entry_frame, text="Use orchestrator queue [DORMANT / TEST-ONLY]", variable=self.execute_use_orch).pack(side=tk.LEFT, padx=5)
 
         self.execute_health_label = ttk.Label(frame, text="", foreground='gray', font=('Open Sans', 9))
         self.execute_health_label.pack(fill=tk.X, padx=10, pady=2)

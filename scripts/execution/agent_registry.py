@@ -19,14 +19,15 @@ class AgentRegistry:
             "security-audit": "agents/security-audit.md"
         }
         # Scan filesystem to augment registry
-        for d in ["agents/", ".agents/"]:
+        for d in ["agents", ".agents", ".codex/agents"]:
             path = os.path.join(self.root, d)
             if os.path.exists(path):
-                for f in os.listdir(path):
-                    if f.endswith(".md"):
-                        name = f.replace(".md", "")
-                        if name not in self.registry:
-                            self.registry[name] = os.path.join(d, f)
+                for root_dir, _, files in os.walk(path):
+                    for f in files:
+                        if f.endswith(".md"):
+                            name = f.replace(".md", "")
+                            if name not in self.registry:
+                                self.registry[name] = os.path.relpath(os.path.join(root_dir, f), self.root)
 
     def get_physical_path(self, name: str) -> str:
         return self.registry.get(name, "")

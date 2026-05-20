@@ -6,6 +6,12 @@ from dataclasses import asdict
 from orchestration.orchestrator import ExecutionOrchestrator, TaskState
 
 class ExecutionQueue:
+    """
+    [DORMANT / TEST-ONLY SYSTEM]
+    The ExecutionQueue provides an async task processing loop.
+    Currently, this acts as a simulated queue mechanism kept alive by unit tests.
+    The real EGC system has no persistent background event loop for queues.
+    """
     def __init__(self, workspace_root: str, concurrency: int = 3):
         self.queue = asyncio.Queue()
         self.concurrency = concurrency
