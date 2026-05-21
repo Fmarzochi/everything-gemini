@@ -88,6 +88,9 @@ EGC ships with a massive, continuously validated catalog of cognitive payloads, 
 | **Agents** | 62 agents | Specialized personas (e.g., `security-reviewer`) that handle distinct domains. |
 | **Skills** | 228 skills | Standardized operating procedures organized in 14 categories. |
 | **Commands** | 74 commands | CLI slash-command entrypoints for terminal execution. |
+| **Rules** | 109 rules | Shared behavioral constraints, coding standards and runtime governance directives. |
+| **Hooks** | 43 hooks | Runtime interception and lifecycle middleware surfaces. |
+| **Governance Overlays** | 2 overlays | Shared AGENTS.md constitutional layers influencing semantic routing and behavior. |
 | **Cognitive Memory** | Obsidian + Local | Persistence layer for long-term project knowledge and vault integration. |
 
 ### Cross-Harness Parity
@@ -99,6 +102,9 @@ How the EGC native inventory compares to the same surfaces in other major AI cod
 | **Agents** | 62 | Shared (AGENTS.md) | Shared (AGENTS.md) | 12 |
 | **Commands** | 74 | Shared | Instruction-based | 31 |
 | **Skills** | 228 | Shared | 10 (native format) | 37 |
+| **Rules** | 109 | Shared | Shared | Supported |
+| **Hooks** | 43 | Native | Unsupported | Supported |
+| **Overlays** | 2 | Shared | Shared | Shared |
 
 ---
 
@@ -118,17 +124,17 @@ We believe in technical honesty. EGC contains preserved architectural substrates
 | **Cognitive Memory** | **ACTIVE** | `src/llm/memory/` provides local-first persistence with Obsidian and MCP providers. |
 | **Provider Bridge** | **ACTIVE** | `src/llm/cli/prompt.py` provides the canonical Python CLI forwarder. |
 | **Registry Snapshots** | **ACTIVE (HOT CACHE)** | `runtime-map.json` acts as the Full Operational Topology Cache, auto-regenerated on install. Discovery falls back to physical disk search only on drift. |
+| **Execution Orchestrator** | **ORPHAN-BY-TESTS** | Simulated Python event loop preserved for structural topology continuity. |
+| **Execution Queue** | **ORPHAN-BY-TESTS** | Python task queues exist primarily as an architectural mockup in tests. |
+| **Workflow Engine** | **ORPHAN-BY-TESTS** | Experimental workflow parser kept alive by topology CI constraints. |
 
 ### Operational Surfaces & Topology
 
 EGC execution is governed by both **Cognitive** and **Behavioral** topology, indexed centrally to ensure structural observability:
 
-- **Cognitive Topology (`agents/`, `skills/`)**: Expertise, roles, and instructions.
-- **Behavioral Topology (`commands/`, `rules/`, `scripts/hooks/`)**: Operational entrypoints (Slash Commands), runtime directives, and event interceptors.
-- **Governance Overlays (`AGENTS.md`)**: Shared constitutional rules loaded by the host harness to influence semantic routing and behavior.
-| **Execution Orchestrator** | **ORPHAN-BY-TESTS** | Simulated Python event loop preserved for structural topology continuity. |
-| **Execution Queue** | **ORPHAN-BY-TESTS** | Python task queues exist primarily as an architectural mockup in tests. |
-| **Workflow Engine** | **ORPHAN-BY-TESTS** | Experimental workflow parser kept alive by topology CI constraints. |
+- **Cognitive Topology (`agents/`, `skills/`)**: Represents *what the AI knows*. Provides domain expertise, specific roles, and declarative instructions.
+- **Behavioral Topology (`commands/`, `rules/`, `scripts/hooks/`)**: Represents *how the AI acts and interacts*. Encompasses operational entrypoints (Slash Commands), runtime directives that alter execution mathematically and stylistically, and event interceptors that modify the runtime lifecycle.
+- **Governance Overlays (`AGENTS.md`)**: Shared constitutional rules loaded by the host harness. They act as a behavioral substrate to influence semantic routing and global orchestration.
 
 ---
 
