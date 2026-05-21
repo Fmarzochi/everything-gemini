@@ -2,7 +2,7 @@
 
 ![Everything Gemini Code — the performance system for AI agent harnesses](assets/hero.png)
 
-[![Version](https://img.shields.io/badge/version-v1.0.0-blue.svg?style=flat-square)]() [![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](LICENSE) [![Engine](https://img.shields.io/badge/engine-Gemini%20Native-1a73e8.svg?style=flat-square)]() [![Bridge](https://img.shields.io/badge/bridge-Claude%20%7C%20OpenAI%20%7C%20Ollama-d97757.svg?style=flat-square)]() [![Language](https://img.shields.io/badge/tech-Python%20%7C%20TypeScript%20%7C%20SQLite-3776AB?style=flat-square)]() [![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20macOS%20%7C%20Windows-blue?style=flat-square)]() [![Local First](https://img.shields.io/badge/telemetry-Local--First-2ea44f?style=flat-square)]()
+[![Version](https://img.shields.io/badge/version-v1.0.0-blue.svg?style=flat-square)]() [![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](LICENSE) [![Engine](https://img.shields.io/badge/engine-Gemini%20Native-1a73e8.svg?style=flat-square)]() [![Bridge](https://img.shields.io/badge/bridge-Claude%20%7C%20OpenAI%20%7C%20Ollama-d97757.svg?style=flat-square)]() [![Language](https://img.shields.io/badge/tech-Python%20%7C%20TypeScript%20%7C%20SQLite-3776AB?style=flat-square)]() [![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20macOS%20%7C%20Windows-blue?style=flat-square)]() [![Local First](https://img.shields.io/badge/telemetry-Local--First-2ea44f?style=flat-square)]() [![Obsidian](https://img.shields.io/badge/interop-Obsidian-8b6cef?style=flat-square)](https://obsidian.md)
 
 <div align="center"></div>
 
@@ -68,6 +68,13 @@ Use the EGC Node installer to deploy skills and agents directly into your prefer
 npm run egc-install -- --target cursor --profile developer typescript
 ```
 
+### 5. Enable Cognitive Memory (Optional)
+To enable long-term persistence and Obsidian integration:
+
+1.  **Configure Environment:** Copy `.env.example` to `.env` and add your `OBSIDIAN_TOKEN`.
+2.  **Initialize Settings:** Copy `egc_settings.json.example` to `egc_settings.json` and set your `vaultPath`.
+3.  **Local Context:** EGC will automatically start indexing sessions into your local memory and vault.
+
 ---
 
 ## 📊 Ecosystem Inventory & Cross-Tool Parity
@@ -81,6 +88,7 @@ EGC ships with a massive, continuously validated catalog of cognitive payloads, 
 | **Agents** | 62 agents | Specialized personas (e.g., `security-reviewer`) that handle distinct domains. |
 | **Skills** | 228 skills | Standardized operating procedures organized in 14 categories. |
 | **Commands** | 74 commands | CLI slash-command entrypoints for terminal execution. |
+| **Cognitive Memory** | Obsidian + Local | Persistence layer for long-term project knowledge and vault integration. |
 
 ### Cross-Harness Parity
 
@@ -106,12 +114,42 @@ We believe in technical honesty. EGC contains preserved architectural substrates
 |---|---|---|
 | **Installer & Manifests** | **ACTIVE** | `manifests/install-modules.json` is the absolute truth for ecosystem deployment. |
 | **Node Hook Mesh** | **ACTIVE** | Context injection, session state, and execution hooks via `scripts/hooks/*.js`. |
-| **Dashboard UI** | **ACTIVE** | `egc_dashboard.py` provides control-plane visibility and physical-disk inventory discovery. |
+| **Dashboard UI** | **ACTIVE** | `egc_dashboard.py` proporciona visibilidade do plano de controle e descoberta de inventário. |
+| **Cognitive Memory** | **ACTIVE** | `src/llm/memory/` provides local-first persistence with Obsidian and MCP providers. |
 | **Provider Bridge** | **ACTIVE** | `src/llm/cli/prompt.py` provides the canonical Python CLI forwarder. |
 | **Registry Snapshots** | **DORMANT BUT INTENTIONAL** | `runtime-map.json` is preserved as a legacy/cache surface; discovery gracefully falls back to deep physical disk search. |
 | **Execution Orchestrator** | **ORPHAN-BY-TESTS** | Simulated Python event loop preserved for structural topology continuity. |
 | **Execution Queue** | **ORPHAN-BY-TESTS** | Python task queues exist primarily as an architectural mockup in tests. |
 | **Workflow Engine** | **ORPHAN-BY-TESTS** | Experimental workflow parser kept alive by topology CI constraints. |
+
+---
+
+## 🧠 Cognitive Infrastructure & Memory Sovereignty
+
+EGC implements a local-first **Cognitive Memory Layer** designed to persist project knowledge, architectural decisions, and session context without cloud dependencies.
+
+### Architecture Map
+
+```text
+[ USER HARNESS ] <───> [ SESSION BRIDGE ] <───> [ MEMORY MANAGER ]
+                                                       │
+          ┌────────────────────────────────────────────┴────────────────────────────────┐
+          │                                            │                                │
+[ LOCAL PROVIDER ]                         [ OBSIDIAN PROVIDER ]                [ MCP PROVIDER ]
+ (memory/state.db)                       (User-Owned .md Vault)                (Remote/Local MCP)
+          │                                            │                                │
+    TRUST BOUNDARY                              TRUST BOUNDARY                   TRUST BOUNDARY
+ (Git Ignored Layer)                         (Outside Repository)              (Dynamic Injection)
+```
+
+### Security & Privacy Model: The "Empty-Push" Architecture
+
+We enforce a strict separation between **OSS Runtime** (shared) and **User Cognition** (private).
+
+*   **Sovereignty:** The runtime code is open source, but your cognition remains local.
+*   **Git Isolation:** Sensitive directories (`memory/`, `.sessions/`, `archaeology/`) and databases are hard-coded in `.gitignore`.
+*   **Secret Injection:** Tokens and absolute paths are never hardcoded. They are injected at runtime via `.env` (using `${OBSIDIAN_TOKEN}`).
+*   **Empty-Push:** Your `git push` remains structurally empty of any private knowledge, notes, or session traces.
 
 ---
 
