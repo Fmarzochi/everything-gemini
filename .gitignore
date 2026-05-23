@@ -158,12 +158,19 @@ coverage/
 !rules/**
 !examples/
 !examples/**
-!memory/
-!memory/**
 !manifests/
 !manifests/**
 !schemas/
 !schemas/**
+
+# =========================================================
+# MEMORY GOVERNANCE: PUBLIC TEMPLATES VS PRIVATE STATE
+# Blocks personal cognition while tracking structural assets
+# =========================================================
+memory/**
+!memory/
+!memory/**/*.template.md
+!memory/**/*.template.json
 
 # =========================================================
 # KEEP: ROOT CONFIGURATION & MANIFESTS
