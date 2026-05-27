@@ -36,7 +36,7 @@ Available skills:
 - verification-loop — Build, test, lint, typecheck, security
 - deep-research — Multi-source research with firecrawl and exa MCPs
 - exa-search — Neural search via Exa MCP for web, code, and companies
-- egc-api — Anthropic Gemini API patterns and SDKs
+- egc-api — Gemini Code API patterns and SDKs
 - x-api — X/Twitter API integration for posting, threads, and analytics
 - crosspost — Multi-platform content distribution
 - fal-ai-media — AI image/video/audio generation via fal.ai
