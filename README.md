@@ -5,7 +5,7 @@
 [![Stars](https://img.shields.io/github/stars/Fmarzochi/everything-gemini?style=social)](https://github.com/Fmarzochi/everything-gemini/stargazers) [![Forks](https://img.shields.io/github/forks/Fmarzochi/everything-gemini?style=social)](https://github.com/Fmarzochi/everything-gemini/network/members) [![Issues](https://img.shields.io/github/issues/Fmarzochi/everything-gemini)](https://github.com/Fmarzochi/everything-gemini/issues) [![Node.js >= 18](https://img.shields.io/badge/node-%3E%3D18-brightgreen?logo=node.js&logoColor=white)](https://nodejs.org) [![TypeScript](https://img.shields.io/badge/TypeScript-5.3-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org) [![SQLite](https://img.shields.io/badge/SQLite-WAL-003B57?logo=sqlite&logoColor=white)](https://sqlite.org) [![Zod](https://img.shields.io/badge/Zod-validation-3E67B1)](https://zod.dev) [![Bash](https://img.shields.io/badge/Bash-installer-4EAA25?logo=gnubash&logoColor=white)](https://www.gnu.org/software/bash) [![Markdown](https://img.shields.io/badge/Markdown-228%20skills-000000?logo=markdown&logoColor=white)](skills/) [![MCP](https://img.shields.io/badge/MCP-2%20servers-orange)](https://modelcontextprotocol.io) [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
 <p align="center">
-  <img src="assets/hero.png" alt="EGC — Everything Gemini Code" width="100%" />
+  <img src="assets/hero (Cópia).png" alt="EGC — Everything Gemini Code" width="100%" />
 </p>
 
 ---
