@@ -2,7 +2,7 @@
 
 <div align="center">
 
-# EGC — Everything Gemini Code
+# EGC - Everything Gemini Code
 
 **Your AI remembers what you decided, how you work, and where you left off. Across every session. Across every tool.**
 

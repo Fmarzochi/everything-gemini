@@ -209,7 +209,6 @@ memory/**
 # GENERATED LOCAL CONFIGS — contain absolute paths
 # =========================================================
 .mcp.egc.json
-.mcp.json
 
 # =========================================================
 # SYNTHETIC ARTIFACTS — not real data
