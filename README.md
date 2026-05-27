@@ -192,3 +192,9 @@ The branch `legacy-runtime` preserves the full historical architecture for anyon
 ---
 
 ## License [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+
+---
+
+<p align="center">
+  <img src="assets/images/egc-logo.png" alt="EGC Logo" width="80" />
+</p>
