@@ -290,7 +290,7 @@ function buildSummarySection(summary) {
   // Tasks (from user messages — collapse newlines and escape backticks to prevent markdown breaks)
   section += '### Tasks\n';
   for (const msg of summary.userMessages) {
-    section += `- ${msg.replace(/\n/g, ' ').replace(/`/g, '\\`')}\n`;
+    section += `- ${msg.replace(/\\/g, '\\\\').replace(/\n/g, ' ').replace(/`/g, '\\`')}\n`;
   }
   section += '\n';
 
