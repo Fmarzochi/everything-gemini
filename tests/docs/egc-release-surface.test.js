@@ -107,7 +107,7 @@ test('business launch copy stays aligned with the rc.1 public surface', () => {
   const source = read('docs/business/social-launch-copy.md');
   assert.ok(source.includes('EGC v2.0.0-rc.1'), 'business launch copy should use the rc.1 release');
   assert.ok(
-    source.includes('https://github.com/Fmarzochi/everything-gemini'),
+    /https:\/\/github\.com\/Fmarzochi\/everything-gemini\b/.test(source),
     'business launch copy should include the public repo URL'
   );
   assert.ok(

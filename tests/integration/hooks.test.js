@@ -165,11 +165,13 @@ function runHookCommand(command, input = {}, env = {}, timeoutMs = 10000) {
       String(value || '').matchAll(/"([^"]*)"|(\S+)/g),
       m => m[1] !== undefined ? m[1] : m[2]
     );
-    const unescapeInlineJs = value => value
-      .replace(/\\\\/g, '\\')
-      .replace(/\\"/g, '"')
-      .replace(/\\n/g, '\n')
-      .replace(/\\t/g, '\t');
+    const unescapeInlineJs = value => value.replace(/\\(.)/g, (match, char) => {
+      if (char === 'n') return '\n';
+      if (char === 't') return '\t';
+      if (char === '\\') return '\\';
+      if (char === '"') return '"';
+      return char;
+    });
     const nodeArgs = inlineNodeMatch
       ? ['-e', unescapeInlineJs(inlineNodeMatch[1]), ...splitArgs(inlineNodeMatch[2])]
       : fileNodeMatch
@@ -664,7 +666,7 @@ async function runTests() {
     });
 
     assert.ok(
-      result.stderr.includes('PR created') || result.stderr.includes('github.com'),
+      result.stderr.includes('PR created') || /github\.com\b/.test(result.stderr),
       'Should extract and log PR URL'
     );
   })) passed++; else failed++;

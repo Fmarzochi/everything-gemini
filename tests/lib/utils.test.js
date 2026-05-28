@@ -292,7 +292,7 @@ function runTests() {
 
     const utilsPath = path.join(__dirname, '..', '..', 'scripts', 'lib', 'utils.js');
     const script = `
-      const utils = require('${utilsPath.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}');
+      const utils = require(${JSON.stringify(utilsPath)});
       process.stdout.write(utils.getSessionIdShort('my.fallback'));
     `;
     const result = spawnSync('node', ['-e', script], {
@@ -1439,7 +1439,7 @@ function runTests() {
     // So getSessionIdShort('my-custom-fallback') = null || 'my-custom-fallback'.
     const utilsPath = path.join(__dirname, '..', '..', 'scripts', 'lib', 'utils.js');
     const script = `
-      const utils = require('${utilsPath.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}');
+      const utils = require(${JSON.stringify(utilsPath)});
       process.stdout.write(utils.getSessionIdShort('my-custom-fallback'));
     `;
     const { spawnSync } = require('child_process');
@@ -1571,7 +1571,7 @@ function runTests() {
 
     const utilsPath = path.join(__dirname, '..', '..', 'scripts', 'lib', 'utils.js');
     const script = `
-      const utils = require('${utilsPath.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}');
+      const utils = require(${JSON.stringify(utilsPath)});
       process.stdout.write(utils.getSessionIdShort('fallback'));
     `;
     const result = spawnSync('node', ['-e', script], {

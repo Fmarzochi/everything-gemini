@@ -125,7 +125,7 @@ if (test('stderr contains PR URL when gh pr create output has PR URL', () => {
   });
   const result = runScript(prCreatedScript, input);
   assert.strictEqual(result.status, 0, 'Should exit with code 0');
-  assert.ok(result.stderr.includes('https://github.com/owner/repo/pull/42'), `stderr should contain PR URL, got: ${result.stderr}`);
+  assert.ok(/https:\/\/github\.com\/owner\/repo\/pull\/42\b/.test(result.stderr), `stderr should contain PR URL, got: ${result.stderr}`);
   assert.ok(result.stderr.includes('[Hook] PR created:'), 'stderr should contain PR created message');
   assert.ok(result.stderr.includes('gh pr review 42'), 'stderr should contain review command');
 })) passed++; else failed++;

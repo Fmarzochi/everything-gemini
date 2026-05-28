@@ -335,7 +335,10 @@ def test_ollama_provider_uses_configured_base_url():
     with patch("urllib.request.urlopen", _fake_urlopen):
         out = provider.generate(_basic_input(model="llama3.2"))
 
-    assert captured["url"].startswith("http://example.invalid:9999")
+    from urllib.parse import urlparse
+    parsed = urlparse(captured["url"])
+    assert parsed.scheme == "http"
+    assert parsed.netloc == "example.invalid:9999"
     assert out.content == "hi from ollama"
     assert out.stop_reason == "stop"
     assert out.model == "llama3.2"
