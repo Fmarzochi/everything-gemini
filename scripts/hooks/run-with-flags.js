@@ -105,7 +105,8 @@ async function main() {
   const scriptPath = path.resolve(pluginRoot, relScriptPath);
 
   // Prevent path traversal outside the plugin root
-  if (!scriptPath.startsWith(resolvedRoot + path.sep)) {
+  const relPath = path.relative(resolvedRoot, scriptPath);
+  if (!relPath || relPath.startsWith('..') || path.isAbsolute(relPath)) {
     process.stderr.write(`[Hook] Path traversal rejected for ${hookId}: ${scriptPath}\n`);
     process.stdout.write(raw);
     process.exit(0);
