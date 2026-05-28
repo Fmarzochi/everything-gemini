@@ -130,7 +130,7 @@ if ($isInteractive -and -not $DryRun) {
                 Write-Host "  installing to Kiro..."
                 bash (Join-Path $RootDir (Join-Path ".kiro" "install.sh")) ~
             } else {
-                Write-Host "  note: Kiro detected but bash not available — run manually: bash .kiro/install.sh ~" -ForegroundColor Yellow
+                Write-Host "  note: Kiro detected but bash not available - run manually: bash .kiro/install.sh ~" -ForegroundColor Yellow
             }
         }
         if ((Get-Command trae -ErrorAction SilentlyContinue) -or (Test-Path (Join-Path $env:USERPROFILE ".trae")) -or (Test-Path (Join-Path $env:USERPROFILE ".trae-cn"))) {
@@ -138,7 +138,7 @@ if ($isInteractive -and -not $DryRun) {
                 Write-Host "  installing to Trae..."
                 bash (Join-Path $RootDir (Join-Path ".trae" "install.sh")) ~
             } else {
-                Write-Host "  note: Trae detected but bash not available — run manually: bash .trae/install.sh ~" -ForegroundColor Yellow
+                Write-Host "  note: Trae detected but bash not available - run manually: bash .trae/install.sh ~" -ForegroundColor Yellow
             }
         }
         if ((Get-Command codebuddy -ErrorAction SilentlyContinue) -or (Test-Path (Join-Path $env:USERPROFILE ".codebuddy"))) {
@@ -146,7 +146,7 @@ if ($isInteractive -and -not $DryRun) {
                 Write-Host "  installing to CodeBuddy..."
                 bash (Join-Path $RootDir (Join-Path ".codebuddy" "install.sh")) ~
             } else {
-                Write-Host "  note: CodeBuddy detected but bash not available — run manually: bash .codebuddy/install.sh ~" -ForegroundColor Yellow
+                Write-Host "  note: CodeBuddy detected but bash not available - run manually: bash .codebuddy/install.sh ~" -ForegroundColor Yellow
             }
         }
     }
@@ -186,7 +186,7 @@ if (-not $DryRun) {
         Register-McpJson -Target $claudeConfig -Label "Claude Code"
     }
 
-    # Claude Code — project .mcp.json (if present)
+    # Claude Code - project .mcp.json (if present)
     $projectMcp = Join-Path $RootDir ".mcp.json"
     if (Test-Path $projectMcp) {
         Register-McpJson -Target $projectMcp -Label "Claude Code (project .mcp.json)"
@@ -224,7 +224,7 @@ if (-not $DryRun) {
         Register-McpJson -Target $geminiConfig -Label "Gemini CLI"
     }
 
-    # Codex CLI (TOML — delegated to Node)
+    # Codex CLI (TOML - delegated to Node)
     $codexToml = Join-Path (Join-Path $env:USERPROFILE ".codex") "config.toml"
     if ((Get-Command codex -ErrorAction SilentlyContinue) -or (Test-Path $codexToml)) {
         $tmpCodexJs = Join-Path $env:TEMP ("egc_codex_" + [System.Guid]::NewGuid().ToString("N") + ".js")
