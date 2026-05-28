@@ -78,6 +78,8 @@ if (-not $DryRun) {
     Write-Host "  initializing database..."
     Set-Location -Path $RootDir
     node $BootstrapDb
+    Write-Host "  bootstrapping cognitive protocol..."
+    node (Join-Path $RootDir (Join-Path "scripts" "bootstrap-cognitive.js"))
 
     # Write harness config
     Set-Location -Path $RootDir
@@ -104,6 +106,15 @@ foreach ($arg in $args) {
 }
 if ($hasInstallArgs) {
     node $EgcInstall @args
+}
+
+# Interactive ecosystem install (skipped in headless/CI)
+$isInteractive = [Environment]::UserInteractive -and -not $env:CI
+if ($isInteractive -and -not $DryRun) {
+    $ans = Read-Host "`n  Install prompt library? (62 agents, 228 skills, 74 commands) [Y/n]"
+    if ($ans -eq '' -or $ans -eq 'Y' -or $ans -eq 'y') {
+        node $EgcInstall --target egc
+    }
 }
 
 if (-not $DryRun) {

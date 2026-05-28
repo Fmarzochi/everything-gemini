@@ -76,6 +76,8 @@ if [ "$DRY_RUN" = false ]; then
   echo "  initializing database..."
   cd "$ROOT_DIR"
   node scripts/bootstrap-state-db.js
+  echo "  bootstrapping cognitive protocol..."
+  node "$ROOT_DIR/scripts/bootstrap-cognitive.js"
 fi
 
 # Delegate to Node installer only when install-relevant args are present
@@ -126,6 +128,16 @@ echo "  ✓ egc-memory build verified"
 
 # Final validation
 node scripts/egc.js doctor
+
+# Interactive ecosystem install (skipped in CI/headless environments)
+if [ -t 0 ] && [ "$DRY_RUN" = false ]; then
+  printf "\n  Install prompt library? (62 agents, 228 skills, 74 commands) [Y/n] "
+  read -r _install_ans
+  _install_ans="${_install_ans:-Y}"
+  if [ "$_install_ans" = "Y" ] || [ "$_install_ans" = "y" ]; then
+    node "$ROOT_DIR/scripts/install-apply.js" --target egc
+  fi
+fi
 
 # ── MCP auto-registration ─────────────────────────────────────────────────────
 
