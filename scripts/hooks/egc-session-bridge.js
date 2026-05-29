@@ -8,6 +8,7 @@ const path = require('path');
 
 const HOOK_ID = 'egc-session-bridge';
 const DEFAULT_TIMEOUT_MS = 5000;
+const SAFE_PYTHON_BASENAMES = new Set(['python3', 'python3.exe', 'python', 'python.exe']);
 
 function readStdin() {
   try {
@@ -31,7 +32,7 @@ function resolvePluginRoot() {
 
 function resolvePythonBin(pluginRoot) {
   const fromEnv = process.env.EGC_PYTHON_BIN;
-  if (fromEnv && fs.existsSync(fromEnv)) return fromEnv;
+  if (fromEnv && fromEnv.trim() && SAFE_PYTHON_BASENAMES.has(path.basename(fromEnv.trim()).toLowerCase()) && fs.existsSync(fromEnv.trim())) return fromEnv.trim();
   const venvBin = os.platform() === 'win32'
     ? path.join(pluginRoot, '.venv', 'Scripts', 'python.exe')
     : path.join(pluginRoot, '.venv', 'bin', 'python3');
