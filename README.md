@@ -16,7 +16,7 @@
 
 ## This is what EGC looks like in practice
 
-You open AGY on a project you haven't touched in two weeks. Without typing anything:
+You open Claude Code on a project you haven't touched in two weeks. Without typing anything:
 
 ```
 State loaded from egc-memory via ~/.egc/state/Projetos--everything-gemini.md
@@ -32,7 +32,7 @@ Ready to pick up the next items:
 
 The AI already knows what you were building, what decisions you made, what failed, and exactly where you stopped. You didn't type anything. You just started working.
 
-After `sh install.sh`, the memory protocol is injected into the global instruction files for Claude Code, AGY/Gemini CLI, Cursor, Codex, OpenCode, Kiro, Trae, and CodeBuddy — so the AI reads state at the start of each session and saves it at the end. For tools where the AI instruction file isn't read automatically (varies by tool version), you may need to add the project's `CLAUDE.md` or equivalent to the session context manually.
+After `sh install.sh`, the memory protocol is injected into the global instruction files for Claude Code, Cursor, Codex, Gemini CLI, OpenCode, Kiro, Trae, and CodeBuddy — so the AI reads state at the start of each session and saves it at the end. For tools where the AI instruction file isn't read automatically (varies by tool version), you may need to add the project's `CLAUDE.md` or equivalent to the session context manually.
 
 ---
 
@@ -48,7 +48,7 @@ It gets worse when you switch tools. Move from Cursor to Claude Code and you sta
 
 One install. Every tool. Permanent memory.
 
-`sh install.sh` detects which AI tools you have installed — Claude Code, AGY, Cursor, Kiro, Codex, OpenCode, Trae, CodeBuddy — and registers the MCP servers in all of them. It also runs a cognitive bootstrap that writes the memory protocol into the global instruction files for each tool, so the AI is instructed to call `get_state({})` at the start of every session and `update_state({...})` at the end.
+`sh install.sh` detects which AI tools you have installed — Claude Code, Cursor, Codex, Gemini CLI, Kiro, OpenCode, Trae, CodeBuddy — and registers the MCP servers in all of them. It also runs a cognitive bootstrap that writes the memory protocol into the global instruction files for each tool, so the AI is instructed to call `get_state({})` at the start of every session and `update_state({...})` at the end.
 
 For every supported tool:
 - **Open any session** → AI reads your project state → picks up where you left off
