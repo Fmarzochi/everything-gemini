@@ -15,6 +15,10 @@ from scripts.scenario_generator import Scenario
 
 SANDBOX_BASE = Path("/tmp/skill-comply-sandbox")
 ALLOWED_MODELS = frozenset({"haiku", "sonnet", "gemini-2.5-pro"})
+ALLOWED_SETUP_BINS = frozenset({
+    "mkdir", "touch", "cp", "mv", "echo", "cat", "ls",
+    "git", "python", "python3", "pip", "pip3",
+})
 
 
 @dataclass(frozen=True)
@@ -85,6 +89,8 @@ def _setup_sandbox(sandbox_dir: Path, scenario: Scenario) -> None:
 
     for cmd in scenario.setup_commands:
         parts = shlex.split(cmd)
+        if not parts or parts[0] not in ALLOWED_SETUP_BINS:
+            raise ValueError(f"setup_command binary not allowed: {parts[0] if parts else '(empty)'!r}")
         subprocess.run(parts, cwd=sandbox_dir, capture_output=True)
 
 
