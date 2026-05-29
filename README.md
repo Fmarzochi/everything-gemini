@@ -1,4 +1,4 @@
-[![version](https://img.shields.io/github/package-json/v/Fmarzochi/everything-gemini?color=cb3837&logo=npm&logoColor=white)](https://github.com/Fmarzochi/everything-gemini) [![Node.js >= 18](https://img.shields.io/badge/node-%3E%3D18-brightgreen)](https://nodejs.org)
+[![version](https://img.shields.io/github/package-json/v/Fmarzochi/everything-gemini?color=cb3837&logo=npm&logoColor=white)](https://github.com/Fmarzochi/everything-gemini) [![Node.js >= 18](https://img.shields.io/badge/node-%3E%3D18-brightgreen?logo=node.js&logoColor=white)](https://nodejs.org) [![TypeScript](https://img.shields.io/badge/TypeScript-5.3-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)](CONTRIBUTING.md) [![Stars](https://img.shields.io/github/stars/Fmarzochi/everything-gemini)](https://github.com/Fmarzochi/everything-gemini/stargazers) [![Forks](https://img.shields.io/github/forks/Fmarzochi/everything-gemini)](https://github.com/Fmarzochi/everything-gemini/network/members) [![Issues](https://img.shields.io/github/issues/Fmarzochi/everything-gemini)](https://github.com/Fmarzochi/everything-gemini/issues) [![Maintained](https://img.shields.io/badge/Maintained-yes-brightgreen)](https://github.com/Fmarzochi/everything-gemini/commits/main) [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/Fmarzochi/everything-gemini/badge)](https://securityscorecards.dev/viewer/?uri=github.com/Fmarzochi/everything-gemini)
 
 <div align="center">
 
@@ -32,13 +32,13 @@ Ready to pick up the next items:
 
 The AI already knows what you were building, what decisions you made, what failed, and exactly where you stopped. You didn't type anything. You just started working.
 
-After `sh install.sh`, the memory protocol is injected into the global instruction files for Claude Code, AGY/Gemini CLI, Cursor, Codex, OpenCode, Kiro, Trae, and CodeBuddy — so the AI reads state at the start of every session and saves decisions at the end.
+After `sh install.sh`, the memory protocol is injected into the global instruction files for Claude Code, AGY/Gemini CLI, Cursor, Codex, OpenCode, Kiro, Trae, and CodeBuddy — so the AI reads state at the start of each session and saves it at the end. For tools where the AI instruction file isn't read automatically (varies by tool version), you may need to add the project's `CLAUDE.md` or equivalent to the session context manually.
 
 ---
 
 ## The problem
 
-Every AI coding session starts from zero. Close the window and the context is gone — your stack preferences, the architectural decisions you made last week, the approach that failed after three hours.
+Every AI coding session starts from zero. Close the window and the context is gone — your stack preferences, the architectural decisions you made last week, the approach that failed after three attempts. Next session you spend the first ten minutes re-explaining ground you already covered.
 
 It gets worse when you switch tools. Move from Cursor to Claude Code and you start over again. The AI doesn't know you. It never did.
 
@@ -48,7 +48,7 @@ It gets worse when you switch tools. Move from Cursor to Claude Code and you sta
 
 One install. Every tool. Permanent memory.
 
-`sh install.sh` detects which AI tools you have installed — Claude Code, AGY, Cursor, Kiro, Codex, OpenCode, Trae, CodeBuddy — and registers the MCP servers in all of them. It also runs a cognitive bootstrap that writes the memory protocol into each tool's instruction files.
+`sh install.sh` detects which AI tools you have installed — Claude Code, AGY, Cursor, Kiro, Codex, OpenCode, Trae, CodeBuddy — and registers the MCP servers in all of them. It also runs a cognitive bootstrap that writes the memory protocol into the global instruction files for each tool, so the AI is instructed to call `get_state({})` at the start of every session and `update_state({...})` at the end.
 
 For every supported tool:
 - **Open any session** → AI reads your project state → picks up where you left off
@@ -129,7 +129,7 @@ cd everything-gemini
 
 ## Prompt library
 
-The prompt library is optional. During `sh install.sh`, you'll be asked whether to install it. In CI or non-interactive shells, this step is skipped. Install once to get access to 62 agents, 228 skills, 74 commands, and 111 rules.
+The prompt library is optional. During `sh install.sh`, you'll be asked whether to install it. In CI or non-interactive shells, this step is skipped. Install once to get access to 62 agents, 228 skills, and 74 commands — written from real experience, not generated.
 
 | Type | Count | What it is |
 |---|---|---|
@@ -165,7 +165,7 @@ Organized per harness under `.cursor/`, `.claude/`, `.gemini/`, `.kiro/`, and fo
 | CodeBuddy | Context injection | Yes — protocol written to `~/.codebuddy/MEMORY.md` |
 | Obsidian | Yes — if already configured, synced to all tools | N/A |
 
-If you use Obsidian and have the [Obsidian MCP server](https://github.com/MarkusPfundstein/mcp-obsidian) configured, the installer detects it automatically and gives every AI tool in your setup direct read-only access to your vault.
+If you use Obsidian and have the [Obsidian MCP server](https://github.com/MarkusPfundstein/mcp-obsidian) configured, the installer detects it automatically and gives every AI tool in your setup direct access to your vault — read notes, search, write — without any extra configuration.
 
 ---
 
@@ -208,7 +208,7 @@ egc auto-update    # pull latest changes and reinstall managed targets
 
 ## Architectural consolidation
 
-Earlier versions of EGC explored distributed runtime concepts — FederationManager, ReplayEngine, cognitive orchestration layers, multi-provider dispatching. Those experiments were real explorations. They taught us what not to build.
+Earlier versions of EGC explored distributed runtime concepts — FederationManager, ReplayEngine, cognitive orchestration layers, multi-provider dispatching. Those experiments were real explorations, not deception. They helped define what the project actually needed to be.
 
 What the project actually needed was simpler and more useful: persistent memory across sessions, a validation layer, and a prompt library that works in every tool without reconfiguration.
 
