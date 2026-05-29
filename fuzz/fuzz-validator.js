@@ -3,18 +3,15 @@
 let validateCommand;
 let validateWrite;
 let isProtectedPath;
-let ready = false;
 
-module.exports.setup = async function () {
-  const mod = await import('../mcp/servers/egc-guardian/build/validator.js');
+const ready = import('../mcp/servers/egc-guardian/build/validator.js').then((mod) => {
   validateCommand = mod.validateCommand;
   validateWrite = mod.validateWrite;
   isProtectedPath = mod.isProtectedPath;
-  ready = true;
-};
+});
 
-module.exports.fuzz = function (data) {
-  if (!ready) return;
+module.exports.fuzz = async function (data) {
+  await ready;
 
   const input = data.toString('utf-8');
 
