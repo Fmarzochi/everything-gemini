@@ -5,6 +5,8 @@ const fs = require('fs');
 const path = require('path');
 const { spawnSync } = require('child_process');
 
+const SAFE_SHELL_BASENAMES = new Set(['bash', 'bash.exe', 'sh', 'sh.exe']);
+
 function readStdinRaw() {
   try {
     return fs.readFileSync(0, 'utf8');
@@ -46,7 +48,10 @@ function resolveTarget(rootDir, relPath) {
 function findShellBinary() {
   const candidates = [];
   if (process.env.BASH && process.env.BASH.trim()) {
-    candidates.push(process.env.BASH.trim());
+    const trimmed = process.env.BASH.trim();
+    if (SAFE_SHELL_BASENAMES.has(path.basename(trimmed).toLowerCase())) {
+      candidates.push(trimmed);
+    }
   }
 
   if (process.platform === 'win32') {
